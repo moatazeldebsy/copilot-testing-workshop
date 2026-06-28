@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Product {
   productId: string;
@@ -43,6 +43,7 @@ const PRODUCTS: Product[] = [
 const emptyCart = (userId: string): Cart => ({ userId, items: [], subtotal: 0 });
 
 const StorePage: React.FC<StorePageProps> = ({ userId, userEmail, token, onLogout }) => {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [cart, setCart] = useState<Cart>(emptyCart(userId));
   const [step, setStep] = useState<CheckoutStep>('cart');
   const [promoCode, setPromoCode] = useState('');
@@ -53,6 +54,12 @@ const StorePage: React.FC<StorePageProps> = ({ userId, userEmail, token, onLogou
   const [error, setError] = useState('');
   const [promoError, setPromoError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
 
   const authHeaders = {
     'Content-Type': 'application/json',
@@ -192,6 +199,9 @@ const StorePage: React.FC<StorePageProps> = ({ userId, userEmail, token, onLogou
           </div>
           <nav className="app-header__nav">
             <span className="app-header__user">{userEmail}</span>
+            <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
             <button className="btn btn--ghost btn--sm" type="button" onClick={onLogout}>Sign out</button>
           </nav>
         </header>

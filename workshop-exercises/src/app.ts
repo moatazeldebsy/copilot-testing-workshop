@@ -84,57 +84,10 @@ app.get('/docs', (_request, response) => {
   <title>Workshop Checkout API — Swagger UI</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
   <style>
-    /* ── Base ── */
-    body, .swagger-ui { background: #0d1117; color: #c9d1d9; }
-
-    /* ── Top bar ── */
-    .swagger-ui .topbar { background: #161b22; border-bottom: 1px solid #30363d; }
-    .swagger-ui .topbar a { color: #a78bfa; }
-
-    /* ── Info block ── */
-    .swagger-ui .info .title { color: #a78bfa; }
-    .swagger-ui .info p,
-    .swagger-ui .info li,
-    .swagger-ui .info a { color: #c9d1d9; }
-
-    /* ── Servers / scheme container (the white band) ── */
-    .swagger-ui .scheme-container { background: #161b22; box-shadow: none; border-bottom: 1px solid #30363d; padding: 16px 0; }
-    .swagger-ui .servers label,
-    .swagger-ui .servers select,
-    .swagger-ui select { background: #0d1117; color: #c9d1d9; border-color: #30363d; }
-
-    /* ── Section headings ── */
-    .swagger-ui .opblock-tag { color: #c9d1d9; border-bottom-color: #30363d; }
-    .swagger-ui .opblock-tag:hover { background: #161b22; }
-
-    /* ── Operation blocks ── */
-    .swagger-ui .opblock { background: #161b22; border-color: #30363d; }
-    .swagger-ui .opblock .opblock-summary { background: transparent; }
-    .swagger-ui .opblock .opblock-summary-description { color: #8b949e; }
-    .swagger-ui .opblock.opblock-post { background: #161b22; border-color: #238636; }
-    .swagger-ui .opblock.opblock-get  { background: #161b22; border-color: #1f6feb; }
-    .swagger-ui .opblock.opblock-delete { background: #161b22; border-color: #da3633; }
-
-    /* ── Expanded body ── */
-    .swagger-ui .opblock-body,
-    .swagger-ui .opblock-description-wrapper { background: #0d1117; color: #c9d1d9; }
-    .swagger-ui textarea,
-    .swagger-ui input[type=text],
-    .swagger-ui input[type=email],
-    .swagger-ui input[type=password] { background: #161b22; color: #c9d1d9; border-color: #30363d; }
-
-    /* ── Tables ── */
-    .swagger-ui table thead tr td,
-    .swagger-ui table thead tr th { color: #8b949e; border-color: #30363d; }
-    .swagger-ui .response-col_status { color: #a78bfa; }
-    .swagger-ui .model-box,
-    .swagger-ui section.models { background: #161b22; border-color: #30363d; }
-    .swagger-ui .model { color: #c9d1d9; }
-    .swagger-ui .prop-type { color: #79c0ff; }
-
-    /* ── Authorize button ── */
-    .swagger-ui .btn.authorize { color: #a78bfa; border-color: #a78bfa; background: transparent; }
-    .swagger-ui .btn.authorize svg { fill: #a78bfa; }
+    body { margin: 0; }
+    .swagger-ui .topbar { background: #7c3aed; }
+    .swagger-ui .topbar a span { color: #fff; }
+    .swagger-ui .info .title { color: #7c3aed; }
   </style>
 </head>
 <body>
