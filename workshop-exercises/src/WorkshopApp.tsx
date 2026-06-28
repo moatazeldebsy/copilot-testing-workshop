@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RegistrationForm } from './components/RegistrationForm';
 import LoginPage from './ui/pages/LoginPage';
 import StorePage from './ui/pages/StorePage';
@@ -19,11 +19,33 @@ function getStoredToken(): string {
 }
 
 const WorkshopApp: React.FC = () => {
-  const [route, setRoute] = useState(window.location.pathname || '/login');
+  const [route, setRoute] = useState(window.location.pathname || '/store');
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState(getStoredToken);
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [submissions, setSubmissions] = useState<string[]>([]);
+  const [autoLogging, setAutoLogging] = useState(!getStoredToken());
+
+  // Auto-login with workshop credentials so the store works on first load
+  useEffect(() => {
+    if (token) {
+      setAutoLogging(false);
+      return;
+    }
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'alice@example.com', password: 'workshop-password' }),
+    })
+      .then((r) => r.json() as Promise<{ data: { token: string; user: SessionUser } }>)
+      .then(({ data }) => {
+        persistToken(data.token);
+        setSessionUser(data.user);
+      })
+      .catch(() => { /* backend not ready yet — user can log in manually */ })
+      .finally(() => { setAutoLogging(false); });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const navigate = (nextRoute: string) => {
     window.history.pushState({}, '', nextRoute);
@@ -92,22 +114,18 @@ const WorkshopApp: React.FC = () => {
     navigate('/login');
   };
 
-  const requireAuth = (renderFn: () => React.ReactElement) => {
-    if (!token || !sessionUser) {
-      return <LoginPage onLogin={handleLogin} onNavigateRegister={() => navigate('/register')} />;
+  if (route === '/store' || route === '/') {
+    if (autoLogging) {
+      return <div className="screen-shell" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading…</div>;
     }
-    return renderFn();
-  };
-
-  if (route === '/store') {
-    return requireAuth(() => (
+    return (
       <StorePage
-        userId={sessionUser!.id}
-        userEmail={sessionUser!.email}
+        userId={sessionUser?.id ?? ''}
+        userEmail={sessionUser?.email ?? ''}
         token={token}
         onLogout={handleLogout}
       />
-    ));
+    );
   }
 
   if (route === '/register') {
@@ -130,7 +148,22 @@ const WorkshopApp: React.FC = () => {
     );
   }
 
-  return <LoginPage onLogin={handleLogin} onNavigateRegister={() => navigate('/register')} />;
+  if (route === '/login') {
+    return <LoginPage onLogin={handleLogin} onNavigateRegister={() => navigate('/register')} />;
+  }
+
+  // Unknown route → go to store
+  if (autoLogging) {
+    return <div className="screen-shell" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading…</div>;
+  }
+  return (
+    <StorePage
+      userId={sessionUser?.id ?? ''}
+      userEmail={sessionUser?.email ?? ''}
+      token={token}
+      onLogout={handleLogout}
+    />
+  );
 };
 
 export default WorkshopApp;
