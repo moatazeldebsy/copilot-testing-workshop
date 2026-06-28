@@ -29,7 +29,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onNavigateRegister }) =>
       <div className="card">
         <div>
           <h1 className="card__title">Sign in</h1>
-          <p className="card__subtitle">Workshop Store — testing exercise</p>
+          <p className="card__subtitle">GenAI in Testing — WeAreDevelopers 2026</p>
         </div>
 
         <form onSubmit={(e) => void handleSubmit(e)} className="form-row">

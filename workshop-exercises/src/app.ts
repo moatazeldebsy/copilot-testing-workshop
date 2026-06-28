@@ -65,6 +65,29 @@ export const app = express();
 
 app.use(express.json());
 
+app.get('/', (_request, response) => {
+  response.status(200).json({
+    name: 'Workshop Checkout API',
+    description: 'System under test for the GenAI in Testing workshop',
+    ui: 'http://localhost:3006',
+    endpoints: {
+      health:        'GET  /api/health',
+      register:      'POST /api/auth/register',
+      login:         'POST /api/auth/login',
+      cart:          'GET  /api/cart/:userId',
+      addItem:       'POST /api/cart/:userId/items',
+      removeItem:    'DELETE /api/cart/:userId/items/:itemId',
+      validatePromo: 'POST /api/discount/validate',
+      applyPromo:    'POST /api/discount/apply',
+      fraudCheck:    'POST /api/fraud/check',
+      charge:        'POST /api/payment/charge',
+      capture:       'POST /api/payment/:id/capture',
+      refund:        'POST /api/payment/:id/refund',
+      receipt:       'POST /api/notifications/receipt',
+    },
+  });
+});
+
 app.get('/api/health', (_request, response) => {
   response.status(200).json({
     data: {
