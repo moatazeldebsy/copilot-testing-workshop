@@ -1,3 +1,11 @@
+/**
+ * BONUS — DiscountService unit tests (not a timed exercise)
+ *
+ * The discount pure function is covered in Exercise A (calculateDiscount.test.ts).
+ * The discount API endpoint is covered in Exercise C (checkout.test.ts).
+ * Use this file if you finish early or want to compare service vs pure-function testing.
+ */
+
 import { DiscountRepository } from '../../src/repositories/discountRepository';
 import { DiscountService } from '../../src/services/discountService';
 

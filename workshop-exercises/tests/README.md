@@ -6,22 +6,26 @@ The workshop starts with incomplete stubs — that's intentional. You fill them 
 
 | Folder | Exercise | What to build |
 |---|---|---|
-| `unit/` | A & B | Unit tests for `calculateDiscount` and the pipeline services |
-| `api/` | C | Supertest API tests for the checkout pipeline |
+| `unit/` | A & B | Unit tests for `calculateDiscount` (core); bonus stubs for other services |
+| `api/` | C | Supertest API tests for the full checkout pipeline |
 | `components/` | D | React Testing Library tests for `StorePage` |
-| `e2e/` | D | Playwright end-to-end checkout scenarios |
+| `e2e/` | D | Playwright end-to-end checkout scenarios (live demo) |
 | `fixtures/` | Backup | Pre-generated examples if Copilot or Wi-Fi is unavailable |
 
 ## Starting Files
 
-### Exercise A & B — Unit tests
+### Exercise A & B — Unit tests (core)
 - `unit/calculateDiscount.weak.test.ts` — pre-seeded weak AI tests; **read before writing your own** (Exercise B)
 - `unit/calculateDiscount.test.ts` — does not exist yet; create it (Exercise A)
-- `unit/cartService.test.ts` — stubs, fill in
-- `unit/discountService.test.ts` — stubs, fill in
-- `unit/fraudService.test.ts` — stubs, fill in
-- `unit/paymentService.test.ts` — stubs, fill in
-- `unit/notificationService.test.ts` — stubs + a flaky test demo (do not fix the marked test)
+- `unit/notificationService.test.ts` — stubs + a deliberately flaky test demo (Exercise E; do not fix the marked test)
+
+### Bonus — Unit tests for pipeline services (if you finish early)
+These stubs cover the full pipeline at the unit level. They are **not** part of the timed exercises — the full pipeline is covered in Exercise C at the API level. Use these if you finish Exercise A/B early or want more Copilot practice after the session.
+
+- `unit/cartService.test.ts` — CartService: add, remove, merge, subtotal
+- `unit/discountService.test.ts` — DiscountService: validate, apply, expired, minimum order
+- `unit/fraudService.test.ts` — FraudService: risk scoring rules, country blocks
+- `unit/paymentService.test.ts` — PaymentService: charge, capture, refund, state machine
 
 ### Exercise C — API tests
 - `api/auth-and-users.test.ts` — already complete; use as reference

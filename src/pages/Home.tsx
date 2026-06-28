@@ -144,75 +144,45 @@ const Home: React.FC = () => {
         <div className="section-inner">
           <h2 className="section-title">Workshop Journey</h2>
           <p className="section-description">
-            Follow these 11 steps across four parts:
+            Five hands-on exercises across 120 minutes:
           </p>
           <div className="journey-grid">
             {[
               {
-                step: '1',
-                title: 'Environment Setup',
-                desc: 'Verify Copilot in VS Code, clone starter repo, first inline suggestion',
+                step: '⚙️',
+                title: 'Intro, Setup & Tour',
+                desc: 'Activate Copilot, clone the exercises repo, and tour the checkout pipeline (User → Cart → Discount → Fraud → Payment → Notification)',
                 path: '/workshop/setup',
               },
               {
-                step: '2',
-                title: 'Introduction to GitHub Copilot',
-                desc: 'Tokens, interaction modes, slash commands, MCP, skills, and customization files',
-                path: '/workshop/copilot-intro',
-              },
-              {
-                step: '3',
-                title: 'Copilot: The Big Picture',
-                desc: 'Where Copilot adds value, where it does not, and the trust model',
-                path: '/workshop/copilot-overview',
-              },
-              {
-                step: '4',
-                title: 'Unit Test Generation',
-                desc: 'Prompt patterns, generate → review → fix loop, spotting flaky tests',
+                step: 'A',
+                title: 'Unit Tests',
+                desc: 'Generate tests for calculateDiscount(); weak vs strong prompts; expose all 3 bugs',
                 path: '/workshop/unit-testing',
               },
               {
-                step: '5',
-                title: 'API & Integration Tests',
-                desc: 'REST API test scaffolding, reviewing generated assertions, edge cases',
-                path: '/workshop/api-integration',
-              },
-              {
-                step: '6',
-                title: 'Test Data & Mocks',
-                desc: 'Fixture factories, mock stubs, and safe test data generation',
-                path: '/workshop/test-data-mocks',
-              },
-              {
-                step: '7',
-                title: 'Reviewing Tests & Guardrails',
-                desc: 'Review checklists, validating AI output, security red flags',
+                step: 'B',
+                title: 'Review AI Tests',
+                desc: 'Read the weak test file, identify false confidence, rewrite with strong assertions',
                 path: '/workshop/reviewing-tests',
               },
               {
-                step: '8',
-                title: 'CI/CD & Team Adoption',
-                desc: 'Quality gates, security scanning, and team-wide onboarding',
-                path: '/workshop/cicd-adoption',
+                step: 'C',
+                title: 'API Tests',
+                desc: 'Supertest for the full checkout pipeline with domain-rules.md as Copilot context',
+                path: '/workshop/api-integration',
               },
               {
-                step: '9',
-                title: 'E2E Testing with Playwright',
-                desc: 'Page Object Model, locator strategies, fixtures, and CI integration',
-                path: '/workshop/e2e-playwright',
-              },
-              {
-                step: '10',
-                title: 'Component Testing with RTL',
-                desc: 'Accessible queries, user-event, mocking hooks and context providers',
+                step: 'D',
+                title: 'Component Tests',
+                desc: 'StorePage RTL tests hands-on; Playwright checkout flow shown as live demo',
                 path: '/workshop/component-testing',
               },
               {
-                step: '11',
-                title: 'Testing AI-Powered Features',
-                desc: 'Non-deterministic output, prompt injection, and agentic workflow testing',
-                path: '/workshop/ai-testing-patterns',
+                step: 'E',
+                title: 'CI Guardrails',
+                desc: 'Coverage gates, flaky test demo, copilot-instructions.md, context engineering',
+                path: '/workshop/cicd-adoption',
               },
             ].map((item) => (
               <Link to={item.path} key={item.step} className="journey-card">
@@ -244,74 +214,44 @@ const Home: React.FC = () => {
             <tbody>
               <tr>
                 <td>12:15</td>
-                <td>Welcome &amp; Setup</td>
-                <td>Introductions, prerequisites check, Copilot activation</td>
+                <td>Intro, Setup &amp; Tour</td>
+                <td>Introductions, prerequisites check, Copilot activation, pipeline walkthrough</td>
+                <td>15 min</td>
+              </tr>
+              <tr>
+                <td>12:30</td>
+                <td>Exercise A — Unit Tests</td>
+                <td>Generate tests for <code>calculateDiscount()</code>; discover that weak prompts produce weak tests</td>
+                <td>25 min</td>
+              </tr>
+              <tr>
+                <td>12:55</td>
+                <td>Exercise B — Review AI Tests</td>
+                <td>Read the weak test file; identify what passes but shouldn't; rewrite with strong assertions</td>
                 <td>10 min</td>
               </tr>
               <tr>
-                <td>12:25</td>
-                <td>Step 1 — Environment Setup</td>
-                <td>Verify Copilot, clone starter repo, first suggestion exercise</td>
-                <td>15 min</td>
-              </tr>
-              <tr>
-                <td>12:40</td>
-                <td>Step 2 — Introduction to GitHub Copilot</td>
-                <td>Tokens, modes, slash commands, MCP, skills, customization files</td>
-                <td>25 min</td>
-              </tr>
-              <tr>
                 <td>13:05</td>
-                <td>Step 3 — Copilot: The Big Picture</td>
-                <td>Value map, risk model, where human judgment is still required</td>
-                <td>20 min</td>
-              </tr>
-              <tr className="schedule-break">
-                <td>13:25</td>
-                <td>⚡ Part 2 begins</td>
-                <td></td>
-                <td></td>
+                <td>Exercise C — API Tests</td>
+                <td>Supertest for the full checkout pipeline; use domain-rules.md as Copilot context</td>
+                <td>25 min</td>
               </tr>
               <tr>
-                <td>13:25</td>
-                <td>Step 4 — Unit Test Generation</td>
-                <td>Prompt patterns, generate → review → fix loop, flaky test detection</td>
-                <td>25 min</td>
+                <td>13:30</td>
+                <td>Exercise D — Component Tests</td>
+                <td>StorePage RTL tests hands-on; Playwright shown as live demo / optional extra</td>
+                <td>20 min</td>
               </tr>
               <tr>
                 <td>13:50</td>
-                <td>Step 5 — API &amp; Integration Tests</td>
-                <td>REST test scaffolding, assertion review, integration coverage</td>
-                <td>20 min</td>
-              </tr>
-              <tr>
-                <td>14:10</td>
-                <td>Step 6 — Test Data &amp; Mocks</td>
-                <td>Fixture factories, stubs, avoiding hardcoded secrets</td>
-                <td>15 min</td>
+                <td>Exercise E — CI Guardrails</td>
+                <td>Coverage gates, flaky test demo, <code>.github/copilot-instructions.md</code>, context engineering</td>
+                <td>10 min</td>
               </tr>
               <tr className="schedule-break">
-                <td>14:25</td>
-                <td>🛡️ Part 3 begins</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>14:25</td>
-                <td>Step 7 — Reviewing Tests &amp; Guardrails</td>
-                <td>Review checklist, false confidence, security red flags, prompt templates</td>
-                <td>20 min</td>
-              </tr>
-              <tr>
-                <td>14:45</td>
-                <td>Step 8 — CI/CD &amp; Team Adoption</td>
-                <td>Quality gates, scanning, CODEOWNERS, team onboarding strategies</td>
-                <td>15 min</td>
-              </tr>
-              <tr className="schedule-break">
-                <td>15:00</td>
+                <td>14:00</td>
                 <td>🎤 Wrap-up &amp; Q&amp;A</td>
-                <td>Key takeaways, resources, open discussion</td>
+                <td>Trust Playbook walkthrough, one action to take back, open discussion</td>
                 <td>15 min</td>
               </tr>
             </tbody>
