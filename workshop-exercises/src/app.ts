@@ -1,5 +1,6 @@
 import express from 'express';
 import { ApiError } from './errors/apiError';
+import { openApiSpec } from './openapi';
 import { CartRepository } from './repositories/cartRepository';
 import { DiscountRepository } from './repositories/discountRepository';
 import { OrderRepository } from './repositories/orderRepository';
@@ -66,26 +67,45 @@ export const app = express();
 app.use(express.json());
 
 app.get('/', (_request, response) => {
-  response.status(200).json({
-    name: 'Workshop Checkout API',
-    description: 'System under test for the GenAI in Testing workshop',
-    ui: 'http://localhost:3006',
-    endpoints: {
-      health:        'GET  /api/health',
-      register:      'POST /api/auth/register',
-      login:         'POST /api/auth/login',
-      cart:          'GET  /api/cart/:userId',
-      addItem:       'POST /api/cart/:userId/items',
-      removeItem:    'DELETE /api/cart/:userId/items/:itemId',
-      validatePromo: 'POST /api/discount/validate',
-      applyPromo:    'POST /api/discount/apply',
-      fraudCheck:    'POST /api/fraud/check',
-      charge:        'POST /api/payment/charge',
-      capture:       'POST /api/payment/:id/capture',
-      refund:        'POST /api/payment/:id/refund',
-      receipt:       'POST /api/notifications/receipt',
-    },
-  });
+  response.redirect(301, '/docs');
+});
+
+app.get('/api/openapi.json', (_request, response) => {
+  response.status(200).json(openApiSpec);
+});
+
+app.get('/docs', (_request, response) => {
+  response.setHeader('Content-Type', 'text/html');
+  response.status(200).send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workshop Checkout API — Swagger UI</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+  <style>
+    body { margin: 0; background: #0d1117; }
+    .swagger-ui .topbar { background: #161b26; border-bottom: 1px solid #1c2333; }
+    .swagger-ui .topbar .download-url-wrapper input[type=text] { border-color: #1c2333; }
+    .swagger-ui .info .title { color: #a78bfa; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    SwaggerUIBundle({
+      url: '/api/openapi.json',
+      dom_id: '#swagger-ui',
+      presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset],
+      layout: 'BaseLayout',
+      deepLinking: true,
+      tryItOutEnabled: true,
+      persistAuthorization: true,
+    });
+  </script>
+</body>
+</html>`);
 });
 
 app.get('/api/health', (_request, response) => {
