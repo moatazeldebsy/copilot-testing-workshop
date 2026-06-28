@@ -1,28 +1,23 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Checkout flow', () => {
-  test.beforeEach(async ({ request }) => {
-    // Reset server data before each test
-    await request.post('/api/auth/login'); // wake server
+test.describe('Store checkout flow', () => {
+  test('user can log in and see the store', async ({ page }) => {
+    // TODO: use Copilot to generate this test
+    // Hint: navigate to /login, fill credentials, assert redirect to /store
   });
 
-  test('user can log in and reach the cart page', async ({ page }) => {
+  test('user can add an item to the cart', async ({ page }) => {
     // TODO: use Copilot to generate this test
-    // Hint: navigate to /login, fill credentials, assert redirect to /dashboard
+    // Hint: login → click Add on a product → assert cart-items list updates
   });
 
-  test('user can add items to cart and proceed to checkout', async ({ page }) => {
+  test('user can apply a discount code', async ({ page }) => {
     // TODO: use Copilot to generate this test
-    // Hint: login → /cart → click Add on a product → click Proceed to Checkout
+    // Hint: login → add item → enter SAVE10 in promo field → apply → verify total reduced
   });
 
-  test('user can apply a discount code during checkout', async ({ page }) => {
+  test('user completes checkout and sees confirmation', async ({ page }) => {
     // TODO: use Copilot to generate this test
-    // Hint: login → /cart → add item → /checkout → enter SAVE10 → verify total updated
-  });
-
-  test('user completes the full checkout and sees confirmation', async ({ page }) => {
-    // TODO: use Copilot to generate this test
-    // Full golden path: login → add to cart → checkout → discount → fraud → pay → confirmation
+    // Full golden path: login → add to cart → pay → confirmation screen
   });
 });

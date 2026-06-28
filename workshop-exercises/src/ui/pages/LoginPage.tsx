@@ -9,29 +9,38 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onNavigateRegister }) =>
   const [email, setEmail] = useState('alice@example.com');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
-
+    setIsLoading(true);
     try {
       await onLogin(email, password);
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'Invalid credentials');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <main className="screen-shell">
-      <section className="card-stack card-stack--wide">
-        <h1>Workshop Login</h1>
-        <form onSubmit={handleSubmit} className="card-stack">
+    <div className="screen-shell">
+      <div className="card">
+        <div>
+          <h1 className="card__title">Sign in</h1>
+          <p className="card__subtitle">Workshop Store — testing exercise</p>
+        </div>
+
+        <form onSubmit={(e) => void handleSubmit(e)} className="form-row">
           <label htmlFor="email">
             Email
             <input
               id="email"
+              type="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
             />
           </label>
           <label htmlFor="password">
@@ -40,17 +49,28 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onNavigateRegister }) =>
               id="password"
               type="password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
             />
           </label>
 
-          {error ? <p className="error-message" role="alert">{error}</p> : null}
+          {error ? <div className="alert alert--error" role="alert">{error}</div> : null}
 
-          <button type="submit">Sign in</button>
-          <button type="button" onClick={onNavigateRegister}>Create account</button>
+          <div className="form-actions">
+            <button className="btn btn--primary btn--full" type="submit" disabled={isLoading}>
+              {isLoading ? 'Signing in…' : 'Sign in'}
+            </button>
+            <button className="link-btn" type="button" onClick={onNavigateRegister}>
+              Create account
+            </button>
+          </div>
         </form>
-      </section>
-    </main>
+
+        <div className="alert alert--info" style={{ fontSize: '0.8rem' }}>
+          Default: <strong>alice@example.com</strong> / <strong>workshop-password</strong>
+        </div>
+      </div>
+    </div>
   );
 };
 
