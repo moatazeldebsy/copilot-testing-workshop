@@ -1,11 +1,38 @@
 import express from 'express';
 import { ApiError } from './errors/apiError';
+import { CartRepository } from './repositories/cartRepository';
+import { DiscountRepository } from './repositories/discountRepository';
+import { OrderRepository } from './repositories/orderRepository';
+import { PaymentRepository } from './repositories/paymentRepository';
 import { UserRepository } from './repositories/userRepository';
-import { verifyToken } from './services/tokenService';
+import { authRouter } from './routes/auth';
+import { cartRouter } from './routes/cart';
+import { discountRouter } from './routes/discount';
+import { fraudRouter } from './routes/fraud';
+import { notificationRouter } from './routes/notification';
+import { paymentRouter } from './routes/payment';
+import { CartService } from './services/cartService';
+import { DiscountService } from './services/discountService';
+import { FraudService } from './services/fraudService';
+import { NotificationService } from './services/notificationService';
+import { PaymentService } from './services/paymentService';
 import { UserService } from './services/userService';
+import { verifyToken } from './services/tokenService';
 
+// Repositories
 export const userRepository = new UserRepository();
+export const cartRepository = new CartRepository();
+export const discountRepository = new DiscountRepository();
+export const paymentRepository = new PaymentRepository();
+export const orderRepository = new OrderRepository();
+
+// Services
 export const userService = new UserService(userRepository);
+export const cartService = new CartService(cartRepository);
+export const discountService = new DiscountService(discountRepository);
+export const fraudService = new FraudService();
+export const paymentService = new PaymentService(paymentRepository);
+export const notificationService = new NotificationService();
 
 async function ensureSeedUser(): Promise<void> {
   try {
@@ -24,6 +51,11 @@ async function ensureSeedUser(): Promise<void> {
 
 export async function resetWorkshopData(): Promise<void> {
   await userRepository.reset();
+  cartRepository.reset();
+  discountRepository.reset();
+  paymentRepository.reset();
+  notificationService.reset();
+  await orderRepository.reset();
   await ensureSeedUser();
 }
 
@@ -34,12 +66,19 @@ export const app = express();
 app.use(express.json());
 
 app.get('/api/health', (_request, response) => {
-  response.status(200).json({ data: { status: 'ok' } });
+  response.status(200).json({
+    data: {
+      status: 'ok',
+      services: ['user', 'cart', 'discount', 'fraud', 'payment', 'notification'],
+    },
+  });
 });
 
+// Auth middleware — public paths bypass token check
+const PUBLIC_POST_PATHS = ['/health', '/auth/login', '/auth/register', '/users'];
+
 app.use('/api', (request, _response, next) => {
-  const publicPaths = ['/health', '/auth/login', '/auth/register', '/users'];
-  if (request.method === 'POST' && publicPaths.includes(request.path)) {
+  if (request.method === 'POST' && PUBLIC_POST_PATHS.includes(request.path)) {
     next();
     return;
   }
@@ -66,28 +105,8 @@ app.use('/api', (request, _response, next) => {
   }
 });
 
+// User routes (kept inline for backward compat with existing tests)
 app.post('/api/users', async (request, response) => {
-  const { name, email, password, role } = request.body as {
-    name?: string;
-    email?: string;
-    password?: string;
-    role?: 'admin' | 'viewer' | 'user';
-  };
-
-  try {
-    const user = await userService.createUser({
-      name: name ?? '',
-      email: email ?? '',
-      password: password ?? '',
-      role,
-    });
-    response.status(201).json({ data: user });
-  } catch (error) {
-    throw error;
-  }
-});
-
-app.post('/api/auth/register', async (request, response) => {
   const { name, email, password, role } = request.body as {
     name?: string;
     email?: string;
@@ -101,14 +120,7 @@ app.post('/api/auth/register', async (request, response) => {
     password: password ?? '',
     role,
   });
-
-  const auth = await userService.authenticate(email ?? '', password ?? '');
-  response.status(201).json({
-    data: {
-      user,
-      token: auth.token,
-    },
-  });
+  response.status(201).json({ data: user });
 });
 
 app.get('/api/users/:id', async (request, response) => {
@@ -121,20 +133,19 @@ app.delete('/api/users/:id', async (request, response) => {
   response.status(204).send();
 });
 
-app.post('/api/auth/login', async (request, response) => {
-  const { email, password } = request.body as { email?: string; password?: string };
+// Checkout pipeline routes
+app.use('/api/auth', authRouter(userService));
+app.use('/api/cart', cartRouter(cartService));
+app.use('/api/discount', discountRouter(discountService));
+app.use('/api/fraud', fraudRouter(fraudService));
+app.use('/api/payment', paymentRouter(paymentService));
+app.use('/api/notifications', notificationRouter(notificationService));
 
-  const result = await userService.authenticate(email ?? '', password ?? '');
-  response.status(200).json({ data: result });
-});
-
+// Global error handler
 app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
   if (error instanceof ApiError) {
     response.status(error.statusCode).json({
-      error: {
-        code: error.code,
-        message: error.message,
-      },
+      error: { code: error.code, message: error.message },
     });
     return;
   }
