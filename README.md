@@ -2,6 +2,8 @@
 
 Workshop materials for **WeAreDevelopers Berlin 2026**.
 
+**Session:** [GenAI in Testing — WeAreDevelopers World Congress](https://www.wearedevelopers.com/world-congress/agenda/workshops/genai-in-testing-using-github-copilot-to-accelerate-quality-without-losing-trust-1107886)
+
 ## Overview
 
 A hands-on workshop exploring how to use GitHub Copilot to speed up testing workflows — unit tests, API integration tests, component tests, E2E with Playwright, and AI-assisted test patterns — without sacrificing trust or quality.
