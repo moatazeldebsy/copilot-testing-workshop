@@ -31,17 +31,12 @@ Use this matrix to place each flow in the matching workshop page.
 
 ```mermaid
 flowchart LR
-  A[Step 1 Setup] --> B[Step 2 Copilot Intro]
-  B --> C[Step 3 Big Picture]
-  C --> D[Step 4 Unit Tests]
-  D --> E[Step 5 API and Integration]
-  E --> F[Step 6 Test Data and Mocks]
-  F --> G[Step 7 Review and Guardrails]
-  G --> H[Step 8 CI/CD and Adoption]
-  H --> I[Step 9 E2E Playwright]
-  I --> J[Step 10 Component Testing]
-  J --> K[Step 11 AI Testing Patterns]
-  K --> L[Step 12 Key Takeaways]
+  A[Setup 20 min] --> B[Exercise A Unit Tests 20 min]
+  B --> C[Exercise B Review AI Tests 20 min]
+  C --> D[Exercise C API Tests 25 min]
+  D --> E[Exercise D Component and E2E 20 min]
+  E --> F[Exercise E CI Guardrails 10 min]
+  F --> G[Wrap-up 5 min]
 ```
 
 ## 2. Delivery Rhythm per Step
@@ -163,10 +158,12 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-  A[Part 1 Foundations 35 min] --> B[Part 2 Generate 40 min]
-  B --> C[Part 3 Responsible Use 20 min]
-  C --> D[Part 4 Advanced and AI 20 min]
-  D --> E[Wrap-up and Q/A 5 min]
+  A[Setup 20 min] --> B[Generate Exercise A 20 min]
+  B --> C[Review Exercise B 20 min]
+  C --> D[API Exercise C 25 min]
+  D --> E[Integration and E2E Exercise D 20 min]
+  E --> F[CI Guardrails Exercise E 10 min]
+  F --> G[Wrap-up 5 min]
 ```
 
 ## 13. Audience Branching Flow (Conference Mixed Audience)

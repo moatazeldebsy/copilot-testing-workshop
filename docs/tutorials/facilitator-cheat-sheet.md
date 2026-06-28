@@ -1,71 +1,109 @@
-# Facilitator Cheat Sheet (One Page)
+# Facilitator Cheat Sheet
 
-Use this page as a live delivery aid for the 120-minute workshop.
+Use this as a live delivery aid for the 120-minute workshop.
 
-## Session Timeline (120 min)
+## Session Timeline
 
-| Segment | Minutes | Goal |
-|---|---:|---|
-| Setup and framing | 0-15 | Ensure all participants can run exercises and use Copilot |
-| Copilot fundamentals | 15-35 | Align on modes, trust boundaries, and prompt quality |
-| Test generation core | 35-75 | Unit + API + test data workflows with review discipline |
-| Responsible adoption | 75-95 | Review checklist, guardrails, CI policy and ownership |
-| Advanced testing | 95-115 | E2E, component, and AI feature testing patterns |
-| Wrap-up and Q&A | 115-120 | Confirm actions participants can apply immediately |
+| Time | Segment | Goal | Duration |
+|---|---|---|---:|
+| 12:15 | **Intro & Setup** | All participants running the app, Copilot active | 10 min |
+| 12:25 | **Setup & Tour** | Navigate the store, hit `/docs`, understand the pipeline | 10 min |
+| 12:35 | **Exercise A — Unit Tests** | Generate tests for `calculateDiscount()`; discover that weak prompts produce weak tests | 20 min |
+| 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite | 20 min |
+| 13:15 | **Exercise C — API Tests** | Supertest for the full pipeline; use domain-rules.md as context | 25 min |
+| 13:40 | **Exercise D — Component & E2E** | StorePage component tests + Playwright checkout flow | 20 min |
+| 14:00 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.copilot-instructions.md` | 10 min |
+| 14:10 | **Wrap-up & Q&A** | Trust Playbook handout, one action to take back | 5 min |
 
-## Tight Phrasing (Step by Step)
+## One-line Message per Segment
 
-| Step | One-line message |
+| Segment | Key message |
 |---|---|
-| 1 Setup | Shared environment first, then speed. |
-| 2 Copilot Intro | Copilot is a collaborator, not an authority. |
-| 3 Big Picture | Generate -> Review -> Fix is non-negotiable. |
-| 4 Unit Testing | Fast drafts are useful only when failures are meaningful. |
-| 5 API/Integration | Scaffolds are fast; contracts create trust. |
-| 6 Test Data/Mocks | Repetition is great for AI; safety is still human-owned. |
-| 7 Review/Guardrails | Quality debt starts where review discipline ends. |
-| 8 CI/CD Adoption | Guardrails belong in pipelines, not memory. |
-| 9 E2E Playwright | Locator strategy determines long-term stability. |
-| 10 Component Testing | Test behavior users see, not internals developers know. |
-| 11 AI Testing | Validate structure, safety, and failure paths, not exact wording. |
-| 12 Takeaways | Accelerate with AI, govern with standards, measure outcomes. |
+| Intro | Copilot is a first-draft machine — your job is to decide what "correct" means. |
+| Setup | The checkout pipeline is your real target today — every test you write touches it. |
+| Exercise A | Fast drafts are useful only when the tests would actually fail on a bug. |
+| Exercise B | AI optimizes for coverage metrics, not for catching failures. |
+| Exercise C | Domain context turns generic Copilot output into domain-aware test suites. |
+| Exercise D | Test behavior users see; prefer `data-testid` and `getByRole` over implementation internals. |
+| Exercise E | Guardrails belong in pipelines, not in memory. |
+| Wrap-up | Accelerate with AI, govern with standards, measure outcomes. |
 
-## Canonical Live Demo (Fail-First)
+## Live Demo Script — The Fail-First Loop (Exercise A)
 
-1. Ask Copilot to generate tests for one focused method.
-2. Run tests and show baseline.
-3. Introduce a small implementation bug intentionally.
-4. Re-run tests and observe whether the bug is caught.
-5. If missed, use Copilot follow-up prompt to strengthen assertions.
-6. Re-run until failure is meaningful.
-7. Restore implementation and confirm green status.
+**Setup (before running):** `calculateDiscount.ts` has 3 bugs pre-seeded. Do not tell participants yet.
 
-Prompt to use:
+1. Open `src/services/calculateDiscount.ts` — read the function aloud (2 min).
+2. Open Copilot Chat, attach `#file:src/services/calculateDiscount.ts`.
+3. Prompt (weak version first):
+   ```
+   Write Jest unit tests for calculateDiscount.
+   ```
+4. Accept the output, run tests → **all pass** (weak assertions miss all 3 bugs).
+5. Ask the room: "Would you ship with this coverage?"
+6. Prompt again (strong version):
+   ```
+   Write Jest unit tests for calculateDiscount.
+   For SAVE10 on $100, assert discountAmount is exactly 10.
+   For FLAT5 on $15 (below $20 min), assert discountAmount is exactly 0.
+   Assert finalTotal is never negative.
+   Avoid toBeTruthy and toBeDefined.
+   ```
+7. Run new tests → **6 fail** (all 3 bugs exposed).
+8. "That's the difference between tests that check and tests that verify."
 
-```text
-Generate Jest tests for UserService.createUser.
-Include: success case, duplicate email error, and missing required field error.
-Add precise assertions for returned payload and dependency call arguments.
-Avoid toBeTruthy/toBeDefined.
+**Timing:** This demo should land in 6–8 minutes inside Exercise A.
+
+## The Flaky Test Moment (Exercise E)
+
+Point to `tests/unit/notificationService.test.ts`. The test marked `🚨 FLAKY` uses `Date.now()` timing.
+
+Ask: "If this passes 99% of the time on your machine but fails 1 in 10 CI runs, is it a good test?"
+
+Follow-up prompt for participants:
+```
+This test uses Date.now() timing assertions. Rewrite it to be deterministic
+using jest.useFakeTimers() or by asserting a structural property instead of timing.
 ```
 
-## Fallback Paths (If Demo Breaks)
+## Context Engineering Demo (Exercise E)
 
-- If local setup fails: switch to pre-recorded terminal output snippets.
-- If a dependency install is slow: continue with prompt review and expected output walkthrough.
-- If tests fail unexpectedly: narrate triage flow (reproduce -> localize -> hypothesize -> validate -> patch).
-- If time runs short: skip bonus exercises and keep the debrief + takeaways.
+Show the difference between prompting with and without domain context:
+
+**Without context:**
+```
+Write tests for the discount API endpoint.
+```
+
+**With context (attach file):**
+```
+#file:.copilot/context/domain-rules.md
+Write tests for POST /api/discount/apply.
+Cover every error code in the domain rules table.
+```
+
+Ask participants to compare assertion specificity in the two outputs.
+
+## Recovery Plan
+
+| Problem | Action |
+|---|---|
+| Copilot unavailable | Use `tests/fixtures/calculateDiscount-examples.md` — paste the strong tests directly |
+| Participant stuck on Exercise A | `git checkout 02-unit-testing` to see the solution |
+| Participant stuck on Exercise C | `git checkout 03-api-testing` |
+| Tests fail unexpectedly | Narrate the triage flow: reproduce → localize → hypothesize → verify → patch |
+| Time short | Skip Exercise D; keep Exercise E and wrap-up |
 
 ## Q&A Anchors
 
-- "How do we trust AI-generated tests?" -> same gates as human code + fail-first verification.
-- "Where does AI help most?" -> boilerplate, mocks, edge-case expansion, refactors.
-- "Where is human judgment essential?" -> strategy, risk, contracts, security, merge decisions.
-- "What should we adopt first next week?" -> review checklist + two CI guardrails (secret scan and coverage threshold).
+- **"How do we trust AI-generated tests?"** — same gates as human code: fail-first + CI coverage threshold.
+- **"Where does AI help most?"** — boilerplate, scaffolding, edge-case enumeration, test data factories.
+- **"Where is human judgment essential?"** — domain rules, risk assessment, boundary decisions, security review.
+- **"What should we adopt first next week?"** — `.copilot-instructions.md` + 80% coverage gate + fix one weak assertion pattern.
 
-## Exit Criteria for Success
+## Exit Criteria
 
-- Participants can generate tests with scoped prompts.
-- Participants can identify weak assertions and harden them.
-- Participants understand CI guardrails and ownership model.
-- Participants leave with one immediate action for their own repository.
+- Participants can generate tests with scoped, context-rich prompts.
+- Participants can identify weak assertions and rewrite them.
+- Participants understand what the flaky test moment illustrates.
+- Participants leave with one immediate action for their own repo.
+- Participants have the Trust Playbook (`docs/ai-testing-trust-playbook.md`) as a reference.

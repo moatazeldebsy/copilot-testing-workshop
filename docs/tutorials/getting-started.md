@@ -67,15 +67,17 @@ If you use Agent mode, keep tasks narrow and explicit to control token and credi
 
 ## 3. Your First Copilot Test
 
+The workshop's system under test is a checkout pipeline — **User → Cart → Discount → Fraud → Payment → Notification**. The entry point for Exercise A is `src/services/calculateDiscount.ts`, a standalone function with 3 intentional bugs. All exercises flow through this same domain.
+
 ### Inline Suggestion
 
-Open any TypeScript file and start typing a test. Copilot suggests the rest — press `Tab` to accept.
+Open `src/services/calculateDiscount.ts` and start typing a test in a new file. Copilot suggests the rest — press `Tab` to accept.
 
 ```typescript
 // Type this and watch Copilot complete it:
-describe('Calculator', () => {
-  it('should add two numbers', () => {
-    // Copilot suggests: expect(add(2, 3)).toBe(5);
+describe('calculateDiscount', () => {
+  it('applies SAVE10 to deduct 10% from the subtotal', () => {
+    // Copilot suggests the rest...
   });
 });
 ```
@@ -103,15 +105,20 @@ Test cases: [success], [error 1], [error 2].
 Mock: [dependency 1], [dependency 2].
 ```
 
-### Example
+### Example prompt (Exercise A)
 
 ```
-Write Jest unit tests for UserService.createUser in TypeScript.
-Test cases: success, duplicate email error, empty name error.
-Mock UserRepository with jest.fn().
+#file:src/services/calculateDiscount.ts
+#file:.copilot/context/domain-rules.md
+
+Write Jest unit tests for calculateDiscount.
+For SAVE10 on $100, assert discountAmount is exactly 10.
+For FLAT5 on $15 (below $20 minimum), assert discountAmount is exactly 0.
+Assert finalTotal is never negative.
+Avoid toBeTruthy and toBeDefined.
 ```
 
-Copilot will generate a complete test file. Review every line before accepting — it is a first draft, not a finished product.
+Copilot will generate a complete test file. Review every line before accepting — it is a first draft, not a finished product. A good sign: some tests will **fail** because they expose the bugs in `calculateDiscount.ts`.
 
 ---
 
@@ -167,9 +174,14 @@ npm test
 # Run with coverage
 npm test -- --coverage
 
-# Run a specific file
-npx jest tests/unit/userService.test.ts --verbose
+# Run a specific file pattern
+npm test -- --testPathPatterns calculateDiscount --verbose
+
+# Run E2E tests
+npm run test:e2e
 ```
+
+For the checkout pipeline specifically, `calculateDiscount.ts` is the starting point (Exercise A). The expected outcome with strong tests is 6 failures — those failures reveal the 3 bugs.
 
 ---
 

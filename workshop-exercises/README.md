@@ -1,80 +1,141 @@
-# Copilot Testing Workshop Exercises
+# Workshop Exercises
 
-This repository is the hands-on codebase for the workshop site.
+The hands-on codebase for the **GenAI in Testing** workshop at WeAreDevelopers 2026.
 
-## Workflow
+## Quick Start
 
-1. Stay on `main` during the live workshop.
-2. Use the workshop pages to decide which files and commands to work on.
-3. If you fall behind, compare your work against the step checkpoints such as `solution/step-4-unit` and `solution/step-9-e2e`.
+```bash
+npm install
 
-## App Overview
+# Terminal 1 — backend API on port 4000
+npm run dev:api
 
-The exercises app is a simple but realistic full-stack target for testing practice:
+# Terminal 2 — frontend on port 3006
+npm run dev
 
-- Frontend: React + Vite in `src/WorkshopApp.tsx`
-- Backend: Express API in `src/app.ts`
-- Persistence: file-backed user store in `data/users.json`
-- Auth: token-based login/register flow with protected routes
+# Run tests
+npm test
+
+# Run E2E tests
+npm run test:e2e
+```
+
+- Store UI: `http://localhost:3006`
+- Swagger API docs: `http://localhost:4000/docs`
+- Default login: `alice@example.com` / `workshop-password`
+
+## System Under Test — Checkout Pipeline
+
+The exercises use a realistic e-commerce pipeline as their target:
+
+```
+User → Cart → Discount → Fraud → Payment → Notification
+```
+
+Every exercise type (unit, API, component, E2E) tests a different layer of the same domain.
 
 ## API Contract
 
 ### Public routes
-
 - `GET /api/health`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
-- `POST /api/users` (kept public for workshop API generation exercises)
 
 ### Protected routes (Bearer token required)
+- `GET  /api/cart/:userId`
+- `POST /api/cart/:userId/items`
+- `DELETE /api/cart/:userId/items/:itemId`
+- `POST /api/discount/validate`
+- `POST /api/discount/apply`
+- `POST /api/fraud/check`
+- `POST /api/payment/charge`
+- `POST /api/payment/:id/capture`
+- `POST /api/payment/:id/refund`
+- `POST /api/notifications/receipt`
+- `GET  /api/notifications/:userId`
 
-- `GET /api/users/:id`
-- `DELETE /api/users/:id`
+**Response envelope:** success → `{ "data": ... }`, error → `{ "error": { "code": "...", "message": "..." } }`
 
-### Response format
+See the full schema at `http://localhost:4000/docs` or in `src/openapi.ts`.
 
-- Success responses return `{ "data": ... }`
-- Error responses return `{ "error": { "code": "...", "message": "..." } }`
+## Exercise Files
 
-## Default workshop account
+### Exercise A & B — `calculateDiscount`
 
-The app seeds a default admin user on startup for testing login flows:
+`src/services/calculateDiscount.ts` is a standalone discount calculator with **3 intentional bugs**:
 
-- Email: `alice@example.com`
-- Password: `workshop-password`
+1. **BUG 1:** `value / 10` instead of `/ 100` — SAVE10 gives 100% off instead of 10%
+2. **BUG 2:** FLAT5 minimum-order guard is missing — applies even on orders below $20
+3. **BUG 3:** `finalTotal` can go negative — no clamping to 0
 
-This is workshop-only seed data and not intended for production usage.
+**Exercise A:** Use Copilot to generate unit tests for `calculateDiscount`. Good tests will fail (revealing bugs). Weak tests will pass and hide the bugs.
 
-## Starter Surfaces
+**Exercise B:** Read `tests/unit/calculateDiscount.weak.test.ts` — pre-seeded AI-generated tests that all pass but miss the bugs. Identify what's wrong and write better ones.
 
-- `src/services/userService.ts` supports the unit-testing step.
-- `src/app.ts` supports the API and integration-testing step.
-- `src/components/RegistrationForm.tsx` supports the React Testing Library step.
-- `src/ui/pages/LoginPage.tsx` supports the Playwright step.
-- `tests/` contains starter scaffolding and intentionally leaves most workshop tests for participants to create.
+The solution is in `calculateDiscount.fixed.ts` — but try not to peek!
 
-## Commands
+### Exercise C — API Tests
 
-```bash
-npm install
-npm run dev
-npm test
-npm run test:api
-npm run test:component
-npm run test:e2e
+Fill in `tests/api/checkout.test.ts` using Copilot. Cover the full pipeline:
+
+```
+POST /api/auth/login  →  POST /api/cart/:id/items  →  POST /api/discount/apply
+  →  POST /api/fraud/check  →  POST /api/payment/charge
+  →  POST /api/payment/:id/capture  →  POST /api/notifications/receipt
 ```
 
-## Notes for test authors
+Tip: use `#file:src/openapi.ts` and `#file:.copilot/context/domain-rules.md` in your Copilot Chat prompt.
 
-- API tests can import `resetWorkshopData` from `src/app.ts` to reset local state before each test.
-- `tests/setupTests.ts` includes `TextEncoder` and `TextDecoder` setup for API tests running in Jest's jsdom environment.
+### Exercise D — Component & E2E Tests
 
-## Additional Practice Concepts
+- `tests/components/CartPage.test.tsx` — React Testing Library tests for `StorePage`
+- `tests/e2e/checkout.spec.ts` — Playwright end-to-end scenarios
 
-To practice beyond core test implementation, use these optional concept exercises:
+### Exercise E — CI Guardrails
 
-- `copilot.md` — prompt-writing drills for generation, refactoring, and review.
-- `.github/skills/api-contract-review/SKILL.md` — contract-focused API test review workflow.
-- `.github/skills/mcp-test-investigation/SKILL.md` — MCP-style investigation workflow for failing tests.
-- `practice/mcp-practice.md` — guided hands-on drills for MCP investigation habits.
-- `practice/README.md` — quick index for all optional concept practice files.
+Explore `.github/copilot-instructions.md` and `.copilot/context/domain-rules.md`. Try context engineering: attach domain-rules.md to a Copilot Chat session and compare the test quality vs without it.
+
+## Seeded Test Data
+
+| Discount code | Type | Value | Min order | Status |
+|---|---|---|---|---|
+| `SAVE10` | percent | 10% | none | active |
+| `FLAT5` | flat | $5 | $20 | active |
+| `EXPIRED` | percent | 15% | none | expired |
+
+Fraud rules: order > $1000 → +40 risk; items > 20 → +30; country `XX` or `ZZ` → +50. Score ≥ 50 = `high` (blocked).
+
+## Test Commands
+
+```bash
+npm test                          # All Jest tests (unit + API + component)
+npm run test:api                  # API tests only
+npm run test:component            # Component tests only
+npm run test:e2e                  # Playwright E2E tests
+npm test -- --coverage            # With coverage report
+```
+
+API tests call `resetWorkshopData()` from `src/app.ts` in `beforeEach` to reset state.
+
+## Recovery Branches
+
+If you fall behind, checkout the solution branch for the exercise you need:
+
+```bash
+git checkout 02-unit-testing      # Exercise A solution
+git checkout 03-api-testing       # Exercise C solution
+git checkout 04-integration-testing  # Exercise D solution
+git checkout 05-ci-guardrails     # CI workflow
+git checkout 06-review-patterns   # Trust Playbook + instructions
+git checkout master               # Back to the workshop starting point
+```
+
+## Extra Practice
+
+- `copilot.md` — prompt-writing drills for generation, refactoring, and review
+- `.copilot/skills/unit-testing.md` — reusable prompt template and review checklist
+- `.copilot/context/domain-rules.md` — business rules reference for context engineering
+- `.github/skills/api-contract-review/SKILL.md` — contract-focused API test review
+- `.github/skills/mcp-test-investigation/SKILL.md` — MCP investigation workflow
+- `docs/ai-testing-trust-playbook.md` — session takeaway playbook
+- `tests/fixtures/calculateDiscount-examples.md` — backup examples if Copilot is unavailable

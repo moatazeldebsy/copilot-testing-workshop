@@ -8,58 +8,107 @@ Workshop materials for **WeAreDevelopers Berlin 2026**.
 
 ## Overview
 
-A hands-on workshop exploring how to use GitHub Copilot to speed up testing workflows — unit tests, API integration tests, component tests, E2E with Playwright, and AI-assisted test patterns — without sacrificing trust or quality.
+A hands-on workshop exploring how to use GitHub Copilot to speed up testing workflows — unit tests, API integration tests, component tests, E2E with Playwright — without sacrificing trust or quality.
 
-## Workshop Modules
-
-1. **Setup** — environment and tooling
-2. **Copilot Intro** — getting started with GitHub Copilot
-3. **Copilot Overview** — the big picture
-4. **Unit Testing** — generating and reviewing unit tests
-5. **API Integration** — testing APIs with Copilot assistance
-6. **Test Data & Mocks** — creating realistic test data and mocks
-7. **Reviewing Tests** — guardrails and quality checks
-8. **CI/CD Adoption** — integrating AI-assisted tests into pipelines
-9. **E2E with Playwright** — end-to-end testing
-10. **Component Testing** — UI component tests
-11. **AI Testing Patterns** — advanced patterns for AI-assisted QA
-12. **Key Takeaways** — lessons learned and next steps
+The **system under test** is a realistic checkout pipeline: **User → Cart → Discount → Fraud → Payment → Notification**. Every exercise uses this same domain so all test types (unit, API, component, E2E) feel connected rather than contrived.
 
 ## 120-Minute Schedule
 
 _Friday, 10 Jul 2026 · Room R2 · 12:15 pm – 2:15 pm WEDT (UTC+02:00)_
 
-| Time | Topic | Description | Duration |
-|------|-------|-------------|----------|
-| 12:15 | Welcome & Setup | Introductions, prerequisites check, Copilot activation | 10 min |
-| 12:25 | Step 1 — Environment Setup | Verify Copilot, clone starter repo, first suggestion exercise | 15 min |
-| 12:40 | Step 2 — Introduction to GitHub Copilot | Tokens, modes, slash commands, MCP, skills, customization files | 25 min |
-| 13:05 | Step 3 — Copilot: The Big Picture | Value map, risk model, where human judgment is still required | 20 min |
-| 13:25 | ⚡ Part 2 begins | | |
-| 13:25 | Step 4 — Unit Test Generation | Prompt patterns, generate → review → fix loop, flaky test detection | 25 min |
-| 13:50 | Step 5 — API & Integration Tests | REST test scaffolding, assertion review, integration coverage | 20 min |
-| 14:10 | Step 6 — Test Data & Mocks | Fixture factories, stubs, avoiding hardcoded secrets | 15 min |  
-| 14:25 | 🛡️ Part 3 begins | | |
-| 14:25 | Step 7 — Reviewing Tests & Guardrails | Review checklist, false confidence, security red flags, prompt templates | 20 min |
-| 14:45 | Step 8 — CI/CD & Team Adoption | Quality gates, scanning, CODEOWNERS, team onboarding strategies | 15 min |
-| 15:00 | 🎤 Wrap-up & Q&A | Key takeaways, resources, open discussion | 15 min |
+| Time | Segment | Activity | Duration |
+|------|---------|----------|----------|
+| 12:15 | **Intro & Setup** | Welcome, prerequisites check, Copilot activation, clone repo | 10 min |
+| 12:25 | **Setup** | Run the app, tour the checkout pipeline, explore the Swagger docs at `/docs` | 10 min |
+| 12:35 | **Exercise A — Unit Tests** | Use Copilot to generate tests for `calculateDiscount()` (a function with 3 hidden bugs) | 20 min |
+| 12:55 | **Exercise B — Review AI Tests** | Audit the pre-seeded weak tests in `calculateDiscount.weak.test.ts`; rewrite the bad ones | 20 min |
+| 13:15 | **Exercise C — API Tests** | Generate Supertest tests for the full checkout pipeline: cart → discount → fraud → payment → notification | 25 min |
+| 13:40 | **Exercise D — Integration & Component** | Component tests for `StorePage` + E2E with Playwright | 20 min |
+| 14:00 | **Exercise E — CI Guardrails** | Coverage gates, flaky test triage, `.copilot-instructions.md`, context engineering | 10 min |
+| 14:10 | **Wrap-up & Takeaways** | Trust Playbook, Q&A, one action to take back to your team | 5 min |
 
 ## Getting Started
 
-**Prerequisites:** Node.js 20.19+ or 22+
+**Prerequisites:** Node.js 20.19+ or 22+, GitHub Copilot subscription
 
 ```bash
+cd workshop-exercises
 npm install
+
+# Run the backend API (port 4000)
+npm run dev:api
+
+# In a second terminal — run the frontend (port 3006)
 npm run dev
+
+# Run all tests
+npm test
+
+# Run E2E tests
+npm run test:e2e
 ```
 
-The app runs at `http://localhost:3005` (or the next available port).
+Open `http://localhost:3006` for the store UI and `http://localhost:4000/docs` for the Swagger API explorer.
+
+Login with: `alice@example.com` / `workshop-password`
+
+## Repository Layout
+
+```
+workshop-exercises/
+  src/
+    services/
+      calculateDiscount.ts     ← Exercise A & B: function with intentional bugs
+      calculateDiscount.fixed.ts ← Solution reference (don't peek!)
+      cartService.ts           ← Cart pipeline step
+      discountService.ts       ← Discount pipeline step
+      fraudService.ts          ← Fraud pipeline step
+      paymentService.ts        ← Payment pipeline step
+      notificationService.ts   ← Notification pipeline step
+    ui/pages/
+      StorePage.tsx            ← Single-page store (Exercise D)
+      LoginPage.tsx
+  tests/
+    unit/                      ← Exercise A stubs (fill these in)
+    api/                       ← Exercise C stubs (fill these in)
+    components/                ← Exercise D stubs (fill these in)
+    e2e/                       ← Exercise D Playwright stubs (fill these in)
+    fixtures/                  ← Pre-generated backup examples
+
+.copilot/
+  context/domain-rules.md      ← Business rules — attach to Copilot Chat prompts
+  skills/unit-testing.md       ← Prompt template + review checklist
+
+.github/copilot-instructions.md ← Repo-level Copilot behavior standards
+
+docs/
+  ai-testing-trust-playbook.md ← Session takeaway
+```
+
+## Recovery Checkpoints (Progressive Branches)
+
+If you fall behind on any exercise, checkout the corresponding branch to see the completed solution:
+
+| Branch | Contains |
+|---|---|
+| `01-baseline` | Starting point — all TODO stubs, buggy `calculateDiscount.ts` |
+| `02-unit-testing` | Strong unit tests for `calculateDiscount` (expose all 3 bugs) |
+| `03-api-testing` | Complete API tests for the checkout pipeline (18 tests) |
+| `04-integration-testing` | Component tests for `StorePage` |
+| `05-ci-guardrails` | CI workflow with coverage gates |
+| `06-review-patterns` | Trust Playbook + Copilot instructions |
+
+```bash
+# Example: catch up after Exercise B
+git checkout 03-api-testing
+```
 
 ## Tech Stack
 
-- React 18 + TypeScript
-- Vite
-- React Router
+- **Backend:** Node.js + Express 5 (port 4000), TypeScript, Jest + Supertest
+- **Frontend:** React 18 + Vite (port 3006), React Testing Library, Playwright
+- **Auth:** JWT bearer tokens
+- **API docs:** OpenAPI 3.0 served at `/docs` (Swagger UI)
 
 ## License
 

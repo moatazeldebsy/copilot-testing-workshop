@@ -1,33 +1,62 @@
-# Test Scaffold
+# Tests
 
-The workshop starts with incomplete or missing tests on purpose.
+The workshop starts with incomplete stubs — that's intentional. You fill them in using Copilot.
 
-Create tests in these folders as you progress through the workshop:
+## Folder Map
 
-- `tests/unit`
-- `tests/api`
-- `tests/integration`
-- `tests/components`
-- `tests/e2e`
-- `tests/services`
+| Folder | Exercise | What to build |
+|---|---|---|
+| `unit/` | A & B | Unit tests for `calculateDiscount` and the pipeline services |
+| `api/` | C | Supertest API tests for the checkout pipeline |
+| `components/` | D | React Testing Library tests for `StorePage` |
+| `e2e/` | D | Playwright end-to-end checkout scenarios |
+| `fixtures/` | Backup | Pre-generated examples if Copilot or Wi-Fi is unavailable |
 
-Recommended first files:
+## Starting Files
 
-- `tests/unit/userService.test.ts`
-- `tests/api/auth-and-users.test.ts`
-- `tests/components/RegistrationForm.test.tsx`
-- `tests/e2e/login.spec.ts`
+### Exercise A & B — Unit tests
+- `unit/calculateDiscount.weak.test.ts` — pre-seeded weak AI tests; **read before writing your own** (Exercise B)
+- `unit/calculateDiscount.test.ts` — does not exist yet; create it (Exercise A)
+- `unit/cartService.test.ts` — stubs, fill in
+- `unit/discountService.test.ts` — stubs, fill in
+- `unit/fraudService.test.ts` — stubs, fill in
+- `unit/paymentService.test.ts` — stubs, fill in
+- `unit/notificationService.test.ts` — stubs + a flaky test demo (do not fix the marked test)
 
-## Current implemented baseline
+### Exercise C — API tests
+- `api/auth-and-users.test.ts` — already complete; use as reference
+- `api/checkout.test.ts` — stubs, fill in
 
-- `tests/api/auth-and-users.test.ts` validates:
-	- register success contract
-	- bearer-token requirement on protected routes
-	- login success for seeded admin user
-	- duplicate-email structured error payload
+### Exercise D — Component & E2E
+- `components/CartPage.test.tsx` — stubs, fill in
+- `e2e/checkout.spec.ts` — stubs, fill in
 
-## API testing notes
+## Key Testing Notes
 
-- Use `resetWorkshopData()` from `src/app.ts` in `beforeEach` to isolate test state.
-- API success payloads are wrapped in `data`; error payloads are wrapped in `error`.
-- Protected endpoints require `Authorization: Bearer <token>`.
+**API tests:**
+- Always call `await resetWorkshopData()` in `beforeEach` to reset state between tests
+- Success responses: `{ data: ... }` — Error responses: `{ error: { code, message } }`
+- Protected routes need `Authorization: Bearer <token>` header
+
+**Component tests:**
+- Mock `fetch` with `jest.fn()` before each test
+- Use `waitFor(...)` when asserting on async state updates
+- Prefer `getByRole` and `getByTestId` over `getByText` when text appears in multiple elements
+
+**E2E tests:**
+- Base URL is `http://127.0.0.1:3006` (configured in `playwright.config.ts`)
+- Login before each test or use `test.use({ storageState: '...' })`
+
+## Running Tests
+
+```bash
+npm test                          # All Jest tests
+npm test -- --coverage            # With coverage report
+npm run test:api                  # API tests only
+npm run test:component            # Component tests only
+npm run test:e2e                  # Playwright
+```
+
+## Solution Files
+
+Solution files end in `.solution.test.ts` / `.solution.test.tsx` and are always present on the matching recovery branch. Do not modify them during the workshop — they exist so you can compare your work.
