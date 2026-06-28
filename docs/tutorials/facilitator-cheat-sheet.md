@@ -8,11 +8,11 @@ Use this as a live delivery aid for the 120-minute workshop.
 |---|---|---|---:|
 | 12:15 | **Intro, Setup & Tour** | All participants running the app, Copilot active, pipeline understood | 15 min |
 | 12:30 | **Exercise A — Unit Tests** | Generate tests for `calculateDiscount()`; discover that weak prompts produce weak tests | 25 min |
-| 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite | 15 min |
-| 13:10 | **Exercise C — API Tests** | Supertest for the full pipeline; use domain-rules.md as context | 25 min |
-| 13:35 | **Exercise D — Component Tests** | StorePage RTL tests hands-on; Playwright shown as live demo / optional extra | 20 min |
-| 13:55 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.github/copilot-instructions.md`, context engineering | 10 min |
-| 14:05 | **Wrap-up & Q&A** | Trust Playbook walkthrough, one action to take back, open discussion | 15 min |
+| 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite | 10 min |
+| 13:05 | **Exercise C — API Tests** | Supertest for the full pipeline; use domain-rules.md as context | 25 min |
+| 13:30 | **Exercise D — Component Tests** | StorePage RTL tests hands-on; Playwright shown as live demo / optional extra | 20 min |
+| 13:50 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.github/copilot-instructions.md`, context engineering | 10 min |
+| 14:00 | **Wrap-up & Q&A** | Trust Playbook walkthrough, one action to take back, open discussion | 15 min |
 
 ## One-line Message per Segment
 

@@ -32,7 +32,7 @@ Use this matrix to place each flow in the matching workshop page.
 ```mermaid
 flowchart LR
   A[Intro Setup and Tour 15 min] --> B[Exercise A Unit Tests 25 min]
-  B --> C[Exercise B Review AI Tests 15 min]
+  B --> C[Exercise B Review AI Tests 10 min]
   C --> D[Exercise C API Tests 25 min]
   D --> E[Exercise D Component Tests 20 min]
   E --> F[Exercise E CI Guardrails 10 min]
@@ -159,7 +159,7 @@ flowchart TD
 ```mermaid
 flowchart LR
   A[Intro Setup Tour 15 min] --> B[Generate Exercise A 25 min]
-  B --> C[Review Exercise B 15 min]
+  B --> C[Review Exercise B 10 min]
   C --> D[API Exercise C 25 min]
   D --> E[Component Exercise D 20 min]
   E --> F[CI Guardrails Exercise E 10 min]
