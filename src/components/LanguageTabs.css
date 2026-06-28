@@ -1,0 +1,44 @@
+.lang-tabs {
+  margin: 1.25rem 0;
+}
+
+.lang-tabs__bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border, #e2e8f0);
+  margin-bottom: 0;
+}
+
+.lang-tabs__tab {
+  padding: 0.45rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: none;
+  background: var(--surface-2, #f8fafc);
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lang-tabs__tab:hover {
+  background: var(--surface-3, #f1f5f9);
+  color: var(--text, #1e293b);
+}
+
+.lang-tabs__tab--active {
+  background: var(--surface, #ffffff);
+  color: var(--accent, #2563eb);
+  border-color: var(--border, #e2e8f0);
+  border-bottom-color: var(--surface, #ffffff);
+  position: relative;
+  bottom: -2px;
+  z-index: 1;
+}
+
+.lang-tabs .codeblock-wrapper {
+  border-radius: 0 0 8px 8px;
+  margin-top: 0;
+}

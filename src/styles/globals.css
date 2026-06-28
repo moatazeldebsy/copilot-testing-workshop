@@ -1,0 +1,596 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* CSS Custom Properties — Dark Theme (default) */
+:root {
+  --bg-primary: #0d1117;
+  --bg-surface: #161b26;
+  --bg-deep: #0b0e14;
+  --border-color: #1c2333;
+  --text-primary: #ffffff;
+  --text-body: #c9d1d9;
+  --text-muted: #8b949e;
+  --text-dim: #484f58;
+  --accent-primary: #7c3aed;
+  --accent-light: #a78bfa;
+  --accent-hover: #c4b5fd;
+  --accent-cta: #e11d48;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f97583;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-surface: #f6f8fa;
+  --bg-deep: #eef1f5;
+  --border-color: #d0d7de;
+  --text-primary: #1f2328;
+  --text-body: #424a53;
+  --text-muted: #656d76;
+  --text-dim: #8b949e;
+  --accent-primary: #7c3aed;
+  --accent-light: #6d28d9;
+  --accent-hover: #5b21b6;
+  --accent-cta: #e11d48;
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+a {
+  text-decoration: none;
+  color: var(--accent-light);
+}
+
+a:hover {
+  text-decoration: underline;
+  color: var(--accent-hover);
+}
+
+/* ─── Workshop Page Layout ─── */
+
+.workshop-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 40px 80px;
+}
+
+.workshop-page h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.workshop-page h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 48px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent-primary) 35%, var(--border-color));
+  color: var(--text-primary);
+}
+
+.workshop-page h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  color: var(--text-body);
+}
+
+.workshop-page p {
+  margin: 0 0 16px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.workshop-page ul, .workshop-page ol {
+  margin: 0 0 16px;
+  padding-left: 24px;
+}
+
+.workshop-page li {
+  margin-bottom: 6px;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+/* ─── Infographic Figure (image fallback) ─── */
+
+.workshop-infographic {
+  margin: 1.75rem 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.workshop-infographic img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.workshop-infographic figcaption {
+  padding: 0.55rem 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+  font-style: italic;
+}
+
+/* ─── Infographic Diagrams (inline JSX) ─── */
+
+.infographic-diagram {
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  padding: 1.25rem;
+  margin: 1.75rem 0;
+}
+
+.infographic-diagram__title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.infographic-diagram__caption {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0.75rem 0 0;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.6rem;
+}
+
+/* Workflow */
+
+.infographic-workflow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.infographic-workflow__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  min-width: 80px;
+}
+
+.infographic-workflow__icon {
+  font-size: 1.2rem;
+}
+
+.infographic-workflow__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.infographic-workflow__arrow {
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.infographic-workflow__types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.infographic-workflow__type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  color: var(--text-muted);
+}
+
+/* File tree */
+
+.infographic-filetree {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.filetree-root {
+  color: var(--text-body);
+}
+
+.filetree-folder {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.filetree-children {
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--border-color);
+  margin-left: 0.5rem;
+}
+
+.filetree-item {
+  padding: 0.18rem 0.4rem;
+  border-radius: 4px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.filetree-item--highlight {
+  color: var(--text-body);
+  font-weight: 600;
+}
+
+.filetree-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  color: var(--accent-light);
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+/* Token strategy */
+
+.infographic-token-strategy {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.token-tier {
+  flex: 1;
+  min-width: 150px;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-color);
+}
+
+.token-tier--always {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.token-tier--scoped {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.token-tier--demand {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.token-tier__badge {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.token-tier--always .token-tier__badge { color: #ef4444; }
+.token-tier--scoped .token-tier__badge { color: #f59e0b; }
+.token-tier--demand .token-tier__badge { color: #22c55e; }
+
+.token-tier ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.token-tier li {
+  margin-bottom: 2px;
+}
+
+/* ─── Step Badge ─── */
+
+.step-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--accent-light);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* ─── Lead Paragraph ─── */
+
+.page-lead {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.workshop-flow-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.workshop-flow-nav a {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 35%, var(--border-color));
+  border-radius: 999px;
+  padding: 6px 11px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-body);
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.workshop-flow-nav a:hover {
+  text-decoration: none;
+  background: rgba(124, 58, 237, 0.16);
+}
+
+/* ─── Info Table ─── */
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+  font-size: 0.92rem;
+}
+
+.info-table thead th {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--accent-primary);
+}
+
+.info-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
+  color: var(--text-body);
+}
+
+.info-table tbody tr:hover {
+  background: rgba(124, 58, 237, 0.04);
+}
+
+/* ─── Code Block ─── */
+
+.code-block {
+  background: var(--bg-deep);
+  color: var(--text-body);
+  border-radius: 10px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  margin-bottom: 28px;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  border: 1px solid var(--border-color);
+}
+
+.code-block code {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  white-space: pre;
+}
+
+/* ─── Callout Boxes ─── */
+
+.callout {
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 28px 0;
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+.callout strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.callout-info {
+  background: rgba(124, 58, 237, 0.08);
+  border-left: 4px solid var(--accent-primary);
+  color: var(--text-body);
+}
+
+.callout-info strong {
+  color: var(--accent-light);
+}
+
+.callout-warning {
+  background: rgba(234, 179, 8, 0.06);
+  border-left: 4px solid var(--warning);
+  color: var(--text-body);
+}
+
+.callout-warning strong {
+  color: var(--warning);
+}
+
+/* ─── Summary Grid (Cleanup page) ─── */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 28px 0;
+}
+
+.summary-card {
+  background: var(--bg-surface);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.summary-card h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.summary-card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.summary-card li {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ─── Inline Code ─── */
+
+.workshop-page code {
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg-surface);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  color: var(--accent-light);
+}
+
+.code-block code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* ─── Challenge Section ─── */
+
+.challenge-section {
+  margin: 48px 0 32px;
+  padding: 24px;
+  border: 2px dashed rgba(124, 58, 237, 0.25);
+  border-radius: 12px;
+  background: rgba(124, 58, 237, 0.02);
+}
+
+.challenge-section h2 {
+  border-bottom: none;
+  margin-top: 0;
+  padding-bottom: 0;
+}
+
+.challenge-section > p {
+  margin-bottom: 20px;
+}
+
+/* ─── Troubleshooting Section ─── */
+
+.troubleshooting-section {
+  margin: 40px 0 32px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-surface);
+}
+
+.troubleshooting-section h2 {
+  border-bottom: none;
+  margin-top: 0;
+  padding-bottom: 0;
+}
+
+/* ─── Key Takeaways consistent wrapper ─── */
+
+.takeaways-section {
+  margin-top: 40px;
+}
+
+.takeaways-section h2 {
+  margin-top: 0;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 1100px) {
+  .workshop-page {
+    padding: 40px 28px 72px;
+  }
+}
+
+@media (max-width: 768px) {
+  .workshop-page {
+    padding: 28px 20px 60px;
+  }
+  .workshop-page h1 {
+    font-size: 1.6rem;
+  }
+  .info-table {
+    font-size: 0.82rem;
+  }
+  .code-block {
+    padding: 14px 16px;
+    font-size: 0.8rem;
+  }
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workshop-flow-nav {
+    gap: 6px;
+  }
+
+  .workshop-flow-nav a {
+    font-size: 0.68rem;
+  }
+}

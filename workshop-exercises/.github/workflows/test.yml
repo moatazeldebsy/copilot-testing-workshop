@@ -1,0 +1,34 @@
+name: Test And Quality Gates
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build UI
+        run: npm run build
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage --coverageReporters=json-summary
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json'); console.log(s.total.lines.pct)")
+          echo "Line coverage: $COVERAGE%"
+          node -e "if (Number(process.argv[1]) < 80) { process.exit(1) }" "$COVERAGE"

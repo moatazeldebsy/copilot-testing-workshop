@@ -1,0 +1,152 @@
+import React, { useState } from 'react';
+import { RegistrationForm } from './components/RegistrationForm';
+import LoginPage from './ui/pages/LoginPage';
+
+const AUTH_TOKEN_KEY = 'workshop-auth-token';
+
+type UserRole = 'admin' | 'viewer' | 'user';
+
+interface SessionUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+const Dashboard: React.FC<{ user: SessionUser; onLogout: () => void }> = ({ user, onLogout }) => (
+  <main className="screen-shell">
+    <section className="card-stack card-stack--wide">
+      <h1>Dashboard</h1>
+      <p>This page exists to support the Playwright step.</p>
+      <p>
+        Signed in as <strong>{user.name}</strong> ({user.role})
+      </p>
+      <button type="button" onClick={onLogout}>Sign out</button>
+    </section>
+  </main>
+);
+
+function getStoredToken(): string {
+  return window.localStorage.getItem(AUTH_TOKEN_KEY) ?? '';
+}
+
+const WorkshopApp: React.FC = () => {
+  const [route, setRoute] = useState(window.location.pathname || '/register');
+  const [isLoading, setIsLoading] = useState(false);
+  const [token, setToken] = useState(getStoredToken);
+  const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
+  const [submissions, setSubmissions] = useState<string[]>([]);
+
+  const navigate = (nextRoute: string) => {
+    window.history.pushState({}, '', nextRoute);
+    setRoute(nextRoute);
+  };
+
+  const persistToken = (nextToken: string) => {
+    setToken(nextToken);
+    if (nextToken) {
+      window.localStorage.setItem(AUTH_TOKEN_KEY, nextToken);
+      return;
+    }
+
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
+  };
+
+  const handleLogin = async (email: string, password: string) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const payload = (await response.json()) as { error?: { message?: string } };
+      throw new Error(payload.error?.message ?? 'Invalid credentials');
+    }
+
+    const payload = (await response.json()) as {
+      data: {
+        token: string;
+        user: SessionUser;
+      };
+    };
+
+    persistToken(payload.data.token);
+    setSessionUser(payload.data.user);
+
+    navigate('/dashboard');
+  };
+
+  const handleRegistration = async (data: {
+    name: string;
+    email: string;
+    password: string;
+    role: 'admin' | 'viewer' | 'user';
+  }) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json()) as { error?: { message?: string } };
+        throw new Error(payload.error?.message ?? 'Registration failed');
+      }
+
+      const payload = (await response.json()) as {
+        data: {
+          token: string;
+          user: SessionUser;
+        };
+      };
+
+      setSubmissions((current) => [...current, `${data.name} (${data.role})`]);
+      persistToken(payload.data.token);
+      setSessionUser(payload.data.user);
+      navigate('/dashboard');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    persistToken('');
+    setSessionUser(null);
+    navigate('/login');
+  };
+
+  if (route === '/dashboard') {
+    if (!token || !sessionUser) {
+      return <LoginPage onLogin={handleLogin} onNavigateRegister={() => navigate('/register')} />;
+    }
+
+    return <Dashboard user={sessionUser} onLogout={handleLogout} />;
+  }
+
+  if (route === '/register') {
+    return (
+      <main className="screen-shell">
+        <section className="card-stack card-stack--wide">
+          <h1>Registration</h1>
+          <p>Use this component in the RTL workshop step.</p>
+          <RegistrationForm onSubmit={handleRegistration} isLoading={isLoading} />
+          <button type="button" onClick={() => navigate('/login')}>Already have an account? Sign in</button>
+          {submissions.length > 0 ? (
+            <ul>
+              {submissions.map((submission) => (
+                <li key={submission}>{submission}</li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      </main>
+    );
+  }
+
+  return <LoginPage onLogin={handleLogin} onNavigateRegister={() => navigate('/register')} />;
+};
+
+export default WorkshopApp;

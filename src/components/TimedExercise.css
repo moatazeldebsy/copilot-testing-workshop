@@ -1,0 +1,69 @@
+.timed-exercise {
+  border-radius: 10px;
+  margin: 1.75rem 0;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-left: 4px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.04);
+  overflow: hidden;
+}
+
+.timed-exercise__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.timed-exercise__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.timed-exercise__icon {
+  font-size: 1rem;
+}
+
+.timed-exercise__title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-body, #1e293b);
+  letter-spacing: 0.01em;
+}
+
+.timed-exercise__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.05em;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #b45309;
+}
+
+.dark .timed-exercise__badge {
+  color: #fbbf24;
+}
+
+.timed-exercise__clock {
+  font-size: 0.85rem;
+}
+
+.timed-exercise__body {
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.timed-exercise__body > *:first-child {
+  margin-top: 0;
+}
+
+.timed-exercise__body > *:last-child {
+  margin-bottom: 0;
+}

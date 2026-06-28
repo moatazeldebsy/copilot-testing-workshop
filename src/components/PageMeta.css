@@ -1,0 +1,44 @@
+.page-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.page-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.page-meta-icon {
+  font-size: 0.8rem;
+}
+
+.page-meta-time {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.page-meta-difficulty--beginner {
+  border-color: rgba(52, 211, 153, 0.3);
+  color: var(--success);
+}
+
+.page-meta-difficulty--intermediate {
+  border-color: rgba(251, 191, 36, 0.3);
+  color: var(--warning);
+}
+
+.page-meta-difficulty--advanced {
+  border-color: rgba(249, 117, 131, 0.3);
+  color: var(--error);
+}

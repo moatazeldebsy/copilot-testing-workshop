@@ -1,0 +1,78 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.22), transparent 32%),
+    linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.screen-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.card-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.card-stack--wide {
+  width: min(520px, 100%);
+  padding: 28px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+
+input,
+select,
+button {
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 12px 14px;
+}
+
+input,
+select {
+  background: rgba(15, 23, 42, 0.85);
+  color: #e2e8f0;
+}
+
+button {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #082f49;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.error-message,
+[role='alert'] {
+  margin: 0;
+  color: #fca5a5;
+}

@@ -1,0 +1,36 @@
+{
+  "name": "copilot-testing-workshop",
+  "version": "1.0.0",
+  "description": "GenAI in Testing: Using GitHub Copilot to Accelerate Quality Without Losing Trust — WeAreDevelopers Berlin 2026",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "github-copilot",
+    "genai",
+    "testing",
+    "workshop",
+    "wearedevelopers"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@types/prismjs": "^1.26.6",
+    "axios": "^1.15.0",
+    "prismjs": "^1.30.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^6.30.3",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.8"
+  }
+}

@@ -1,0 +1,172 @@
+.progress-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+}
+
+.progress-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.progress-card-header {
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 1rem;
+  color: var(--color-text);
+  transition: background-color 0.2s ease;
+}
+
+.progress-card-header:hover {
+  background-color: var(--color-hover-bg, rgba(0, 0, 0, 0.02));
+}
+
+.progress-card-info {
+  flex: 1;
+  text-align: left;
+}
+
+.progress-card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.progress-card-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.progress-card-percentage {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.progress-circle {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-circle-bg {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 3;
+}
+
+.progress-circle-fill {
+  fill: none;
+  stroke: #3b82f6;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.3s ease;
+}
+
+.progress-circle-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.progress-card-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.progress-card-chevron.open {
+  transform: rotate(180deg);
+}
+
+.progress-card-content {
+  border-top: 1px solid var(--color-border);
+  padding: 12px 20px;
+  background-color: var(--color-bg-secondary, rgba(0, 0, 0, 0.02));
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+.progress-card-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.progress-card-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.progress-card-item:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.progress-card-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.progress-card-label {
+  cursor: pointer;
+  flex: 1;
+  padding: 4px 0;
+}
+
+/* Dark mode support */
+:root[data-theme='dark'] .progress-card {
+  --color-surface: #1e1e1e;
+  --color-border: #404040;
+  --color-text: #e0e0e0;
+  --color-text-secondary: #a0a0a0;
+  --color-hover-bg: rgba(255, 255, 255, 0.05);
+  --color-bg-secondary: rgba(255, 255, 255, 0.02);
+}
+
+:root[data-theme='light'] .progress-card {
+  --color-surface: #ffffff;
+  --color-border: #e5e5e5;
+  --color-text: #1a1a1a;
+  --color-text-secondary: #6a6a6a;
+  --color-hover-bg: rgba(0, 0, 0, 0.02);
+  --color-bg-secondary: rgba(0, 0, 0, 0.02);
+}

@@ -1,0 +1,218 @@
+.codeblock-wrapper {
+  position: relative;
+  margin: 1.25rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: var(--bg-deep);
+}
+
+.codeblock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.codeblock-toolbar {
+  padding: 0.45rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.codeblock-expand {
+  border: 1px solid rgba(124, 58, 237, 0.45);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-body);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.28rem 0.72rem;
+  cursor: pointer;
+}
+
+.codeblock-expand:hover {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.codeblock-expand:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.codeblock-lang {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.codeblock-copy {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.codeblock-copy:hover {
+  color: var(--text-body);
+  border-color: var(--accent-primary);
+}
+
+.codeblock-copy--copied {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.codeblock-pre {
+  margin: 0;
+  padding: 1.25rem;
+  overflow-x: auto;
+  background: var(--bg-deep);
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+
+.codeblock-pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  background: none !important;
+  padding: 0 !important;
+  border: none !important;
+  color: var(--text-body);
+}
+
+/* Prism theme overrides for dark navy */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6a737d;
+}
+
+.token.punctuation {
+  color: #8b949e;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #f97583;
+}
+
+.token.boolean,
+.token.number {
+  color: #79c0ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #a5d6ff;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #d2a8ff;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #7c3aed;
+}
+
+.token.function,
+.token.class-name {
+  color: #d2a8ff;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #ffa657;
+}
+
+/* Light theme Prism overrides */
+[data-theme="light"] .token.comment,
+[data-theme="light"] .token.prolog,
+[data-theme="light"] .token.doctype,
+[data-theme="light"] .token.cdata {
+  color: #57606a;
+}
+
+[data-theme="light"] .token.punctuation {
+  color: #24292f;
+}
+
+[data-theme="light"] .token.property,
+[data-theme="light"] .token.tag,
+[data-theme="light"] .token.constant,
+[data-theme="light"] .token.symbol,
+[data-theme="light"] .token.deleted {
+  color: #cf222e;
+}
+
+[data-theme="light"] .token.boolean,
+[data-theme="light"] .token.number {
+  color: #0550ae;
+}
+
+[data-theme="light"] .token.selector,
+[data-theme="light"] .token.attr-name,
+[data-theme="light"] .token.string,
+[data-theme="light"] .token.char,
+[data-theme="light"] .token.builtin,
+[data-theme="light"] .token.inserted {
+  color: #0a3069;
+}
+
+[data-theme="light"] .token.operator,
+[data-theme="light"] .token.entity,
+[data-theme="light"] .token.url,
+[data-theme="light"] .language-css .token.string,
+[data-theme="light"] .style .token.string {
+  color: #8250df;
+}
+
+[data-theme="light"] .token.atrule,
+[data-theme="light"] .token.attr-value,
+[data-theme="light"] .token.keyword {
+  color: #6639ba;
+}
+
+[data-theme="light"] .token.function,
+[data-theme="light"] .token.class-name {
+  color: #8250df;
+}
+
+[data-theme="light"] .token.regex,
+[data-theme="light"] .token.important,
+[data-theme="light"] .token.variable {
+  color: #953800;
+}
+
+@media (max-width: 1024px) {
+  .codeblock-pre {
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+}

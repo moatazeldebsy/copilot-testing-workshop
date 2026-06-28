@@ -1,0 +1,52 @@
+.verify-block {
+  border-radius: 8px;
+  margin: 1.25rem 0;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-left: 4px solid var(--success);
+  overflow: hidden;
+  background: rgba(52, 211, 153, 0.04);
+}
+
+.verify-block-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.12);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.verify-block-icon {
+  font-size: 0.85rem;
+}
+
+.verify-block-label {
+  color: var(--success);
+}
+
+.verify-block-body {
+  padding: 0.75rem 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--text-body);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.verify-block-body code {
+  background: none !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-size: inherit;
+}
+
+@media (max-width: 768px) {
+  .verify-block-body {
+    font-size: 0.78rem;
+    padding: 0.6rem 0.75rem;
+  }
+}

@@ -1,0 +1,126 @@
+.collapsible {
+  border-radius: 8px;
+  margin: 1rem 0;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.collapsible-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  user-select: none;
+  list-style: none;
+  transition: background 0.15s;
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.collapsible-summary:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+[data-theme="light"] .collapsible-summary:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.collapsible-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.collapsible-title {
+  flex: 1;
+}
+
+.collapsible-chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.collapsible-chevron::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.collapsible[open] .collapsible-chevron::before {
+  transform: rotate(45deg);
+  top: 2px;
+}
+
+.collapsible[open] .collapsible-summary {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.collapsible-content {
+  padding: 0 1rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+.collapsible-content p {
+  margin: 0.5rem 0;
+}
+
+/* Variant: hint (blue/purple) */
+.collapsible--hint {
+  background: rgba(124, 58, 237, 0.04);
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+.collapsible--hint .collapsible-summary {
+  color: var(--accent-light);
+}
+
+/* Variant: solution (green) */
+.collapsible--solution {
+  background: rgba(52, 211, 153, 0.04);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+.collapsible--solution .collapsible-summary {
+  color: var(--success);
+}
+
+/* Variant: bonus (gold) */
+.collapsible--bonus {
+  background: rgba(251, 191, 36, 0.04);
+  border-color: rgba(251, 191, 36, 0.2);
+}
+
+.collapsible--bonus .collapsible-summary {
+  color: var(--warning);
+}
+
+@media (max-width: 768px) {
+  .collapsible-summary {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  .collapsible-content {
+    padding: 0 0.75rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
