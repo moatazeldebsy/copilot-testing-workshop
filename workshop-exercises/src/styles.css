@@ -206,7 +206,7 @@ label {
 .card__subtitle {
   font-size: 0.875rem;
   color: var(--text-muted);
-  margin-top: -12px;
+  margin-top: 4px;
 }
 
 .form-row { display: grid; gap: 16px; }
