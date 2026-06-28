@@ -231,6 +231,7 @@ const Home: React.FC = () => {
       <section className="section section-alt">
         <div className="section-inner">
           <h2 className="section-title">120-Minute Schedule</h2>
+          <p style={{ textAlign: 'center', marginBottom: '1rem', opacity: 0.7 }}>Friday, 10 Jul 2026 · Room R2 · 12:15 pm – 2:15 pm WEDT (UTC+02:00)</p>
           <table className="schedule-table">
             <thead>
               <tr>
@@ -242,73 +243,73 @@ const Home: React.FC = () => {
             </thead>
             <tbody>
               <tr>
-                <td>00:00</td>
+                <td>12:15</td>
                 <td>Welcome &amp; Setup</td>
                 <td>Introductions, prerequisites check, Copilot activation</td>
                 <td>10 min</td>
               </tr>
               <tr>
-                <td>00:10</td>
+                <td>12:25</td>
                 <td>Step 1 — Environment Setup</td>
                 <td>Verify Copilot, clone starter repo, first suggestion exercise</td>
                 <td>15 min</td>
               </tr>
               <tr>
-                <td>00:25</td>
+                <td>12:40</td>
                 <td>Step 2 — Introduction to GitHub Copilot</td>
                 <td>Tokens, modes, slash commands, MCP, skills, customization files</td>
                 <td>25 min</td>
               </tr>
               <tr>
-                <td>00:50</td>
+                <td>13:05</td>
                 <td>Step 3 — Copilot: The Big Picture</td>
                 <td>Value map, risk model, where human judgment is still required</td>
                 <td>20 min</td>
               </tr>
               <tr className="schedule-break">
-                <td>01:10</td>
+                <td>13:25</td>
                 <td>⚡ Part 2 begins</td>
                 <td></td>
                 <td></td>
               </tr>
               <tr>
-                <td>01:10</td>
+                <td>13:25</td>
                 <td>Step 4 — Unit Test Generation</td>
                 <td>Prompt patterns, generate → review → fix loop, flaky test detection</td>
                 <td>25 min</td>
               </tr>
               <tr>
-                <td>01:35</td>
+                <td>13:50</td>
                 <td>Step 5 — API &amp; Integration Tests</td>
                 <td>REST test scaffolding, assertion review, integration coverage</td>
                 <td>20 min</td>
               </tr>
               <tr>
-                <td>01:55</td>
+                <td>14:10</td>
                 <td>Step 6 — Test Data &amp; Mocks</td>
                 <td>Fixture factories, stubs, avoiding hardcoded secrets</td>
                 <td>15 min</td>
               </tr>
               <tr className="schedule-break">
-                <td>02:10</td>
+                <td>14:25</td>
                 <td>🛡️ Part 3 begins</td>
                 <td></td>
                 <td></td>
               </tr>
               <tr>
-                <td>02:10</td>
+                <td>14:25</td>
                 <td>Step 7 — Reviewing Tests &amp; Guardrails</td>
                 <td>Review checklist, false confidence, security red flags, prompt templates</td>
                 <td>20 min</td>
               </tr>
               <tr>
-                <td>02:30</td>
+                <td>14:45</td>
                 <td>Step 8 — CI/CD &amp; Team Adoption</td>
                 <td>Quality gates, scanning, CODEOWNERS, team onboarding strategies</td>
                 <td>15 min</td>
               </tr>
               <tr className="schedule-break">
-                <td>02:45</td>
+                <td>15:00</td>
                 <td>🎤 Wrap-up &amp; Q&amp;A</td>
                 <td>Key takeaways, resources, open discussion</td>
                 <td>15 min</td>
