@@ -6,22 +6,20 @@ Use this as a live delivery aid for the 120-minute workshop.
 
 | Time | Segment | Goal | Duration |
 |---|---|---|---:|
-| 12:15 | **Intro & Setup** | All participants running the app, Copilot active | 10 min |
-| 12:25 | **Setup & Tour** | Navigate the store, hit `/docs`, understand the pipeline | 10 min |
-| 12:35 | **Exercise A — Unit Tests** | Generate tests for `calculateDiscount()`; discover that weak prompts produce weak tests | 20 min |
-| 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite | 20 min |
-| 13:15 | **Exercise C — API Tests** | Supertest for the full pipeline; use domain-rules.md as context | 25 min |
-| 13:40 | **Exercise D — Component & E2E** | StorePage component tests + Playwright checkout flow | 20 min |
-| 14:00 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.copilot-instructions.md` | 10 min |
-| 14:10 | **Wrap-up & Q&A** | Trust Playbook handout, one action to take back | 5 min |
+| 12:15 | **Intro, Setup & Tour** | All participants running the app, Copilot active, pipeline understood | 15 min |
+| 12:30 | **Exercise A — Unit Tests** | Generate tests for `calculateDiscount()`; discover that weak prompts produce weak tests | 25 min |
+| 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite | 15 min |
+| 13:10 | **Exercise C — API Tests** | Supertest for the full pipeline; use domain-rules.md as context | 25 min |
+| 13:35 | **Exercise D — Component Tests** | StorePage RTL tests hands-on; Playwright shown as live demo / optional extra | 20 min |
+| 13:55 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.github/copilot-instructions.md`, context engineering | 10 min |
+| 14:05 | **Wrap-up & Q&A** | Trust Playbook walkthrough, one action to take back, open discussion | 15 min |
 
 ## One-line Message per Segment
 
 | Segment | Key message |
 |---|---|
-| Intro | Copilot is a first-draft machine — your job is to decide what "correct" means. |
-| Setup | The checkout pipeline is your real target today — every test you write touches it. |
-| Exercise A | Fast drafts are useful only when the tests would actually fail on a bug. |
+| Intro & Setup | Copilot is a first-draft machine — your job is to decide what "correct" means. |
+| Exercise A | Fast drafts are useful only when failures are meaningful. |
 | Exercise B | AI optimizes for coverage metrics, not for catching failures. |
 | Exercise C | Domain context turns generic Copilot output into domain-aware test suites. |
 | Exercise D | Test behavior users see; prefer `data-testid` and `getByRole` over implementation internals. |

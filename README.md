@@ -18,14 +18,13 @@ _Friday, 10 Jul 2026 · Room R2 · 12:15 pm – 2:15 pm WEDT (UTC+02:00)_
 
 | Time | Segment | Activity | Duration |
 |------|---------|----------|----------|
-| 12:15 | **Intro & Setup** | Welcome, prerequisites check, Copilot activation, clone repo | 10 min |
-| 12:25 | **Setup** | Run the app, tour the checkout pipeline, explore the Swagger docs at `/docs` | 10 min |
-| 12:35 | **Exercise A — Unit Tests** | Use Copilot to generate tests for `calculateDiscount()` (a function with 3 hidden bugs) | 20 min |
-| 12:55 | **Exercise B — Review AI Tests** | Audit the pre-seeded weak tests in `calculateDiscount.weak.test.ts`; rewrite the bad ones | 20 min |
-| 13:15 | **Exercise C — API Tests** | Generate Supertest tests for the full checkout pipeline: cart → discount → fraud → payment → notification | 25 min |
-| 13:40 | **Exercise D — Integration & Component** | Component tests for `StorePage` + E2E with Playwright | 20 min |
-| 14:00 | **Exercise E — CI Guardrails** | Coverage gates, flaky test triage, `.copilot-instructions.md`, context engineering | 10 min |
-| 14:10 | **Wrap-up & Takeaways** | Trust Playbook, Q&A, one action to take back to your team | 5 min |
+| 12:15 | **Intro, Setup & Tour** | Welcome, prerequisites, Copilot activation, clone repo, tour the store UI and `/docs` | 15 min |
+| 12:30 | **Exercise A — Unit Tests** | Use Copilot to generate tests for `calculateDiscount()` (3 hidden bugs); weak vs strong prompt comparison | 25 min |
+| 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite the weak assertions | 15 min |
+| 13:10 | **Exercise C — API Tests** | Generate Supertest tests for the full checkout pipeline: cart → discount → fraud → payment → notification | 25 min |
+| 13:35 | **Exercise D — Component Tests** | React Testing Library tests for `StorePage`; Playwright E2E shown as live demo / optional for early finishers | 20 min |
+| 13:55 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.github/copilot-instructions.md`, context engineering | 10 min |
+| 14:05 | **Wrap-up & Q&A** | Trust Playbook walkthrough, one action to take back, open discussion | 15 min |
 
 ## Getting Started
 
