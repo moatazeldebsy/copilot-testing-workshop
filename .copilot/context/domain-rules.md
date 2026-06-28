@@ -70,7 +70,7 @@ Attempting an invalid transition (e.g. refunding a pending intent) returns
 | NOT_FOUND              | 404  | User / item / payment not found             |
 | ITEM_NOT_FOUND         | 404  | Cart item does not exist                    |
 | DUPLICATE_EMAIL        | 409  | Registration with existing email            |
-| INVALID_PAYMENT_STATE  | 409  | Payment lifecycle transition not allowed    |
+| INVALID_PAYMENT_STATE  | 400  | Payment lifecycle transition not allowed    |
 | INVALID_DISCOUNT_CODE  | 400  | Code does not exist                         |
 | DISCOUNT_EXPIRED       | 400  | Code exists but past its expiry date        |
 | ORDER_BELOW_MINIMUM    | 400  | Subtotal below minOrder for flat discount   |
