@@ -304,6 +304,12 @@ Steps:
 
 Use beforeEach to call db.reset() and seedCatalog() so tests are isolated.`}</CodeBlock>
 
+      <div className="callout callout-info">
+        <strong>Starter repo branch</strong> — The integration test helpers (<code>db.reset()</code>,{' '}
+        <code>seedCatalog()</code>, <code>addItem()</code>, <code>checkout()</code>) are wired up
+        in the <code>04-integration-testing</code> branch. Check that out to run these tests locally.
+      </div>
+
       <CodeBlock language="typescript">{`// tests/integration/checkout.int.test.ts
 import { db, seedCatalog } from '../../src/db';
 import { addItem, applyDiscount, checkout, getCart } from '../../src/services';

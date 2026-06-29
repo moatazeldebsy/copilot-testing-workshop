@@ -283,7 +283,7 @@ jobs:
               });
             }`}</CodeBlock>
 
-      <h2>Exercise E — The Flaky-Test Moment</h2>
+      <h2>Exercise B — Part 2: The Flaky-Test Moment</h2>
       <p>
         Flaky tests are not bugs in your code — they are bugs in your
         <em> assumptions</em>. Non-determinism makes a test pass sometimes and

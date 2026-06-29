@@ -812,9 +812,10 @@ Rule of thumb: the more precise your #selection, the better the suggestion.`}</C
 - Type-check: npm run type-check`}</CodeBlock>
 
       <p>
-        Example <code>AGENTS.md</code> persona used in the exercises repository:
+        Example <code>AGENTS.md</code> files from the exercises repository — root
+        level plus two scoped variants:
       </p>
-      <CodeBlock language="markdown">{`# AGENTS
+      <CodeBlock language="markdown">{`# AGENTS.md — root level (applies to all agents)
 
 Mission: produce reliable tests quickly while preserving behavior.
 
@@ -822,10 +823,19 @@ Priorities:
 1. Keep API contracts unchanged unless explicitly requested.
 2. Prefer minimal, reviewable patches.
 3. Validate with targeted test commands first.
-4. For review tasks, report findings first.
+4. For review tasks, report findings first.`}</CodeBlock>
 
-Prompt format:
-Task, Scope, Constraints, Validation, Output.`}</CodeBlock>
+      <CodeBlock language="markdown">{`# tests/unit/AGENTS.md — scoped to unit tests
+
+Focus: calculateDiscount and pure functions.
+Run: npm run test:unit
+Do not modify src/ files.`}</CodeBlock>
+
+      <CodeBlock language="markdown">{`# tests/api/AGENTS.md — scoped to API tests
+
+Focus: checkout pipeline routes.
+Attach: #file:.copilot/context/domain-rules.md
+Run: npm run test:api`}</CodeBlock>
 
       <p>
         A path-specific instructions file that enforces API test patterns for all
