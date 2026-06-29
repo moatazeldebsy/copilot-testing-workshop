@@ -11,15 +11,17 @@ import TimedExercise from '../../components/TimedExercise';
 const ComponentTesting: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 10</span>
+      <span className="step-badge">Exercise D</span>
       <h1>Component Testing with React Testing Library</h1>
       <PageMeta duration="20 min" difficulty="intermediate" />
       <p className="page-lead">
         React Testing Library (RTL) tests components the way users interact with
-        them — through accessible queries and real events, not internal state.
-        Copilot generates RTL tests quickly, but often defaults to fragile
-        implementation-detail queries. This step shows how to guide it toward
-        accessible, maintainable tests.
+        them — through accessible queries and real events, not internal state. In
+        this exercise you will use Copilot to generate RTL tests for{' '}
+        <code>StorePage</code>, the product listing and cart entry point in the
+        checkout pipeline. Copilot generates RTL tests quickly, but often defaults
+        to fragile implementation-detail queries — this step shows how to steer it
+        toward accessible, maintainable assertions.
       </p>
 
       <ExerciseRepoCallout path="/workshop/component-testing" />
@@ -32,14 +34,15 @@ const ComponentTesting: React.FC = () => (
 
       <div className="callout callout-info">
         <strong>Presenter checkpoint</strong>
-        Live pacing target: 7 min RTL strategy, 6 min hook/context patterns, 7 min refactor challenge and debrief.
+        Live pacing target: 7 min RTL strategy and StorePage walkthrough, 6 min generated test review, 7 min refactor challenge and debrief.
       </div>
 
       <div className="callout callout-info">
         <strong>2-minute speaker script</strong>
         "In component tests, behavior beats implementation details.
-        We will steer Copilot toward accessible queries and user-event interactions.
-        If a test only checks internals, it is likely fragile and low value."
+        We will steer Copilot toward accessible queries, mocked fetch, and
+        waitFor assertions. If a test only checks internals or class names,
+        it is fragile and low value."
       </div>
 
       <PollBlock
@@ -61,212 +64,184 @@ const ComponentTesting: React.FC = () => (
         Avoid querying by CSS class or component internals.
       </div>
 
-      <h2>Part A — Testing a Form Component</h2>
+      <h2>The Component Under Test — StorePage</h2>
       <p>
-        Ask Copilot to generate tests for a registration form component.
-        Provide the component's interface so Copilot can generate accurate assertions:
+        <code>StorePage</code> renders the product catalog, handles "Add to Cart"
+        interactions, and shows the current cart. It fetches products from{' '}
+        <code>/api/products</code> and posts cart updates to the checkout pipeline.
       </p>
-      <CodeBlock language="bash">{`Generate React Testing Library + Jest tests for a RegistrationForm component.
-Props: onSubmit(data: { name: string; email: string; role: 'admin' | 'viewer' }) => void
-The form has: Name input (label "Full Name"), email input (label "Email"),
-a select dropdown (label "Role"), and a Submit button.
-Test: renders all fields, submits correct data, shows validation when name is empty,
-disables submit while loading (prop: isLoading).`}</CodeBlock>
+      <CodeBlock language="typescript">{`// src/ui/pages/StorePage.tsx (abbreviated)
+// Props the component accepts:
+interface StorePageProps {
+  userId: string;
+  token: string;
+}
 
-      <h2>Step 1 — Review the Generated Tests</h2>
-      <CodeBlock language="typescript">{`// tests/components/RegistrationForm.test.tsx  (Copilot-generated — review required)
-import { render, screen } from '@testing-library/react';
+// What it renders:
+// - A product list with one "Add" button per product (data-testid="add-{productId}")
+// - A cart section (data-testid="cart-items") showing added item names
+// - fetch() is used for both product loading and cart updates`}</CodeBlock>
+
+      <h2 id="component-generate">Step 1 — Generate StorePage Tests with Copilot</h2>
+      <p>Select <code>StorePage.tsx</code>, open Copilot Chat, and use this prompt:</p>
+      <CodeBlock language="bash">{`Write React Testing Library + Jest tests for StorePage.
+#file:src/ui/pages/StorePage.tsx
+
+Props: userId (string), token (string)
+The component:
+- renders a product list with Add buttons (one per product)
+- each Add button has data-testid="add-{productId}"
+- clicking Add posts to /api/cart/:userId/items via fetch
+- added items appear in data-testid="cart-items"
+
+Mock global.fetch in beforeEach.
+Test:
+1. Renders at least one Add button
+2. Clicking Add shows the item name in cart-items
+
+Use getByRole and getByTestId for queries. Use userEvent.setup().
+Use waitFor to await the cart update.`}</CodeBlock>
+
+      <h2>Step 2 — The Factory and Fetch Mock Pattern</h2>
+      <p>
+        When the generated tests reference test data and fetch mocking, Copilot
+        should produce helpers like these. Review them for correct shape.
+      </p>
+      <CodeBlock language="typescript">{`// tests/factories.ts  (Copilot-generated — matches slide 29)
+export const buildCartItem = (overrides = {}) => ({
+  id: 'item-1',
+  productId: 'prod_1',
+  name: 'Workshop T-Shirt',
+  price: 25,
+  quantity: 1,
+  ...overrides,
+});
+
+export function mockFetchOnce(body: unknown, status = 200) {
+  (global.fetch as jest.Mock).mockResolvedValueOnce({
+    ok: status < 300,
+    status,
+    json: async () => body,
+  });
+}`}</CodeBlock>
+
+      <h2>Step 3 — Review the Generated Tests</h2>
+      <CodeBlock language="typescript">{`// tests/components/StorePage.test.tsx  (Copilot-generated — review required)
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { RegistrationForm } from '../../src/components/RegistrationForm';
+import { StorePage } from '../../src/ui/pages/StorePage';
+import { buildCartItem, mockFetchOnce } from '../factories';
 
-describe('RegistrationForm', () => {
-  it('renders all form fields', () => {
-    render(<RegistrationForm onSubmit={jest.fn()} />);
+const props = { userId: 'user-test-01', token: 'test-token' };
 
-    expect(screen.getByLabelText('Full Name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Email')).toBeInTheDocument();
-    expect(screen.getByLabelText('Role')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+describe('StorePage', () => {
+  beforeEach(() => {
+    global.fetch = jest.fn();
   });
 
-  it('calls onSubmit with correct data when form is filled', async () => {
-    const user = userEvent.setup();
-    const onSubmit = jest.fn();
-
-    render(<RegistrationForm onSubmit={onSubmit} />);
-
-    await user.type(screen.getByLabelText('Full Name'), 'Alice Smith');
-    await user.type(screen.getByLabelText('Email'), 'alice@example.com');
-    await user.selectOptions(screen.getByLabelText('Role'), 'admin');
-    await user.click(screen.getByRole('button', { name: 'Submit' }));
-
-    expect(onSubmit).toHaveBeenCalledWith({
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      role: 'admin',
-    });
-    expect(onSubmit).toHaveBeenCalledTimes(1);
+  afterEach(() => {
+    jest.resetAllMocks();
   });
 
-  it('shows validation error when name is empty', async () => {
+  it('renders products with Add buttons', async () => {
+    mockFetchOnce({ data: { products: [{ id: 'prod_1', name: 'Workshop T-Shirt', price: 25 }] } });
+
+    render(<StorePage {...props} />);
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /add/i }).length).toBeGreaterThan(0)
+    );
+  });
+
+  it('shows item name in cart after clicking Add', async () => {
     const user = userEvent.setup();
 
-    render(<RegistrationForm onSubmit={jest.fn()} />);
+    // First fetch: load product list
+    mockFetchOnce({ data: { products: [{ id: 'prod_1', name: 'Workshop T-Shirt', price: 25 }] } });
+    // Second fetch: cart update response
+    mockFetchOnce({ data: { items: [buildCartItem()] } });
 
-    await user.type(screen.getByLabelText('Email'), 'alice@example.com');
-    await user.click(screen.getByRole('button', { name: 'Submit' }));
+    render(<StorePage {...props} />);
 
-    expect(screen.getByRole('alert')).toHaveTextContent(/name is required/i);
-  });
+    await waitFor(() => screen.getByTestId('add-prod_1'));
+    await user.click(screen.getByTestId('add-prod_1'));
 
-  it('disables submit button while loading', () => {
-    render(<RegistrationForm onSubmit={jest.fn()} isLoading />);
-
-    expect(screen.getByRole('button', { name: 'Submit' })).toBeDisabled();
+    await waitFor(() =>
+      expect(screen.getByTestId('cart-items')).toHaveTextContent('Workshop T-Shirt')
+    );
   });
 });`}</CodeBlock>
 
       <div className="callout callout-info">
         <strong>🔍 RTL review checklist:</strong>
         <ul>
-          <li>Are queries using <code>getByRole</code> or <code>getByLabelText</code> rather than CSS classes or test IDs?</li>
-          <li>Is <code>userEvent.setup()</code> called instead of the deprecated <code>userEvent.type()</code> directly?</li>
-          <li>Does the submit test assert <em>what</em> was called, not just <em>that</em> it was called?</li>
-          <li>Is the validation test checking a visible <code>alert</code> role — not internal state?</li>
+          <li>Are queries using <code>getByRole</code> or <code>getByTestId</code> rather than CSS classes?</li>
+          <li>Is <code>userEvent.setup()</code> called instead of the deprecated direct <code>userEvent.click()</code>?</li>
+          <li>Are <code>waitFor</code> assertions used to handle async fetch responses?</li>
+          <li>Is <code>global.fetch</code> mocked in <code>beforeEach</code> and reset in <code>afterEach</code>?</li>
+          <li>Is the fetch mock order correct? (product list first, then cart update)</li>
         </ul>
       </div>
 
-      <h2>Part B — Mocking Hooks and Context</h2>
-      <p>
-        When a component depends on a custom hook or React context, Copilot
-        needs explicit guidance on how to mock them. Use this pattern:
-      </p>
-      <CodeBlock language="bash">{`Generate RTL tests for a UserProfile component that:
-- reads from useCurrentUser() hook (returns { name, email, role })
-- calls logout() from useAuth() hook on button click
-Mock both hooks with jest.mock(). Test: renders user data, calls logout on click.`}</CodeBlock>
+      <h2>Step 4 — Run the Tests</h2>
+      <CodeBlock language="bash">{`npx jest tests/components/StorePage.test.tsx --verbose`}</CodeBlock>
+      <VerifyBlock>{`PASS tests/components/StorePage.test.tsx
+  StorePage
+    ✓ renders products with Add buttons (38 ms)
+    ✓ shows item name in cart after clicking Add (54 ms)
 
-      <CodeBlock language="typescript">{`// tests/components/UserProfile.test.tsx
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { UserProfile } from '../../src/components/UserProfile';
+Tests: 2 passed, 2 total`}</VerifyBlock>
 
-// Mock hooks at the module level
-jest.mock('../../src/hooks/useCurrentUser', () => ({
-  useCurrentUser: () => ({
-    name: 'Alice Smith',
-    email: 'alice@example.com',
-    role: 'admin',
-  }),
-}));
-
-const mockLogout = jest.fn();
-jest.mock('../../src/hooks/useAuth', () => ({
-  useAuth: () => ({ logout: mockLogout }),
-}));
-
-describe('UserProfile', () => {
-  beforeEach(() => {
-    mockLogout.mockClear();
-  });
-
-  it('renders user name and email', () => {
-    render(<UserProfile />);
-
-    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
-    expect(screen.getByText('alice@example.com')).toBeInTheDocument();
-  });
-
-  it('calls logout when logout button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<UserProfile />);
-
-    await user.click(screen.getByRole('button', { name: /log out/i }));
-
-    expect(mockLogout).toHaveBeenCalledTimes(1);
-  });
-});`}</CodeBlock>
-
-      <h2>Part C — Testing Context Providers</h2>
-      <p>
-        For components that consume React Context, create a helper wrapper
-        rather than wrapping every test manually:
-      </p>
-      <CodeBlock language="bash">{`Generate a renderWithProviders() test utility that wraps components in:
-- ThemeContext (default theme: 'light')
-- AuthContext (default user: { id: '1', role: 'viewer' })
-Use React Testing Library's render() options.`}</CodeBlock>
-
-      <CodeBlock language="typescript">{`// tests/utils/renderWithProviders.tsx
-import React from 'react';
-import { render, type RenderOptions } from '@testing-library/react';
-import { ThemeProvider } from '../../src/context/ThemeContext';
-import { AuthProvider } from '../../src/context/AuthContext';
-
-const AllProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ThemeProvider defaultTheme="light">
-    <AuthProvider defaultUser={{ id: '1', role: 'viewer' }}>
-      {children}
-    </AuthProvider>
-  </ThemeProvider>
-);
-
-export function renderWithProviders(
-  ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
-) {
-  return render(ui, { wrapper: AllProviders, ...options });
-}`}</CodeBlock>
-
-      <VerifyBlock>{`PASS tests/components/RegistrationForm.test.tsx
-  RegistrationForm
-    ✓ renders all form fields (22 ms)
-    ✓ calls onSubmit with correct data when form is filled (48 ms)
-    ✓ shows validation error when name is empty (31 ms)
-    ✓ disables submit button while loading (8 ms)
-
-PASS tests/components/UserProfile.test.tsx
-  UserProfile
-    ✓ renders user name and email (12 ms)
-    ✓ calls logout when logout button is clicked (19 ms)
-
-Tests: 6 passed, 6 total`}</VerifyBlock>
+      <div className="callout callout-info">
+        <strong>🎬 Playwright live demo</strong> — The presenter will now run a
+        live Playwright E2E test against the checkout flow. This shows the same
+        user journey as the RTL tests, but through a real browser navigating from
+        StorePage → cart → checkout confirmation.
+      </div>
 
       <div id="component-exercise">
       <TimedExercise minutes={8} title="Hands-on Challenge">
         <p>
-          A teammate wrote this test. Use Copilot to identify the problem and
-          generate an improved version:
+          A teammate wrote this StorePage test. Use Copilot to identify the
+          problems and generate an improved version:
         </p>
-        <CodeBlock language="typescript">{`it('submits the form', async () => {
-  const onSubmit = jest.fn();
-  const { container } = render(<RegistrationForm onSubmit={onSubmit} />);
+        <CodeBlock language="typescript">{`it('adds item to cart', async () => {
+  const { container } = render(<StorePage userId="u1" token="tok" />);
 
-  fireEvent.change(container.querySelector('.name-input'), { target: { value: 'Alice' } });
-  fireEvent.click(container.querySelector('button[type="submit"]'));
+  fireEvent.click(container.querySelector('.add-button'));
 
-  expect(onSubmit).toBeTruthy();
+  expect(container.querySelector('.cart-items')).toBeTruthy();
 });`}</CodeBlock>
         <Collapsible title="Hint: What are the three problems?" variant="hint">
           <ul>
-            <li>CSS class selector (<code>.name-input</code>) — fragile, breaks on rename</li>
-            <li><code>fireEvent</code> instead of <code>userEvent</code> — doesn't simulate real browser events</li>
-            <li><code>expect(onSubmit).toBeTruthy()</code> — always passes; doesn't verify it was actually called</li>
+            <li>CSS class selector (<code>.add-button</code>) — fragile, breaks on rename; use <code>getByTestId('add-prod_1')</code></li>
+            <li><code>fireEvent</code> instead of <code>userEvent</code> — doesn't simulate real browser pointer events</li>
+            <li><code>toBeTruthy()</code> on the element — passes even if cart shows nothing; assert the item <em>name</em> is visible</li>
           </ul>
         </Collapsible>
         <Collapsible title="Fixed Version" variant="solution">
-          <CodeBlock language="typescript">{`it('submits the form', async () => {
+          <CodeBlock language="typescript">{`it('shows item name in cart after clicking Add', async () => {
   const user = userEvent.setup();
-  const onSubmit = jest.fn();
 
-  render(<RegistrationForm onSubmit={onSubmit} />);
+  mockFetchOnce({ data: { products: [{ id: 'prod_1', name: 'Workshop T-Shirt', price: 25 }] } });
+  mockFetchOnce({ data: { items: [buildCartItem()] } });
 
-  await user.type(screen.getByLabelText('Full Name'), 'Alice');
-  await user.click(screen.getByRole('button', { name: 'Submit' }));
+  render(<StorePage userId="user-test-01" token="test-token" />);
 
-  expect(onSubmit).toHaveBeenCalledTimes(1);
-  expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ name: 'Alice' }));
+  await waitFor(() => screen.getByTestId('add-prod_1'));
+  await user.click(screen.getByTestId('add-prod_1'));
+
+  await waitFor(() =>
+    expect(screen.getByTestId('cart-items')).toHaveTextContent('Workshop T-Shirt')
+  );
 });`}</CodeBlock>
+        </Collapsible>
+        <Collapsible title="Bonus: Test empty cart state" variant="bonus">
+          <p>
+            Add a test that verifies the cart section shows a "Your cart is empty"
+            message on initial render before any items are added. Ask Copilot to
+            generate it, then check whether it mocks the initial fetch correctly.
+          </p>
         </Collapsible>
       </TimedExercise>
       </div>
@@ -275,11 +250,11 @@ Tests: 6 passed, 6 total`}</VerifyBlock>
         <h2>Key Takeaways</h2>
         <div className="summary-card">
           <ul>
-            <li>RTL favors user-facing queries (<code>getByRole</code>, <code>getByLabelText</code>) over CSS or test IDs</li>
+            <li>Use <code>getByRole</code> and <code>getByTestId</code> — avoid CSS class selectors</li>
             <li>Always use <code>userEvent.setup()</code> — it simulates real pointer and keyboard events</li>
-            <li>Check <em>what</em> functions are called with, not just <em>that</em> they were called</li>
-            <li>Mock hooks at the module level; clear mocks in <code>beforeEach</code> to prevent test leakage</li>
-            <li>Extract <code>renderWithProviders</code> to avoid wrapping context in every single test</li>
+            <li>Mock <code>global.fetch</code> in <code>beforeEach</code>; load responses in order using <code>mockResolvedValueOnce</code></li>
+            <li>Assert visible content (item names, text) not just element existence</li>
+            <li>Use <code>waitFor</code> for any assertion that depends on async fetch or state update</li>
           </ul>
         </div>
       </div>

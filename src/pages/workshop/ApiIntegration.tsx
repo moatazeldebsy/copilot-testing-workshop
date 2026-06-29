@@ -13,14 +13,16 @@ import TimedExercise from '../../components/TimedExercise';
 const ApiIntegration: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 5</span>
+      <span className="step-badge">Exercise C</span>
       <h1>API &amp; Integration Tests</h1>
-      <PageMeta duration="20 min" difficulty="intermediate" />
+      <PageMeta duration="25 min" difficulty="intermediate" />
       <p className="page-lead">
-        Copilot is effective at scaffolding REST API tests and integration test
-        structure — but it cannot know your specific routes, status codes, or
-        data contracts. This step shows how to use Copilot to generate the
-        skeleton and then fill in the knowledge Copilot lacks.
+        In this exercise you will use Copilot to generate Supertest coverage for
+        the full checkout pipeline — Cart → Discount → Fraud → Payment →
+        Notification. Copilot is effective at scaffolding route contracts, but it
+        cannot know your specific status codes or error shapes without context.
+        Attaching <code>domain-rules.md</code> is what turns generic scaffolding
+        into domain-aware assertions.
       </p>
 
       <ExerciseRepoCallout path="/workshop/api-integration" />
@@ -33,14 +35,14 @@ const ApiIntegration: React.FC = () => (
 
       <div className="callout callout-info">
         <strong>Presenter checkpoint</strong>
-        Live pacing target: 6 min route-contract generation, 7 min scaffold review and fixes, 7 min hands-on challenge.
+        Live pacing target: 7 min checkout pipeline tour and prompt, 8 min scaffold review and fixes, 10 min hands-on challenge.
       </div>
 
       <div className="callout callout-info">
         <strong>2-minute speaker script</strong>
-        "Copilot can scaffold API tests fast, but only you know your real contract.
-        We will validate status, body shape, and auth boundaries explicitly.
-        Speed comes from scaffolding; trust comes from contract assertions."
+        "Copilot scaffolds the structure fast, but only you know the domain.
+        We will add domain-rules.md as context so Copilot generates the right
+        error codes and boundary cases for every checkout step."
       </div>
 
       <PollBlock
@@ -67,20 +69,20 @@ const ApiIntegration: React.FC = () => (
           {
             emoji: '🤷',
             label: 'Not sure yet',
-            rationale: 'Use this step to start with route tests first, then add one integration path for confidence in repository behavior.',
+            rationale: 'Use this step to start with route tests first, then add one integration path for confidence in checkout state.',
           },
         ]}
         note="Pick a strategy, reveal rationale, then align your first implementation slice with the recommendation."
       />
 
       <ArchDiagram
-        title="API Test Architecture"
+        title="Checkout Pipeline Under Test"
         nodes={[
           { label: 'Test File', icon: '🧪' },
           { label: 'Supertest', icon: '📡' },
           { label: 'Express App', icon: '🔌' },
-          { label: 'Service Layer', icon: '⚙️' },
-          { label: 'Mock DB / Real DB', icon: '🗄️' },
+          { label: 'Cart / Discount / Fraud', icon: '⚙️' },
+          { label: 'In-Memory Store', icon: '🗄️' },
         ]}
         connections={[
           { from: 0, to: 1, label: 'uses' },
@@ -90,93 +92,172 @@ const ApiIntegration: React.FC = () => (
         ]}
       />
 
-      <h2>Part A — REST API Tests with Supertest</h2>
+      <h2>The Checkout Pipeline</h2>
       <p>
-        Supertest lets you test Express routes without starting a real server.
-        Copilot knows this pattern well.
+        Every exercise in this workshop runs against the same sample checkout
+        system. The API tests in this step cover the full pipeline:
       </p>
+      <table className="info-table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Key Routes</th>
+            <th>What to test</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cart</td>
+            <td><code>POST /api/cart/:userId/items</code></td>
+            <td>Add item, merge duplicate products, reject invalid price/quantity</td>
+          </tr>
+          <tr>
+            <td>Discount</td>
+            <td><code>POST /api/discount/apply</code></td>
+            <td>Valid codes, expired codes, unknown codes, minimum-order gate</td>
+          </tr>
+          <tr>
+            <td>Fraud</td>
+            <td><code>POST /api/fraud/check</code></td>
+            <td>Low-risk approval, high-risk block, blacklisted country</td>
+          </tr>
+          <tr>
+            <td>Payment</td>
+            <td><code>POST /api/payment/capture</code></td>
+            <td>Successful capture, fraud-blocked order, invalid state transition</td>
+          </tr>
+        </tbody>
+      </table>
 
       <h2 id="api-generate">Step 1 — Generate the API Test Scaffold</h2>
-      <p>Open Copilot Chat and use this prompt (adjust for your actual routes):</p>
+      <p>
+        Attach the domain-rules file so Copilot generates correct error codes and
+        boundary values:
+      </p>
       <LanguageTabs tabs={[
         {
           label: 'TypeScript / Supertest',
           language: 'bash',
-            code: `Write Supertest tests for an Express app with auth-aware routes.
-  Routes:
-  - POST /api/auth/register
-  - POST /api/auth/login
-  - GET /api/users/:id (requires Bearer token)
-  - DELETE /api/users/:id (requires Bearer token)
-  Response contract:
-  - success payloads in { data: ... }
-  - errors in { error: { code, message } }
-  Use Jest and include tests for happy path, unauthorized requests, and duplicate email registration.`,
+          code: `Write Supertest tests for the checkout pipeline.
+#file:.copilot/context/domain-rules.md
+#file:src/app.ts
+
+Cover these routes:
+- POST /api/cart/:userId/items — add item, assert 201 + subtotal
+- POST /api/discount/apply — valid SAVE10 code, unknown code (BOGUS → INVALID_DISCOUNT_CODE)
+- POST /api/fraud/check — high-risk order (amount > $1000, country XX) → approved: false
+
+Use Jest and Supertest. Assert both status code AND response body shape.
+Use the error codes from domain-rules.md for error case assertions.`,
         },
         {
           label: 'Python / pytest',
           language: 'bash',
-          code: `Write pytest integration tests for a Flask/FastAPI router at /api/users.
-Routes: POST /api/users (create), GET /api/users/{id} (fetch), DELETE /api/users/{id} (delete).
-Use the requests library or TestClient. Mock the UserService. Test: success, 404, 422 validation errors.`,
+          code: `Write pytest integration tests for the checkout pipeline.
+Routes:
+- POST /api/cart/{user_id}/items — add item, assert 201 + subtotal
+- POST /api/discount/apply — SAVE10 success, BOGUS → INVALID_DISCOUNT_CODE error
+- POST /api/fraud/check — high-risk (amount>1000, country=XX) → approved: False
+
+Use the requests library or TestClient. Assert status AND body structure.`,
         },
         {
           label: 'Java / RestAssured',
           language: 'bash',
-          code: `Write RestAssured + JUnit 5 integration tests for a Spring Boot controller at /api/users.
-Routes: POST /api/users (create), GET /api/users/{id} (fetch), DELETE /api/users/{id} (delete).
-Mock the UserService with @MockBean. Test: success cases, 404 errors, 400 validation errors.`,
+          code: `Write RestAssured + JUnit 5 integration tests for the checkout pipeline.
+Routes: POST /api/cart/{userId}/items, POST /api/discount/apply, POST /api/fraud/check.
+Use @MockBean for dependencies. Test success cases, error codes, and fraud blocking.`,
         },
       ]} />
 
-        <h2>Step 2 — Review the Generated Scaffold</h2>
-        <Collapsible title="Full generated scaffold" variant="hint">
-          <CodeBlock language="typescript">{`// tests/api/auth-and-users.test.ts  (Copilot-generated — review required)
+      <h2>Step 2 — Review the Generated Scaffold</h2>
+      <Collapsible title="Full generated scaffold" variant="hint">
+        <CodeBlock language="typescript">{`// tests/api/checkout.test.ts  (Copilot-generated — review required)
 import request from 'supertest';
-    import { app, resetWorkshopData } from '../../src/app';
+import { app, resetWorkshopData } from '../../src/app';
 
-    describe('Auth and user API', () => {
-      beforeEach(async () => {
-        await resetWorkshopData();
-      });
+const userId = 'user-workshop-01';
+let token: string;
 
-      it('registers a user and returns token + public user payload', async () => {
-        const response = await request(app)
-          .post('/api/auth/register')
-          .send({
-            name: 'Bob Builder',
-            email: 'bob@example.com',
-            password: 'supersecure123',
-            role: 'user',
-          });
+beforeEach(async () => {
+  await resetWorkshopData();
+  // Obtain a seeded auth token for protected routes
+  const login = await request(app)
+    .post('/api/auth/login')
+    .send({ email: 'alice@example.com', password: 'workshop-password' });
+  token = login.body.data.token;
+});
 
-        expect(response.status).toBe(201);
-        expect(response.body.data.token).toBeTruthy();
-        expect(response.body.data.user.email).toBe('bob@example.com');
-        expect(response.body.data.user.passwordHash).toBeUndefined();
-      });
+describe('Cart', () => {
+  it('adds an item and returns the updated subtotal', async () => {
+    const res = await request(app)
+      .post(\`/api/cart/\${userId}/items\`)
+      .set('Authorization', \`Bearer \${token}\`)
+      .send({ productId: 'prod-1', price: 25, quantity: 1 });
 
-      it('rejects protected user route without Bearer token', async () => {
-        const response = await request(app).get('/api/users/some-id');
+    expect(res.status).toBe(201);
+    expect(res.body.data.subtotal).toBe(25);
+  });
 
-        expect(response.status).toBe(401);
-        expect(response.body.error.code).toBe('UNAUTHORIZED');
-      });
+  it('merges quantities when the same product is added twice', async () => {
+    await request(app)
+      .post(\`/api/cart/\${userId}/items\`)
+      .set('Authorization', \`Bearer \${token}\`)
+      .send({ productId: 'prod-1', price: 25, quantity: 1 });
 
-      it('logs in seeded admin and allows protected route with token', async () => {
-        const login = await request(app)
-          .post('/api/auth/login')
-          .send({ email: 'alice@example.com', password: 'workshop-password' });
+    const res = await request(app)
+      .post(\`/api/cart/\${userId}/items\`)
+      .set('Authorization', \`Bearer \${token}\`)
+      .send({ productId: 'prod-1', price: 25, quantity: 2 });
 
-        const token = login.body.data.token;
-        const userId = login.body.data.user.id;
+    expect(res.status).toBe(201);
+    // quantity should be merged to 3, not two separate line items
+    const items = res.body.data.items;
+    expect(items).toHaveLength(1);
+    expect(items[0].quantity).toBe(3);
+  });
+});
 
-        const userResponse = await request(app)
-          .get('/api/users/' + userId)
-          .set('Authorization', 'Bearer ' + token);
+describe('Discount', () => {
+  it('applies SAVE10 and returns the correct discounted total', async () => {
+    const res = await request(app)
+      .post('/api/discount/apply')
+      .send({ code: 'SAVE10', subtotal: 100 });
 
-        expect(userResponse.status).toBe(200);
-        expect(userResponse.body.data.email).toBe('alice@example.com');
+    expect(res.status).toBe(200);
+    expect(res.body.data.discountAmount).toBe(10);
+    expect(res.body.data.finalTotal).toBe(90);
+  });
+
+  it('rejects an unknown code with INVALID_DISCOUNT_CODE', async () => {
+    const res = await request(app)
+      .post('/api/discount/apply')
+      .send({ code: 'BOGUS', subtotal: 100 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('INVALID_DISCOUNT_CODE');
+  });
+});
+
+describe('Fraud', () => {
+  it('blocks a high-risk order (amount > $1000, country XX)', async () => {
+    const res = await request(app)
+      .post('/api/fraud/check')
+      .send({ orderAmount: 10000, itemCount: 50, ipCountry: 'XX' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.approved).toBe(false);
+    expect(res.body.data.riskLevel).toBe('high');
+  });
+
+  it('approves a low-risk order', async () => {
+    const res = await request(app)
+      .post('/api/fraud/check')
+      .send({ orderAmount: 50, itemCount: 2, ipCountry: 'DE' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.approved).toBe(true);
+    expect(res.body.data.riskLevel).toBe('low');
   });
 });`}</CodeBlock>
       </Collapsible>
@@ -184,121 +265,113 @@ import request from 'supertest';
       <div className="callout callout-info">
         <strong>🔍 Review checklist for API tests:</strong>
         <ul>
-              <li>Does the test verify the response envelope shape (for example <code>data.user</code>, <code>error.code</code>)?</li>
-              <li>Do protected-route tests include both missing-token and valid-token cases?</li>
-              <li>Are sensitive fields like <code>passwordHash</code> excluded from public responses?</li>
-              <li>Are duplicate-email and invalid-credential failures asserted with stable error codes?</li>
+          <li>Does every test assert <em>both</em> status code and response body?</li>
+          <li>Do error cases use the exact error codes from <code>domain-rules.md</code> (e.g. <code>INVALID_DISCOUNT_CODE</code>, not <code>NOT_FOUND</code>)?</li>
+          <li>Does the fraud test verify <code>riskLevel</code> and <code>approved</code> — not just one field?</li>
+          <li>Is the cart merge test asserting <code>items</code> length, not just status?</li>
         </ul>
       </div>
 
       <h2>Step 3 — Run the API Tests</h2>
-          <CodeBlock language="bash">{`npm run test:api`}</CodeBlock>
-          <VerifyBlock>{`PASS tests/api/auth-and-users.test.ts
-      Auth and user API
-        ✓ should register a user and return token with public profile
-        ✓ should reject requests to protected user route without bearer token
-        ✓ should login seeded admin and read protected user route with bearer token
-        ✓ should reject duplicate registration with structured error payload
+      <CodeBlock language="bash">{`npm run test:api`}</CodeBlock>
+      <VerifyBlock>{`PASS tests/api/checkout.test.ts
+  Cart
+    ✓ adds an item and returns the updated subtotal (28 ms)
+    ✓ merges quantities when the same product is added twice (22 ms)
+  Discount
+    ✓ applies SAVE10 and returns the correct discounted total (18 ms)
+    ✓ rejects an unknown code with INVALID_DISCOUNT_CODE (12 ms)
+  Fraud
+    ✓ blocks a high-risk order (amount > $1000, country XX) (15 ms)
+    ✓ approves a low-risk order (9 ms)
 
-Tests: 4 passed, 4 total`}</VerifyBlock>
+Tests: 6 passed, 6 total`}</VerifyBlock>
 
-          <h2>Part B — Integration Tests with Real Persistence</h2>
+      <h2>Part B — Integration Tests with Real State</h2>
       <p>
-            For integration coverage, test service + repository behavior without
-            mocking persistence. In this workshop app, the repository persists to
-            a local JSON file, so you can validate realistic state transitions.
+        For integration coverage, test that a full checkout flow transitions
+        state correctly — items are added, a discount is applied, and the cart
+        is cleared after checkout.
       </p>
-          <CodeBlock language="bash">{`Write a Jest integration test for UserRepository with file-backed persistence.
-    Test: save user, read by email, reset repository, verify user no longer exists.
-    Use beforeEach to call repo.reset() so tests are isolated.`}</CodeBlock>
+      <CodeBlock language="bash">{`Write a Jest integration test for the full checkout flow.
+#file:.copilot/context/domain-rules.md
 
-          <CodeBlock language="typescript">{`// tests/integration/userRepository.integration.test.ts
-import { UserRepository } from '../../src/repositories/userRepository';
+Steps:
+1. Add item (sku-42) to cart for userId 'user-test-01'
+2. Apply discount code SAVE10
+3. Call checkout — verify order status is 'confirmed'
+4. Verify cart is empty after checkout
 
-describe('UserRepository (integration)', () => {
-  let repo: UserRepository;
+Use beforeEach to call db.reset() and seedCatalog() so tests are isolated.`}</CodeBlock>
 
-      beforeEach(async () => {
-        repo = new UserRepository();
-        await repo.reset();
-  });
+      <CodeBlock language="typescript">{`// tests/integration/checkout.int.test.ts
+import { db, seedCatalog } from '../../src/db';
+import { addItem, applyDiscount, checkout, getCart } from '../../src/services';
 
-      afterEach(async () => {
-        await repo.reset();
-  });
+const userId = 'user-test-01';
 
-      it('saves and reads a user by email', async () => {
-        await repo.save({
-          id: '1',
-          name: 'Alice',
-          email: 'alice@example.com',
-          passwordHash: 'hash',
-          role: 'viewer',
-          createdAt: new Date(),
-        });
+beforeEach(async () => {
+  await db.reset();
+  await seedCatalog();
+});
 
-    const found = await repo.findByEmail('alice@example.com');
+it('places an order and clears the cart', async () => {
+  const cart = await addItem(userId, 'sku-42', { quantity: 1, price: 25 });
+  const discounted = await applyDiscount(cart.id, 'SAVE10');
 
-    expect(found?.id).toBe('1');
-    expect(found?.name).toBe('Alice');
-  });
+  expect(discounted.discountAmount).toBe(2.5);  // 10% of $25
 
-      it('removes persisted users after reset', async () => {
-        await repo.save({
-          id: '2',
-          name: 'Bob',
-          email: 'bob@example.com',
-          passwordHash: 'hash',
-          role: 'user',
-          createdAt: new Date(),
-        });
+  const order = await checkout(cart.id);
+  expect(order.status).toBe('confirmed');
 
-        await repo.reset();
+  const after = await getCart(userId);
+  expect(after.items).toHaveLength(0);
+});
 
-        const result = await repo.findByEmail('bob@example.com');
-        expect(result).toBeNull();
-  });
+it('blocks checkout when fraud check fails', async () => {
+  const cart = await addItem(userId, 'sku-42', { quantity: 50, price: 250 });
+
+  await expect(checkout(cart.id, { ipCountry: 'XX' }))
+    .rejects.toThrow('FRAUD_BLOCKED');
 });`}</CodeBlock>
 
       <div id="api-exercise">
-      <TimedExercise minutes={8} title="Hands-on Challenge">
+      <TimedExercise minutes={10} title="Hands-on Challenge">
         <p>
-              Add DELETE route coverage with auth. Use Copilot to generate tests
-              for both authorized deletion and unauthorized access.
+          Add coverage for the Payment lifecycle. Use Copilot to generate tests
+          for a successful capture and an invalid state transition. Refer to the
+          Payment lifecycle in <code>domain-rules.md</code>.
         </p>
-        <Collapsible title="Hint: What to check in the generated DELETE test" variant="hint">
+        <Collapsible title="Hint: Payment lifecycle rules" variant="hint">
           <ul>
-                <li>Does the test first obtain a valid token from login or registration?</li>
-                <li>Does it verify <code>204 No Content</code> for a valid authenticated delete?</li>
-                <li>Does it include an unauthorized case (missing or invalid Bearer token)?</li>
+            <li>Valid transitions: <code>pending → captured</code> (POST /api/payment/:id/capture)</li>
+            <li>Invalid transition: refunding a <code>pending</code> intent returns <code>INVALID_PAYMENT_STATE</code> with HTTP 409</li>
+            <li>Assert the <code>error.code</code> in the error response — not just the status</li>
           </ul>
         </Collapsible>
         <Collapsible title="Full Solution" variant="solution">
-              <CodeBlock language="typescript">{`it('deletes a user with valid Bearer token', async () => {
-      const registration = await request(app)
-        .post('/api/auth/register')
-        .send({
-          name: 'Delete Me',
-          email: 'delete-me@example.com',
-          password: 'supersecure123',
-          role: 'viewer',
-        });
+          <CodeBlock language="typescript">{`describe('Payment', () => {
+  it('captures a pending payment intent', async () => {
+    // First create a payment intent via checkout
+    const { paymentId } = await setupPendingPayment(userId, token);
 
-      const token = registration.body.data.token;
-      const userId = registration.body.data.user.id;
+    const res = await request(app)
+      .post(\`/api/payment/\${paymentId}/capture\`)
+      .set('Authorization', \`Bearer \${token}\`);
 
-      const response = await request(app)
-        .delete('/api/users/' + userId)
-        .set('Authorization', 'Bearer ' + token);
-
-      expect(response.status).toBe(204);
-    });
+    expect(res.status).toBe(200);
+    expect(res.body.data.status).toBe('captured');
   });
-    it('rejects delete without Bearer token', async () => {
-      const response = await request(app).delete('/api/users/some-id');
-    mockUserService.prototype.deleteUser = jest.fn().mockRejectedValue(new Error('User not found'));
-      expect(response.status).toBe(401);
-      expect(response.body.error.code).toBe('UNAUTHORIZED');
+
+  it('rejects refunding a payment that is still pending', async () => {
+    const { paymentId } = await setupPendingPayment(userId, token);
+
+    const res = await request(app)
+      .post(\`/api/payment/\${paymentId}/refund\`)
+      .set('Authorization', \`Bearer \${token}\`);
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('INVALID_PAYMENT_STATE');
   });
 });`}</CodeBlock>
         </Collapsible>
@@ -309,11 +382,11 @@ describe('UserRepository (integration)', () => {
         <h2>Key Takeaways</h2>
         <div className="summary-card">
           <ul>
-            <li>Copilot is strongest when you provide route details and response contracts up front</li>
-            <li>Verify both status and payload structure (for example <code>data</code> and <code>error.code</code>)</li>
-            <li>Protected route tests should always include both unauthorized and authorized cases</li>
-            <li>Integration tests should touch real persistence boundaries, not only mocked services</li>
-            <li>Use deterministic reset helpers between tests to prevent state leakage</li>
+            <li>Attach <code>domain-rules.md</code> as context — it gives Copilot the exact error codes and boundaries it needs</li>
+            <li>Always assert both status code AND body shape — neither alone is sufficient</li>
+            <li>Test the checkout pipeline end-to-end: happy path, invalid discount, fraud block, payment lifecycle</li>
+            <li>Integration tests should reset and seed state in <code>beforeEach</code> to prevent order-dependent failures</li>
+            <li>Speed comes from scaffolding; trust comes from asserting the right domain values</li>
           </ul>
         </div>
       </div>

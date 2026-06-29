@@ -73,57 +73,87 @@ const TestDataMocks: React.FC = () => (
         ]}
       />
 
-      <h2 id="mocks-generate">Part A — Fixture Factories</h2>
+      <h2 id="mocks-generate">Part A — Fixture Factories for the Checkout Pipeline</h2>
       <p>
         A factory function creates test objects with sensible defaults that can
-        be overridden per test. Ask Copilot to generate one from your type:
+        be overridden per test. Ask Copilot to generate one from your type. Here
+        the factories mirror the checkout domain used throughout this workshop:
       </p>
       <LanguageTabs tabs={[
         {
           label: 'TypeScript / Jest',
           language: 'bash',
-          code: `Generate a TypeScript factory function for this User type:
-{ id: string; name: string; email: string; role: 'admin' | 'user'; createdAt: Date }
-Use crypto.randomUUID() for id. Make all fields overridable via a Partial<User> parameter.`,
+          code: `Generate TypeScript factory functions for the checkout pipeline types.
+#file:src/models/cart.ts
+#file:src/models/order.ts
+
+Factories needed:
+1. buildCartItem(overrides?) — CartItem with id, productId, name, price, quantity
+2. buildOrder(overrides?) — Order with id, userId, items, subtotal, status ('pending'|'confirmed'|'cancelled')
+
+Use obviously fake defaults. Make all fields overridable via a spread parameter.`,
         },
         {
           label: 'Python / pytest',
           language: 'bash',
-          code: `Generate a Python factory function for a User dataclass:
-@dataclass User: id: str, name: str, email: str, role: Literal['admin', 'user'], created_at: datetime
-Use uuid.uuid4() for id. Make all fields overridable via keyword arguments with defaults.`,
+          code: `Generate Python factory functions for checkout pipeline types.
+Factories needed:
+1. build_cart_item(**overrides) — dict with id, product_id, name, price, quantity
+2. build_order(**overrides) — dict with id, user_id, items, subtotal, status
+
+Use obviously fake defaults. Make all fields overridable via keyword arguments.`,
         },
         {
           label: 'Java / JUnit 5',
           language: 'bash',
-          code: `Generate a Java builder/factory for a User record:
-record User(String id, String name, String email, Role role, Instant createdAt)
-Use UUID.randomUUID() for id. Make all fields overridable via a fluent builder pattern.`,
+          code: `Generate Java builder/factory methods for checkout pipeline types.
+Factories needed:
+1. CartItemBuilder — id, productId, name, price, quantity with fluent overrides
+2. OrderBuilder — id, userId, items, subtotal, status
+
+Use obvious test defaults. Use a fluent builder pattern.`,
         },
       ]} />
 
-      <CodeBlock language="typescript">{`// tests/factories/userFactory.ts  (Copilot-generated)
-import { User } from '../../src/models/user';
-
-export const createUser = (overrides: Partial<User> = {}): User => ({
-  id: crypto.randomUUID(),
-  name: 'Test User',
-  email: \`user-\${Date.now()}@example.com\`,
-  role: 'user',
-  createdAt: new Date(),
+      <CodeBlock language="typescript">{`// tests/factories.ts  (Copilot-generated — matches checkout domain)
+export const buildCartItem = (overrides: Partial<CartItem> = {}): CartItem => ({
+  id: 'item-1',
+  productId: 'prod_1',
+  name: 'Workshop T-Shirt',
+  price: 25,
+  quantity: 1,
   ...overrides,
 });
 
-// Usage in tests:
-// const admin = createUser({ role: 'admin', name: 'Admin Alice' });
-// const existing = createUser({ email: 'known@example.com' });`}</CodeBlock>
+export const buildOrder = (overrides: Partial<Order> = {}): Order => ({
+  id: 'order-1',
+  userId: 'user-test-01',
+  items: [buildCartItem()],
+  subtotal: 25,
+  status: 'pending',
+  ...overrides,
+});
+
+// Fetch mock helper — used in StorePage component tests
+export function mockFetchOnce(body: unknown, status = 200) {
+  (global.fetch as jest.Mock).mockResolvedValueOnce({
+    ok: status < 300,
+    status,
+    json: async () => body,
+  });
+}
+
+// Usage examples:
+// const shirt = buildCartItem({ quantity: 3 });
+// const confirmed = buildOrder({ status: 'confirmed', subtotal: 90 });
+// mockFetchOnce({ data: { items: [buildCartItem()] } });`}</CodeBlock>
 
       <div className="callout callout-info">
-        <strong>✅ What makes this factory good:</strong>
+        <strong>✅ What makes these factories good:</strong>
         <ul>
-          <li>Uses <code>Date.now()</code> in the email to avoid duplicate-key errors in integration tests</li>
-          <li>Defaults are realistic but obviously fake (e.g. <code>example.com</code>)</li>
-          <li><code>Partial&lt;User&gt;</code> spread allows per-test overrides without boilerplate</li>
+          <li>Defaults are obviously fake ("Workshop T-Shirt", "user-test-01") — not real-looking PII</li>
+          <li>Spread overrides let each test express only what it cares about</li>
+          <li><code>mockFetchOnce</code> returns a proper Response-like object including <code>ok</code>, <code>status</code>, and <code>json()</code></li>
         </ul>
       </div>
 
@@ -132,42 +162,43 @@ export const createUser = (overrides: Partial<User> = {}): User => ({
         Ask Copilot to generate a complete mock for a service interface. This is
         especially useful for dependency-heavy classes:
       </p>
-      <CodeBlock language="bash">{`Generate a Jest mock factory for EmailService with methods:
-sendWelcome(email: string): Promise<void>
-sendPasswordReset(email: string, token: string): Promise<void>
+      <CodeBlock language="bash">{`Generate a Jest mock factory for NotificationService with methods:
+sendOrderConfirmation(orderId: string, email: string): Promise<void>
+sendShippingUpdate(orderId: string, trackingUrl: string): Promise<void>
 All methods should be jest.fn() returning resolved promises.`}</CodeBlock>
 
-      <CodeBlock language="typescript">{`// tests/mocks/mockEmailService.ts  (Copilot-generated)
-import { EmailService } from '../../src/services/emailService';
+      <CodeBlock language="typescript">{`// tests/mocks/mockNotificationService.ts  (Copilot-generated)
+import { NotificationService } from '../../src/services/notificationService';
 
-export const createMockEmailService = (): jest.Mocked<EmailService> => ({
-  sendWelcome: jest.fn().mockResolvedValue(undefined),
-  sendPasswordReset: jest.fn().mockResolvedValue(undefined),
+export const createMockNotificationService = (): jest.Mocked<NotificationService> => ({
+  sendOrderConfirmation: jest.fn().mockResolvedValue(undefined),
+  sendShippingUpdate: jest.fn().mockResolvedValue(undefined),
 });
 
 // Usage:
-// const emailService = createMockEmailService();
-// emailService.sendWelcome.mockRejectedValueOnce(new Error('SMTP failure'));`}</CodeBlock>
+// const notifService = createMockNotificationService();
+// notifService.sendOrderConfirmation.mockRejectedValueOnce(new Error('SMTP failure'));`}</CodeBlock>
 
       <h2>Part C — Test Data at Scale with Faker</h2>
       <p>
-        For tests that need many records (performance, pagination, bulk
-        operations), ask Copilot to use a fake data library:
+        For tests that need many records (pagination, bulk cart operations), ask
+        Copilot to use a fake data library:
       </p>
-      <CodeBlock language="bash">{`Generate a function that creates an array of N fake User objects using @faker-js/faker.
-Fields: id (uuid), name (fullName), email (internet.email), role (random admin/user), createdAt (past date).`}</CodeBlock>
+      <CodeBlock language="bash">{`Generate a function that creates an array of N fake CartItem objects using @faker-js/faker.
+Fields: id (uuid), productId (uuid), name (commerce.productName), price (number 1-500), quantity (integer 1-10).
+Keep prices and quantities in realistic ranges for a checkout pipeline.`}</CodeBlock>
 
-      <CodeBlock language="typescript">{`// tests/factories/bulkUserFactory.ts  (Copilot-generated)
+      <CodeBlock language="typescript">{`// tests/factories/bulkCartFactory.ts  (Copilot-generated)
 import { faker } from '@faker-js/faker';
-import { User } from '../../src/models/user';
+import { CartItem } from '../../src/models/cart';
 
-export const createUsers = (count: number): User[] =>
+export const createCartItems = (count: number): CartItem[] =>
   Array.from({ length: count }, () => ({
     id: faker.string.uuid(),
-    name: faker.person.fullName(),
-    email: faker.internet.email(),
-    role: faker.helpers.arrayElement(['admin', 'user'] as const),
-    createdAt: faker.date.past(),
+    productId: faker.string.uuid(),
+    name: faker.commerce.productName(),
+    price: faker.number.float({ min: 1, max: 500, fractionDigits: 2 }),
+    quantity: faker.number.int({ min: 1, max: 10 }),
   }));`}</CodeBlock>
 
       <h2>Security Guardrail — What to Check</h2>
@@ -215,31 +246,36 @@ export const createUsers = (count: number): User[] =>
       </div>
 
       <h2>Step — Run a Test Using the Factory</h2>
-      <CodeBlock language="typescript">{`// tests/unit/userService.test.ts  — using the factory
-import { createUser } from '../factories/userFactory';
+      <CodeBlock language="typescript">{`// tests/unit/calculateDiscount.test.ts  — using checkout factories
+import { buildCartItem, buildOrder } from '../factories';
 
-it('should throw if email already exists', async () => {
-  const existing = createUser({ email: 'taken@example.com' });
-  mockRepo.findByEmail.mockResolvedValue(existing);
+it('FLAT5 is applied to a confirmed order above the minimum', () => {
+  const order = buildOrder({ subtotal: 50, status: 'confirmed' });
+  const result = calculateDiscount({ subtotal: order.subtotal, code: 'FLAT5' });
 
-  await expect(userService.createUser({ name: 'Bob', email: 'taken@example.com' }))
-    .rejects.toThrow('Email already registered');
+  expect(result.discountAmount).toBe(5);
+  expect(result.finalTotal).toBe(45);
+});
+
+it('StorePage renders the cart item name after Add', async () => {
+  mockFetchOnce({ data: { items: [buildCartItem({ name: 'Workshop T-Shirt' })] } });
+  // ... render StorePage and assert
 });`}</CodeBlock>
-      <VerifyBlock>{`✓ should throw if email already exists (2 ms)`}</VerifyBlock>
+      <VerifyBlock>{`✓ FLAT5 is applied to a confirmed order above the minimum (2 ms)`}</VerifyBlock>
 
       <div id="mocks-exercise">
       <TimedExercise minutes={6} title="Hands-on Challenge">
         <p>
-          Ask Copilot to generate a factory for the <code>Order</code> type in
-          the starter repo. Then review the output for the three most common
-          problems: hardcoded IDs, real-looking amounts, and missing override
-          support.
+          The <code>buildOrder</code> factory above does not include a
+          <code>discount</code> field. Ask Copilot to extend the factory, then
+          review the output for the three most common problems: hardcoded IDs,
+          real-looking amounts, and missing override support.
         </p>
         <Collapsible title="Hint: Prompt template" variant="hint">
-          <CodeBlock language="bash">{`Generate a TypeScript factory for the Order type.
-Include: id (uuid), userId (string), items (array of OrderItem), total (number), status ('pending'|'complete'|'cancelled'), createdAt (Date).
-Make all fields overridable via Partial<Order>.
-Use obviously fake values (not real-looking IDs or amounts).`}</CodeBlock>
+          <CodeBlock language="bash">{`Extend the buildOrder factory to include an optional discount field:
+{ code: string; discountAmount: number; finalTotal: number }
+Make it optional (undefined by default).
+Do not use real-looking amounts — keep values obviously fake (e.g. 5, 10, 25).`}</CodeBlock>
         </Collapsible>
         <Collapsible title="Bonus: Shared factory index" variant="bonus">
           <p>

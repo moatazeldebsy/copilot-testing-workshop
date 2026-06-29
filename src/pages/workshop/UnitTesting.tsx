@@ -12,15 +12,15 @@ import ExerciseRepoCallout from '../../components/ExerciseRepoCallout';
 const UnitTesting: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 4</span>
+      <span className="step-badge">Exercise A</span>
       <h1>Unit Test Generation</h1>
       <PageMeta duration="25 min" difficulty="intermediate" />
       <p className="page-lead">
-        Unit tests are where Copilot delivers the most immediate value — they
-        are self-contained, predictable in structure, and follow well-known
-        patterns that Copilot knows well. In this step you will use Copilot to
-        generate a full unit test suite, review every suggestion critically, and
-        fix what it gets wrong.
+        Unit tests are where Copilot delivers the most immediate value — they are
+        self-contained, predictable in structure, and follow well-known patterns.
+        In this exercise you will use Copilot to generate a full suite for{' '}
+        <code>calculateDiscount()</code>, review every suggestion critically, and
+        expose three bugs that weak assertions miss.
       </p>
 
       <ExerciseRepoCallout path="/workshop/unit-testing" />
@@ -46,7 +46,7 @@ const UnitTesting: React.FC = () => (
       <ArchDiagram
         title="Unit Test Generation Flow"
         nodes={[
-          { label: 'Source File', icon: '📄' },
+          { label: 'calculateDiscount.ts', icon: '📄' },
           { label: 'Copilot Chat', icon: '🤖' },
           { label: 'Generated Tests', icon: '🧪' },
           { label: 'Review & Fix', icon: '👀' },
@@ -76,189 +76,204 @@ const UnitTesting: React.FC = () => (
         <tbody>
           <tr>
             <td>❌ Too vague</td>
-            <td>"Write tests for userService"</td>
-            <td>Generic happy-path only, wrong method names</td>
+            <td>"Write tests for calculateDiscount"</td>
+            <td>Happy-path only, <code>toBeTruthy()</code> assertions that miss bugs</td>
           </tr>
           <tr>
             <td>⚠️ Better</td>
-            <td>"Write Jest unit tests for UserService.createUser"</td>
-            <td>Correct structure, may miss edge cases</td>
+            <td>"Write Jest unit tests for calculateDiscount with SAVE10 and FLAT5"</td>
+            <td>Correct structure, may miss boundary and negative cases</td>
           </tr>
           <tr>
             <td>✅ Best</td>
-            <td>"Write Jest unit tests for UserService.createUser. Include: success case, duplicate email error, missing required field. Mock the UserRepository."</td>
-            <td>Structured, targeted, ready to review</td>
+            <td>"Write Jest unit tests for calculateDiscount. Cover: SAVE10 (10% off), FLAT5 ($5 off orders ≥ $20), unknown codes, case-insensitivity, and the negative-total clamp."</td>
+            <td>Targeted, boundary-aware, ready to review</td>
           </tr>
         </tbody>
       </table>
 
-      <h2>Step 1 — Explore the Service Under Test</h2>
-      <CodeBlock language="typescript">{`// src/services/userService.ts
-import { UserRepository } from '../repositories/userRepository';
-import { User, CreateUserDto } from '../models/user';
+      <h2>Step 1 — Explore the Function Under Test</h2>
+      <CodeBlock language="typescript">{`// src/services/calculateDiscount.ts
+export interface DiscountInput {
+  subtotal: number;
+  code: string;
+}
 
-export class UserService {
-  constructor(private readonly repo: UserRepository) {}
+export interface DiscountResult {
+  discountAmount: number;
+  finalTotal: number;
+}
 
-  async createUser(dto: CreateUserDto): Promise<User> {
-    const existing = await this.repo.findByEmail(dto.email);
-    if (existing) throw new Error('Email already registered');
-    if (!dto.name || dto.name.trim() === '') throw new Error('Name is required');
-    return this.repo.save({ ...dto, id: crypto.randomUUID(), createdAt: new Date() });
-  }
-
-  async deleteUser(id: string): Promise<void> {
-    const user = await this.repo.findById(id);
-    if (!user) throw new Error('User not found');
-    await this.repo.delete(id);
-  }
+// Active discount codes — see .copilot/context/domain-rules.md for full rules
+// SAVE10 : 10% off,  no minimum
+// FLAT5  : $5 off,   $20 minimum order
+// EXPIRED: 15% off,  expired — no longer applied
+export function calculateDiscount({ subtotal, code }: DiscountInput): DiscountResult {
+  // implementation hidden — your tests will verify the contract
 }`}</CodeBlock>
 
+      <div className="callout callout-info">
+        <strong>💡 Context tip</strong> — Attach{' '}
+        <code>#file:.copilot/context/domain-rules.md</code> to your Copilot Chat
+        prompt so it knows the discount rules before generating assertions.
+      </div>
+
       <h2 id="unit-generate">Step 2 — Generate Tests with Copilot</h2>
-      <p>Select the entire file, open Copilot Chat, and use this prompt:</p>
+      <p>Select <code>calculateDiscount.ts</code>, open Copilot Chat, and use this prompt:</p>
       <LanguageTabs tabs={[
         {
           label: 'TypeScript / Jest',
           language: 'bash',
-          code: `Write Jest unit tests for UserService in TypeScript.
-Include tests for:
-- createUser: success, duplicate email error, empty name error
-- deleteUser: success, user not found error
-Mock UserRepository with jest.fn().
-Use describe/it blocks with descriptive test names.`,
+          code: `Write Jest unit tests for calculateDiscount() in TypeScript.
+#file:src/services/calculateDiscount.ts
+#file:.copilot/context/domain-rules.md
+
+Cover all of these cases:
+- SAVE10 deducts exactly 10% of the subtotal
+- FLAT5 deducts $5 from orders at or above $20
+- FLAT5 is NOT applied when subtotal is below the $20 minimum
+- An unknown code returns zero discount without throwing
+- Codes are case-insensitive (save10 == SAVE10)
+- finalTotal is never negative when discount would exceed subtotal
+
+Name each test for the behavior it proves, not the code path.`,
         },
         {
           label: 'Python / pytest',
           language: 'bash',
-          code: `Write pytest unit tests for UserService in Python.
-Include tests for:
-- create_user: success, duplicate email error, empty name error
-- delete_user: success, user not found error
-Mock UserRepository with unittest.mock.MagicMock().
-Use class-based or function-based tests with descriptive names.`,
+          code: `Write pytest unit tests for calculate_discount() in Python.
+Cover:
+- SAVE10 deducts exactly 10% of the subtotal
+- FLAT5 deducts $5.00 from orders >= $20
+- FLAT5 returns zero discount below $20 minimum
+- Unknown codes return zero discount
+- Codes are case-insensitive
+- final_total never goes below 0`,
         },
         {
           label: 'Java / JUnit 5',
           language: 'bash',
-          code: `Write JUnit 5 unit tests for UserService in Java.
-Include tests for:
-- createUser: success, duplicate email error, empty name error
-- deleteUser: success, user not found error
-Mock UserRepository with Mockito.
-Use @ExtendWith(MockitoExtension.class) and descriptive @DisplayName annotations.`,
+          code: `Write JUnit 5 unit tests for calculateDiscount() in Java.
+Use @ParameterizedTest where appropriate.
+Cover: SAVE10 (10%), FLAT5 ($5 off, $20 min), unknown code,
+case-insensitive matching, and the non-negative finalTotal invariant.
+Use @DisplayName to name each test for the behavior.`,
         },
       ]} />
 
       <h2>Step 3 — Review the Generated Output</h2>
       <p>
-        Copilot will produce something like this. Read it carefully — there are
-        common problems to find:
+        Copilot should produce tests that look something like this. Read them
+        carefully before accepting — there are common problems to look for.
       </p>
       <LanguageTabs tabs={[
         {
           label: 'TypeScript / Jest',
           language: 'typescript',
-          code: `// tests/unit/userService.test.ts  (Copilot-generated — review before accepting)
-import { UserService } from '../../src/services/userService';
-import { UserRepository } from '../../src/repositories/userRepository';
+          code: `// tests/unit/calculateDiscount.test.ts  (Copilot-generated — review before accepting)
+import { calculateDiscount } from '../../src/services/calculateDiscount';
 
-jest.mock('../../src/repositories/userRepository');
-
-describe('UserService', () => {
-  let userService: UserService;
-  let mockRepo: jest.Mocked<UserRepository>;
-
-  beforeEach(() => {
-    mockRepo = new UserRepository() as jest.Mocked<UserRepository>;
-    userService = new UserService(mockRepo);
+describe('calculateDiscount', () => {
+  it('SAVE10 deducts exactly 10% of the subtotal', () => {
+    const result = calculateDiscount({ subtotal: 100, code: 'SAVE10' });
+    expect(result.discountAmount).toBe(10);
+    expect(result.finalTotal).toBe(90);
   });
 
-  describe('createUser', () => {
-    it('should create a user successfully', async () => {
-      mockRepo.findByEmail.mockResolvedValue(null);
-      mockRepo.save.mockResolvedValue({ id: '1', name: 'Alice', email: 'alice@example.com', createdAt: new Date() });
+  it('FLAT5 deducts $5 from a $50 order', () => {
+    const result = calculateDiscount({ subtotal: 50, code: 'FLAT5' });
+    expect(result.discountAmount).toBe(5);
+    expect(result.finalTotal).toBe(45);
+  });
 
-      const result = await userService.createUser({ name: 'Alice', email: 'alice@example.com' });
+  it('FLAT5 is not applied when subtotal is below the $20 minimum', () => {
+    const result = calculateDiscount({ subtotal: 15, code: 'FLAT5' });
+    expect(result.discountAmount).toBe(0);
+    expect(result.finalTotal).toBe(15);
+  });
 
-      expect(result.name).toBe('Alice');
-      expect(mockRepo.save).toHaveBeenCalledTimes(1);
-    });
+  it('returns zero discount for an unknown code', () => {
+    const result = calculateDiscount({ subtotal: 100, code: 'INVALID' });
+    expect(result.discountAmount).toBe(0);
+    expect(result.finalTotal).toBe(100);
+  });
 
-    it('should throw if email already exists', async () => {
-      mockRepo.findByEmail.mockResolvedValue({ id: '1', name: 'Bob', email: 'bob@example.com', createdAt: new Date() });
+  it('codes are case-insensitive', () => {
+    const result = calculateDiscount({ subtotal: 100, code: 'save10' });
+    expect(result.discountAmount).toBe(10);
+    expect(result.finalTotal).toBe(90);
+  });
 
-      await expect(userService.createUser({ name: 'Bob', email: 'bob@example.com' }))
-        .rejects.toThrow('Email already registered');
-    });
+  it('finalTotal is never negative when discount exceeds subtotal', () => {
+    const result = calculateDiscount({ subtotal: 3, code: 'FLAT5' });
+    expect(result.finalTotal).toBeGreaterThanOrEqual(0);
+    expect(result.discountAmount).toBeLessThanOrEqual(3);
   });
 });`,
         },
         {
           label: 'Python / pytest',
           language: 'python',
-          code: `# tests/test_user_service.py  (Copilot-generated — review before accepting)
+          code: `# tests/unit/test_calculate_discount.py  (Copilot-generated — review before accepting)
 import pytest
-from unittest.mock import MagicMock
-from src.services.user_service import UserService
+from src.services.calculate_discount import calculate_discount
 
-@pytest.fixture
-def mock_repo():
-    return MagicMock()
+def test_save10_deducts_10_percent():
+    result = calculate_discount(subtotal=100, code='SAVE10')
+    assert result['discount_amount'] == 10
+    assert result['final_total'] == 90
 
-@pytest.fixture
-def service(mock_repo):
-    return UserService(mock_repo)
+def test_flat5_deducts_five_dollars():
+    result = calculate_discount(subtotal=50, code='FLAT5')
+    assert result['discount_amount'] == 5
+    assert result['final_total'] == 45
 
-def test_create_user_success(service, mock_repo):
-    mock_repo.find_by_email.return_value = None
-    mock_repo.save.return_value = {'id': '1', 'name': 'Alice', 'email': 'alice@example.com'}
+def test_flat5_not_applied_below_minimum():
+    result = calculate_discount(subtotal=15, code='FLAT5')
+    assert result['discount_amount'] == 0
+    assert result['final_total'] == 15
 
-    result = service.create_user({'name': 'Alice', 'email': 'alice@example.com'})
+def test_unknown_code_returns_zero_discount():
+    result = calculate_discount(subtotal=100, code='INVALID')
+    assert result['discount_amount'] == 0
+    assert result['final_total'] == 100
 
-    assert result['name'] == 'Alice'
-    mock_repo.save.assert_called_once()
+def test_codes_are_case_insensitive():
+    result = calculate_discount(subtotal=100, code='save10')
+    assert result['discount_amount'] == 10
 
-def test_create_user_duplicate_email_raises(service, mock_repo):
-    mock_repo.find_by_email.return_value = {'id': '1', 'name': 'Bob', 'email': 'bob@example.com'}
-
-    with pytest.raises(ValueError, match='Email already registered'):
-        service.create_user({'name': 'Bob', 'email': 'bob@example.com'})`,
+def test_final_total_is_never_negative():
+    result = calculate_discount(subtotal=3, code='FLAT5')
+    assert result['final_total'] >= 0`,
         },
         {
           label: 'Java / JUnit 5',
-          language: 'typescript',  // closest highlight; java not in prism bundle
-          code: `// UserServiceTest.java  (Copilot-generated — review before accepting)
+          language: 'typescript',
+          code: `// CalculateDiscountTest.java  (Copilot-generated — review before accepting)
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private UserService userService;
+class CalculateDiscountTest {
 
     @Test
-    @DisplayName("createUser — success")
-    void createUser_success() {
-        when(userRepository.findByEmail("alice@example.com")).thenReturn(Optional.empty());
-        User saved = new User("1", "Alice", "alice@example.com");
-        when(userRepository.save(any())).thenReturn(saved);
-
-        User result = userService.createUser(new CreateUserDto("Alice", "alice@example.com"));
-
-        assertThat(result.getName()).isEqualTo("Alice");
-        verify(userRepository).save(any());
+    @DisplayName("SAVE10 deducts exactly 10% of the subtotal")
+    void save10_deducts_ten_percent() {
+        DiscountResult result = calculateDiscount(100, "SAVE10");
+        assertThat(result.getDiscountAmount()).isEqualByComparingTo("10");
+        assertThat(result.getFinalTotal()).isEqualByComparingTo("90");
     }
 
     @Test
-    @DisplayName("createUser — throws when email already exists")
-    void createUser_duplicateEmail_throws() {
-        when(userRepository.findByEmail("bob@example.com"))
-            .thenReturn(Optional.of(new User("1", "Bob", "bob@example.com")));
+    @DisplayName("FLAT5 is not applied when subtotal is below $20 minimum")
+    void flat5_skipped_below_minimum() {
+        DiscountResult result = calculateDiscount(15, "FLAT5");
+        assertThat(result.getDiscountAmount()).isEqualByComparingTo("0");
+        assertThat(result.getFinalTotal()).isEqualByComparingTo("15");
+    }
 
-        assertThatThrownBy(() -> userService.createUser(new CreateUserDto("Bob", "bob@example.com")))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Email already registered");
+    @Test
+    @DisplayName("finalTotal is never negative")
+    void finalTotal_never_negative() {
+        DiscountResult result = calculateDiscount(3, "FLAT5");
+        assertThat(result.getFinalTotal()).isGreaterThanOrEqualTo(BigDecimal.ZERO);
     }
 }`,
         },
@@ -267,122 +282,137 @@ class UserServiceTest {
       <div className="callout callout-info">
         <strong>🔍 Common issues to look for in generated unit tests:</strong>
         <ul>
-          <li>Assertions checking only that a method was called, not what it returned</li>
-          <li>Hardcoded IDs like <code>'1'</code> instead of meaningful values</li>
-          <li>Missing <code>afterEach(() =&gt; jest.clearAllMocks())</code></li>
-          <li>Test names that describe the mock, not the expected behaviour</li>
+          <li><code>toBeTruthy()</code> or <code>toBeDefined()</code> instead of exact value assertions — these mask bugs</li>
+          <li>Tests that only check the happy path — boundaries and edge cases are where bugs hide</li>
+          <li>Missing the negative-total invariant test — the clamp to 0 is a real business rule</li>
+          <li>No case-insensitivity test — easy to miss, commonly broken</li>
         </ul>
       </div>
 
       <h2>Step 4 — Run the Tests</h2>
-      <CodeBlock language="bash">{`npx jest tests/unit/userService.test.ts --verbose`}</CodeBlock>
-      <VerifyBlock>{`PASS tests/unit/userService.test.ts
-  UserService
-    createUser
-      ✓ should create a user successfully (4 ms)
-      ✓ should throw if email already exists (1 ms)
-      ✓ should throw if name is empty (1 ms)
-    deleteUser
-      ✓ should delete an existing user (1 ms)
-      ✓ should throw if user not found (1 ms)
+      <CodeBlock language="bash">{`npx jest tests/unit/calculateDiscount.test.ts --verbose`}</CodeBlock>
+      <VerifyBlock>{`PASS tests/unit/calculateDiscount.test.ts
+  calculateDiscount
+    ✓ SAVE10 deducts exactly 10% of the subtotal (3 ms)
+    ✓ FLAT5 deducts $5 from a $50 order (1 ms)
+    ✓ FLAT5 is not applied when subtotal is below the $20 minimum (1 ms)
+    ✓ returns zero discount for an unknown code (1 ms)
+    ✓ codes are case-insensitive (1 ms)
+    ✓ finalTotal is never negative when discount exceeds subtotal (1 ms)
 
-Tests: 5 passed, 5 total`}</VerifyBlock>
+Tests: 6 passed, 6 total`}</VerifyBlock>
 
       <div id="unit-exercise">
-      <TimedExercise minutes={10} title="Hands-on Challenge">
+      <TimedExercise minutes={15} title="Hands-on Challenge — Find and Fix Weak Tests">
         <p>
-          The generated tests above are missing something important. Ask Copilot
-          to add the missing test, then decide whether to accept it.
+          Open <code>tests/unit/calculateDiscount.weak.test.ts</code>. These
+          tests were AI-generated with a vague prompt. Each one passes today —
+          but none of them would catch the three bugs hidden in the
+          implementation. Find all three bugs and rewrite the assertions.
         </p>
-        <Collapsible title="Hint: What is missing?" variant="hint">
-          <p>
-            The <code>createUser</code> tests don't verify that{' '}
-            <code>mockRepo.findByEmail</code> was called with the correct email
-            address. Without this assertion, the test would pass even if the
-            duplicate-email check were removed from the service.
-          </p>
-          <p>
-            Ask Copilot: <em>"Add an assertion to verify findByEmail was called with the correct argument"</em>
-          </p>
+
+        <h3>The Weak Tests (what Copilot produced)</h3>
+        <CodeBlock language="typescript">{`// calculateDiscount.weak.test.ts — passes today but proves almost nothing
+
+it('SAVE10 produces a discount', () => {
+  const r = calculateDiscount({ subtotal: 100, code: 'SAVE10' });
+  expect(r.discountAmount).toBeTruthy();   // ← passes even if discount is $100
+});
+
+it('FLAT5 processes the order', () => {
+  const r = calculateDiscount({ subtotal: 15, code: 'FLAT5' });
+  expect(r).toBeDefined();                 // ← passes even when discount should be 0
+});
+
+it('handles a discount code', () => {
+  const r = calculateDiscount({ subtotal: 3, code: 'FLAT5' });
+  expect(r.finalTotal).toBeDefined();      // ← passes even if finalTotal is negative
+});`}</CodeBlock>
+
+        <Collapsible title="Hint: What each weak test misses" variant="hint">
+          <ul>
+            <li><strong>Bug 1</strong> — <code>toBeTruthy()</code> passes for any non-zero value. If the implementation
+              deducts 100% instead of 10%, this test still passes. Assert the exact amount: <code>toBe(10)</code>.</li>
+            <li><strong>Bug 2</strong> — <code>subtotal: 15</code> is below the $20 minimum; <code>FLAT5</code> should
+              not apply. <code>toBeDefined()</code> passes regardless. Assert <code>discountAmount</code> is <code>0</code>.</li>
+            <li><strong>Bug 3</strong> — <code>subtotal: 3</code> is below the $5 flat deduction; without the clamp,
+              <code>finalTotal</code> could be <code>-2</code>. <code>toBeDefined()</code> misses this entirely.
+              Assert <code>finalTotal</code> <code>toBeGreaterThanOrEqual(0)</code>.</li>
+          </ul>
         </Collapsible>
-        <Collapsible title="Full Fix" variant="solution">
-          <CodeBlock language="typescript">{`it('should create a user successfully', async () => {
-  mockRepo.findByEmail.mockResolvedValue(null);
-  mockRepo.save.mockResolvedValue({ id: '1', name: 'Alice', email: 'alice@example.com', createdAt: new Date() });
 
-  const result = await userService.createUser({ name: 'Alice', email: 'alice@example.com' });
+        <Collapsible title="Strong Rewrites" variant="solution">
+          <CodeBlock language="typescript">{`// Bug 1 fixed — assert exact amount, not just truthy
+it('SAVE10 deducts exactly 10%, not 100%', () => {
+  const r = calculateDiscount({ subtotal: 100, code: 'SAVE10' });
+  expect(r.discountAmount).toBe(10);
+  expect(r.finalTotal).toBe(90);
+});
 
-  expect(result.name).toBe('Alice');
-  expect(mockRepo.findByEmail).toHaveBeenCalledWith('alice@example.com'); // ← added
-  expect(mockRepo.save).toHaveBeenCalledTimes(1);
+// Bug 2 fixed — assert the minimum-order guard works
+it('FLAT5 is skipped when subtotal is below the $20 minimum', () => {
+  const r = calculateDiscount({ subtotal: 15, code: 'FLAT5' });
+  expect(r.discountAmount).toBe(0);
+  expect(r.finalTotal).toBe(15);
+});
+
+// Bug 3 fixed — assert the non-negative finalTotal invariant
+it('finalTotal is never negative when discount exceeds subtotal', () => {
+  const r = calculateDiscount({ subtotal: 3, code: 'FLAT5' });
+  expect(r.finalTotal).toBeGreaterThanOrEqual(0);
+  expect(r.discountAmount).toBeLessThanOrEqual(3);
 });`}</CodeBlock>
         </Collapsible>
-        <Collapsible title="Bonus: Spot the flaky test risk" variant="bonus">
+
+        <Collapsible title="Bonus: Prompt Copilot to improve weak tests" variant="bonus">
           <p>
-            The <code>createUser</code> implementation uses{' '}
-            <code>crypto.randomUUID()</code> and <code>new Date()</code>.
-            How would you test that those fields are populated correctly
-            without making the test time-dependent or random-dependent?
+            Select the three weak tests in Copilot Chat and paste this prompt:
           </p>
+          <CodeBlock language="bash">{`Review these tests. Replace any toBeTruthy/toBeDefined assertions with
+specific value matchers. Add the missing boundary and minimum-order cases.
+Each test name should describe the behavior it proves, not the code path.`}</CodeBlock>
         </Collapsible>
       </TimedExercise>
       </div>
 
-      <TimedExercise minutes={10} title="Prompt Engineering Challenge">
+      <TimedExercise minutes={10} title="Bonus: Prompt Engineering Challenge">
         <p>
-          Write a Copilot prompt that generates <strong>production-quality</strong>
-          tests for the function below — then identify what's still missing even
-          after you apply your best prompt.
+          Write a prompt that produces <strong>all six strong tests</strong> from
+          the generated output above in a single Copilot Chat turn. Then identify
+          what Copilot still won't get right even with your best prompt.
         </p>
-        <CodeBlock language="typescript">{`function processPayment(amount: number, currency: string, userId: string) {
-  if (amount <= 0) throw new Error('Invalid amount');
-  const fee = calculateFee(amount, currency);
-  return chargeUser(userId, amount + fee);
-}`}</CodeBlock>
-        <Collapsible title="Hint: What should a strong prompt include?" variant="hint">
+        <Collapsible title="Hint: What a strong prompt must include" variant="hint">
           <ul>
-            <li>Specify the framework: <em>"Jest unit tests in TypeScript"</em></li>
-            <li>List the cases: valid payment, <code>amount &lt;= 0</code>, unsupported currency, unknown <code>userId</code></li>
-            <li>Tell it what to mock: <em>"Mock <code>calculateFee</code> and <code>chargeUser</code> with <code>jest.fn()</code>"</em></li>
-            <li>Request assertion depth: <em>"assert that <code>chargeUser</code> was called with the correct total"</em></li>
+            <li>Attach <code>#file:calculateDiscount.ts</code> and <code>#file:.copilot/context/domain-rules.md</code></li>
+            <li>List every case explicitly: golden path, boundary (exactly at $20), below minimum, unknown code, case-insensitivity, negative clamp</li>
+            <li>Specify the assertion style: <em>"use toBe() for exact values, not toBeTruthy or toBeDefined"</em></li>
+            <li>Specify test names: <em>"name each test for the behavior it proves"</em></li>
           </ul>
-        </Collapsible>
-        <Collapsible title="Strong Prompt Example" variant="solution">
-          <CodeBlock language="bash">{`Generate Jest unit tests in TypeScript for processPayment(amount, currency, userId).
-Cover:
-1. Valid payment — amount 150, currency 'EUR': verify chargeUser called with amount + fee
-2. amount <= 0 — should throw 'Invalid amount'
-3. calculateFee throws (unsupported currency) — error propagates
-4. chargeUser throws (unknown userId) — error propagates
-Mock calculateFee and chargeUser with jest.fn().
-Use Given/When/Then test names.
-Assert call arguments, not just call counts.`}</CodeBlock>
         </Collapsible>
         <Collapsible title="What Copilot still won't get right" variant="bonus">
           <ul>
-            <li><strong>Fee calculation logic</strong> — Copilot doesn't know your <code>calculateFee</code> rules</li>
-            <li><strong>Currency validation rules</strong> — it may guess supported currencies incorrectly</li>
-            <li><strong>userId format constraints</strong> — UUID? numeric? Copilot cannot infer this</li>
-            <li><strong>Idempotency</strong> — is double-charging on retry prevented? Copilot won't test this unless told</li>
+            <li><strong>The EXPIRED code</strong> — Copilot won't know it exists unless you add it to the prompt</li>
+            <li><strong>Exactly-at-minimum boundary</strong> — <code>subtotal: 20</code> with FLAT5 should apply; Copilot may skip this unless explicitly asked</li>
+            <li><strong>Domain intent</strong> — whether a 10% discount on a $3 order is a business error or a valid case requires your judgment, not Copilot's</li>
           </ul>
         </Collapsible>
       </TimedExercise>
 
       <div className="troubleshooting-section">
         <h2>🔧 Troubleshooting</h2>
-        <Collapsible title="jest.mock() path is wrong" variant="hint">
+        <Collapsible title="Tests pass but bugs are present" variant="hint">
           <p>
-            If Jest cannot find the module, check that the path in{' '}
-            <code>jest.mock('...')</code> is relative to the test file, not the
-            src directory. Run <code>npx jest --verbose</code> to see the full
-            import error.
+            Run the weak test file against a broken implementation:{' '}
+            <code>npx jest calculateDiscount.weak.test.ts</code>. All three tests
+            should still pass despite the bugs — that is the point of the
+            exercise. The strong tests should detect all three failures.
           </p>
         </Collapsible>
-        <Collapsible title="TypeScript errors on mockRepo methods" variant="hint">
+        <Collapsible title="TypeScript cannot find calculateDiscount" variant="hint">
           <p>
-            If TypeScript complains that <code>mockRepo.findByEmail</code> is
-            not a function, ensure you cast the mocked class correctly:{' '}
-            <code>new UserRepository() as jest.Mocked&lt;UserRepository&gt;</code>.
+            Check your import path is relative to the test file location:{' '}
+            <code>import {'{ calculateDiscount }'} from '../../src/services/calculateDiscount'</code>.
+            Run <code>npx jest --verbose</code> to see the full import error.
           </p>
         </Collapsible>
       </div>
@@ -391,11 +421,11 @@ Assert call arguments, not just call counts.`}</CodeBlock>
         <h2>Key Takeaways</h2>
         <div className="summary-card">
           <ul>
-            <li>Specific prompts produce better, more targeted test suggestions</li>
-            <li>Always check that assertions verify behaviour, not just execution</li>
-            <li>Generated tests may omit call-argument assertions — add them manually</li>
-            <li>Look for time/random dependencies that make tests flaky</li>
-            <li>Run the tests before accepting — broken suggestions do happen</li>
+            <li>Specific prompts with attached context files produce better, targeted test suggestions</li>
+            <li>Always assert exact values — <code>toBeTruthy()</code> and <code>toBeDefined()</code> hide bugs</li>
+            <li>Boundary cases (exactly at minimum, zero, negative) are where real bugs live</li>
+            <li>Run tests against a broken implementation to verify they actually catch the bug</li>
+            <li>Copilot drafts the cases; you validate the intent and the assertions</li>
           </ul>
         </div>
       </div>

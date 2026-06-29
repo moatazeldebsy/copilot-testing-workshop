@@ -12,7 +12,7 @@ const CicdAdoption: React.FC = () => (
     <div className="workshop-page">
       <span className="step-badge">Step 8</span>
       <h1>CI/CD &amp; Team Adoption</h1>
-      <PageMeta duration="15 min" difficulty="intermediate" />
+      <PageMeta duration="10 min" difficulty="intermediate" />
       <p className="page-lead">
         AI-assisted testing only improves quality at scale when it is governed
         by CI/CD pipelines and clear team norms. This step shows how to add

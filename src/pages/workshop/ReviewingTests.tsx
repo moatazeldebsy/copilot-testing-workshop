@@ -283,6 +283,71 @@ jobs:
               });
             }`}</CodeBlock>
 
+      <h2>Exercise E — The Flaky-Test Moment</h2>
+      <p>
+        Flaky tests are not bugs in your code — they are bugs in your
+        <em> assumptions</em>. Non-determinism makes a test pass sometimes and
+        fail others, eroding trust in the whole suite.
+      </p>
+
+      <CodeBlock language="typescript">{`// ❌ Flaky — depends on wall-clock timing
+it('sentAt is within 50ms of the call', () => {
+  const before = Date.now();
+  const log = notificationService.send(payload);
+  const after = Date.now();
+
+  // Fails on a loaded CI runner where the function takes > 50ms
+  expect(log.sentAt.getTime()).toBeLessThanOrEqual(after + 50);
+});
+
+// ✅ Deterministic — mock the clock
+it('sentAt is the mocked time', () => {
+  jest.useFakeTimers().setSystemTime(new Date('2026-07-10T12:00:00Z'));
+
+  const log = notificationService.send(payload);
+
+  expect(log.sentAt).toEqual(new Date('2026-07-10T12:00:00Z'));
+
+  jest.useRealTimers();
+});`}</CodeBlock>
+
+      <div className="callout callout-info">
+        <strong>Copilot prompt to fix a flaky test</strong>
+        <CodeBlock language="bash">{`"Make this test deterministic. The sentAt field depends on Date.now() —
+replace the timing assertion with jest.useFakeTimers() and a fixed timestamp."`}</CodeBlock>
+        <p style={{ marginTop: '0.5rem' }}>
+          Alternatively, if you only need to verify <em>structure</em> rather than exact value:
+          assert that <code>sentAt</code> is an instance of <code>Date</code>, not a specific timestamp.
+        </p>
+      </div>
+
+      <table className="info-table">
+        <thead>
+          <tr>
+            <th>Non-determinism source</th>
+            <th>Fix</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Date.now()</code> / <code>new Date()</code></td>
+            <td><code>jest.useFakeTimers().setSystemTime(new Date(...))</code></td>
+          </tr>
+          <tr>
+            <td><code>Math.random()</code></td>
+            <td>Mock with <code>jest.spyOn(Math, 'random').mockReturnValue(0.5)</code></td>
+          </tr>
+          <tr>
+            <td><code>sleep()</code> / fixed delays</td>
+            <td>Use <code>waitFor()</code> — polls until ready or times out cleanly</td>
+          </tr>
+          <tr>
+            <td>Shared module-level state</td>
+            <td>Reset in <code>beforeEach</code>; generate unique IDs per test</td>
+          </tr>
+        </tbody>
+      </table>
+
       <div id="review-exercise">
       <TimedExercise minutes={10} title="Hands-on Challenge">
         <p>
