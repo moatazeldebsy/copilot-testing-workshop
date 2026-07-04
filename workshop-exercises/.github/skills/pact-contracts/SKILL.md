@@ -1,9 +1,9 @@
 ---
-name: api-contract-review
+name: pact-contracts
 summary: Review and harden API tests against route contracts, auth rules, and response envelopes in workshop-exercises.
 ---
 
-# API Contract Review Skill
+# Pact Contracts Skill
 
 Use this skill when working on API tests in this repository.
 

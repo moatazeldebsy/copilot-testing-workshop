@@ -47,10 +47,11 @@ You should see GitHub-related capabilities and tool access reflected in the resp
 
 ## 3. Skill Practice in the Exercises Repo
 
-The exercises repository includes two practice skills:
+The exercises repository includes three practice skills:
 
-- `.github/skills/api-contract-review/SKILL.md`
-- `.github/skills/mcp-test-investigation/SKILL.md`
+- `.github/skills/pact-contracts/SKILL.md`
+- `.github/skills/flaky-test-hunt/SKILL.md`
+- `.github/skills/test-generation/SKILL.md`
 
 Current GitHub Copilot guidance treats skills as reusable folders of instructions,
 scripts, and resources. In practice, you will most often see them in project-level
@@ -60,22 +61,32 @@ scripts, and resources. In practice, you will most often see them in project-lev
 If you use GitHub CLI in environments where skill discovery is enabled, you can
  also explore installable skills with commands such as `gh skill`.
 
-### API contract review drill
+### Pact contracts drill
 
 Use this prompt:
 
 ```text
-Use the API contract review skill to inspect tests/api/auth-and-users.test.ts against src/app.ts.
+Use the pact-contracts skill to inspect tests/api/auth-and-users.test.ts against src/app.ts.
 Report missing assertions by severity and propose minimal test updates.
 ```
 
-### MCP-style investigation drill
+### Flaky test hunt drill
 
 Use this prompt:
 
 ```text
-Use the MCP test investigation workflow to diagnose the first failing API test.
-Return findings first, then a minimal patch.
+Use the flaky-test-hunt skill to diagnose the notification test marked FLAKY
+in tests/unit/notificationService.test.ts. Return findings first, then a
+deterministic fix.
+```
+
+### Test generation drill
+
+Use this prompt:
+
+```text
+Use the test-generation skill to scaffold tests for src/services/discountService.ts.
+Reuse factories from tests/factories.ts where applicable.
 ```
 
 ## 4. copilot.md Prompt Workbook

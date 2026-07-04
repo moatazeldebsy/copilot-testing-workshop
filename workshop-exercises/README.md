@@ -91,6 +91,14 @@ Tip: use `#file:src/openapi.ts` and `#file:.copilot/context/domain-rules.md` in 
 - `tests/components/CartPage.test.tsx` — React Testing Library tests for `StorePage`
 - `tests/e2e/checkout.spec.ts` — Playwright end-to-end scenarios
 
+### Integration Tests — service-layer demo (not timed)
+
+`tests/integration/checkout.pipeline.test.ts` calls the exported service
+singletons (`cartService`, `discountService`, `fraudService`, `paymentService`,
+`notificationService` from `src/app.ts`) directly — no HTTP, no mocks. This
+exercises real cross-module wiring, distinct from Exercise C's HTTP-level
+contract tests.
+
 ### Exercise E — CI Guardrails
 
 Explore `.github/copilot-instructions.md` and `.copilot/context/domain-rules.md`. Try context engineering: attach domain-rules.md to a Copilot Chat session and compare the test quality vs without it.
@@ -127,6 +135,7 @@ git checkout 03-api-testing       # Exercise C solution
 git checkout 04-integration-testing  # Exercise D solution
 git checkout 05-ci-guardrails     # CI workflow
 git checkout 06-review-patterns   # Trust Playbook + instructions
+git checkout 07-service-integration  # Integration pipeline demo solution
 git checkout master               # Back to the workshop starting point
 ```
 
@@ -135,7 +144,9 @@ git checkout master               # Back to the workshop starting point
 - `copilot.md` — prompt-writing drills for generation, refactoring, and review
 - `.copilot/skills/unit-testing.md` — reusable prompt template and review checklist
 - `.copilot/context/domain-rules.md` — business rules reference for context engineering
-- `.github/skills/api-contract-review/SKILL.md` — contract-focused API test review
-- `.github/skills/mcp-test-investigation/SKILL.md` — MCP investigation workflow
+- `.github/skills/pact-contracts/SKILL.md` — contract-focused API test review
+- `.github/skills/flaky-test-hunt/SKILL.md` — flaky test investigation workflow
+- `.github/skills/test-generation/SKILL.md` — scaffold new tests from a target file
+- `tests/integration/checkout.pipeline.test.ts` — service-layer integration demo (Cart → Discount → Fraud → Payment → Notification, no HTTP)
 - `docs/ai-testing-trust-playbook.md` — session takeaway playbook
 - `tests/fixtures/calculateDiscount-examples.md` — backup examples if Copilot is unavailable

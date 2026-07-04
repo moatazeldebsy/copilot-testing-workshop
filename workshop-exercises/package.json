@@ -11,6 +11,7 @@
     "test": "jest --runInBand --passWithNoTests",
     "test:unit": "jest tests/unit --runInBand",
     "test:api": "jest tests/api --runInBand",
+    "test:integration": "jest tests/integration --runInBand",
     "test:component": "jest tests/components --runInBand",
     "test:e2e": "playwright test"
   },
