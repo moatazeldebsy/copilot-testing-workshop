@@ -9,7 +9,7 @@ export const openApiSpec = {
       '**Seed credentials:** `alice@example.com` / `workshop-password`\n\n' +
       '**Promo codes:** `SAVE10` (10% off), `FLAT5` ($5 flat, min $20), `EXPIRED` (expired — good for error-path tests)',
     version: '1.0.0',
-    contact: { name: 'Workshop repo', url: 'https://github.com' },
+    contact: { name: 'Workshop repo', url: 'https://github.com/moatazeldebsy/copilot-testing-workshop' },
   },
   servers: [{ url: 'http://localhost:4000', description: 'Local dev' }],
   tags: [

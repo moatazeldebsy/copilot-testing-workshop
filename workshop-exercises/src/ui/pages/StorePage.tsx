@@ -332,7 +332,7 @@ const StorePage: React.FC<StorePageProps> = ({ userId, userEmail, token, onLogou
                     </div>
                     {promoError ? <div className="alert alert--error">{promoError}</div> : null}
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      Try: <code>SAVE10</code>, <code>FLAT5</code>
+                      Try: <code>SAVE10</code>, <code>FLAT5</code>, <code>EXPIRED</code>
                     </div>
                   </>
                 )}
