@@ -1,18 +1,26 @@
 [
   {
-    "id": "ce6baa84-dc8e-4d9f-af5b-4536faf3d40e",
+    "id": "1b00e0f0-ca65-4089-8c4b-6bf7dc45491a",
     "name": "Workshop Admin",
     "email": "alice@example.com",
     "passwordHash": "ae963da80c7937d703c6ae31467eeee79c1769ece1501b0c885d201e708d8959ecd79028f17cdc87cdabc34c0e460450a22fb0bedec8cf76aaea78315f86a7f1",
     "role": "admin",
-    "createdAt": "2026-06-14T22:00:16.266Z"
+    "createdAt": "2026-06-28T18:37:06.082Z"
   },
   {
-    "id": "2438526e-4346-4a2e-b998-125f0a3216ed",
+    "id": "f37db64d-381a-479a-ad9c-df4680712a7f",
     "name": "Nina",
     "email": "nina@example.com",
     "passwordHash": "220b3e664687ed269dd2aaefbd0c8dc00606eab96a380866689d16fb751b947ca75312a2f80e4058855c8da0655bf8990a92acac73e02702bb5a2c1a4fd58749",
     "role": "viewer",
-    "createdAt": "2026-06-14T22:00:16.380Z"
+    "createdAt": "2026-06-28T18:37:06.260Z"
+  },
+  {
+    "id": "052b996d-242a-4e8c-9b5f-3740d08f3af6",
+    "name": "demo",
+    "email": "demo-user@gmail.com",
+    "passwordHash": "682dc0216cbfd1790f858819296f20212d54328aec42c23c6f29880255acf7ab1fc8ce931dca4f6bd471750c39a53ae0a656445d324a757380b106287e514daa",
+    "role": "user",
+    "createdAt": "2026-06-28T21:24:24.357Z"
   }
 ]

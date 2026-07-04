@@ -18,13 +18,46 @@ function getStoredToken(): string {
   return window.localStorage.getItem(AUTH_TOKEN_KEY) ?? '';
 }
 
+function tryDecodeStoredToken(): { token: string; user: SessionUser } | null {
+  const token = getStoredToken();
+  if (!token) return null;
+  try {
+    const [encodedPayload] = token.split('.');
+    if (!encodedPayload) return null;
+    const base64 = encodedPayload.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64)) as {
+      userId: string;
+      email: string;
+      role: UserRole;
+      exp: number;
+    };
+    if (payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return {
+      token,
+      user: { id: payload.userId, name: payload.email, email: payload.email, role: payload.role },
+    };
+  } catch {
+    return null;
+  }
+}
+
 const WorkshopApp: React.FC = () => {
   const [route, setRoute] = useState(window.location.pathname || '/store');
   const [isLoading, setIsLoading] = useState(false);
-  const [token, setToken] = useState(getStoredToken);
-  const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
+  const storedSession = tryDecodeStoredToken();
+  const [token, setToken] = useState(storedSession?.token ?? '');
+  const [sessionUser, setSessionUser] = useState<SessionUser | null>(storedSession?.user ?? null);
   const [submissions, setSubmissions] = useState<string[]>([]);
-  const [autoLogging, setAutoLogging] = useState(!getStoredToken());
+  const [autoLogging, setAutoLogging] = useState(!storedSession);
+
+  // Clear a stale or expired token from localStorage so future loads auto-login cleanly
+  useEffect(() => {
+    const raw = getStoredToken();
+    if (raw && !storedSession) {
+      window.localStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-login with workshop credentials so the store works on first load
   useEffect(() => {
