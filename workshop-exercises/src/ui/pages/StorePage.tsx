@@ -232,6 +232,9 @@ const StorePage: React.FC<StorePageProps> = ({ userId, userEmail, token, onLogou
         </div>
         <nav className="app-header__nav">
           <span className="app-header__user">{userEmail}</span>
+          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label="Toggle theme">
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <button className="btn btn--ghost btn--sm" type="button" onClick={onLogout}>Sign out</button>
         </nav>
       </header>

@@ -60,10 +60,9 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
 
   return (
     <main className="screen-shell">
-      <section className="card-stack card-stack--wide">
-        <h1 data-testid="confirmation-heading">Order Confirmed!</h1>
-
-        <p>Thank you for your purchase.</p>
+      <div className="card">
+        <h1 className="card__title" data-testid="confirmation-heading">Order Confirmed!</h1>
+        <p className="card__subtitle">Thank you for your purchase.</p>
 
         <div>
           <p><strong>Payment ID:</strong> {paymentIntentId}</p>
@@ -74,12 +73,17 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
           )}
         </div>
 
-        {error ? <p className="error-message" role="alert">{error}</p> : null}
+        {error ? <div className="alert alert--error" role="alert">{error}</div> : null}
 
-        <button type="button" onClick={onContinueShopping} data-testid="continue-shopping-btn">
+        <button
+          className="btn btn--primary btn--full"
+          type="button"
+          onClick={onContinueShopping}
+          data-testid="continue-shopping-btn"
+        >
           Continue Shopping
         </button>
-      </section>
+      </div>
     </main>
   );
 };
