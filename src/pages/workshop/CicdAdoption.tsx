@@ -10,7 +10,7 @@ import ExerciseRepoCallout from '../../components/ExerciseRepoCallout';
 const CicdAdoption: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 8</span>
+      <span className="step-badge">Exercise E</span>
       <h1>CI/CD &amp; Team Adoption</h1>
       <PageMeta duration="10 min" difficulty="intermediate" />
       <p className="page-lead">

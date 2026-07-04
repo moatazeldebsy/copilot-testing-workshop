@@ -13,7 +13,7 @@ import TimedExercise from '../../components/TimedExercise';
 const TestDataMocks: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 6</span>
+      <span className="step-badge">Reference</span>
       <h1>Test Data &amp; Mock Generation</h1>
       <PageMeta duration="15 min" difficulty="intermediate" />
       <p className="page-lead">

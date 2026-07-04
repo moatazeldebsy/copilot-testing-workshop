@@ -289,7 +289,7 @@ class CalculateDiscountTest {
         </ul>
       </div>
 
-      <h2>Step 4 — Run the Tests</h2>
+      <h2>Run the Tests</h2>
       <CodeBlock language="bash">{`npx jest tests/unit/calculateDiscount.test.ts --verbose`}</CodeBlock>
       <VerifyBlock>{`PASS tests/unit/calculateDiscount.test.ts
   calculateDiscount

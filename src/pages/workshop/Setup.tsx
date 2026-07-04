@@ -89,7 +89,7 @@ code --list-extensions | grep copilot`}</CodeBlock>
         Do not treat the old separate <code>GitHub.copilot-chat</code> install as a workshop prerequisite.
       </div>
 
-      <h2>Step 4 — Your First Copilot Suggestion</h2>
+      <h2>Step 1 — Your First Copilot Suggestion</h2>
       <p>
         Create a new file <code>tests/smoke.test.ts</code> and start typing.
         Copilot will suggest a completion — press <kbd>Tab</kbd> to accept it.
@@ -115,7 +115,7 @@ describe('smoke', () => {
         </table>
       </div>
 
-      <h2>Step 5 — Run the Existing Tests</h2>
+      <h2>Step 2 — Run the Existing Tests</h2>
       <CodeBlock language="bash">{`npm test`}</CodeBlock>
       <VerifyBlock>{`Test Suites: 0 passed, 0 total
 Tests:       0 passed, 0 total

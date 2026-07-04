@@ -183,7 +183,7 @@ describe('StorePage', () => {
         </ul>
       </div>
 
-      <h2>Step 4 — Run the Tests</h2>
+      <h2>Run the Tests</h2>
       <CodeBlock language="bash">{`npx jest tests/components/StorePage.test.tsx --verbose`}</CodeBlock>
       <VerifyBlock>{`PASS tests/components/StorePage.test.tsx
   StorePage

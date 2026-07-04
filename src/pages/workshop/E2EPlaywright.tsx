@@ -12,7 +12,7 @@ import TimedExercise from '../../components/TimedExercise';
 const E2EPlaywright: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 9</span>
+      <span className="step-badge">Exercise D</span>
       <h1>E2E Testing with Playwright</h1>
       <PageMeta duration="25 min" difficulty="intermediate" />
       <p className="page-lead">

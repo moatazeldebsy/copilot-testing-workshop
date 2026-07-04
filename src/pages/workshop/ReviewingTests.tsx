@@ -11,7 +11,7 @@ import PollBlock from '../../components/PollBlock';
 const ReviewingTests: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 7</span>
+      <span className="step-badge">Exercise B</span>
       <h1>Reviewing AI Tests &amp; Guardrails</h1>
       <PageMeta duration="20 min" difficulty="intermediate" />
       <p className="page-lead">
@@ -351,7 +351,7 @@ replace the timing assertion with jest.useFakeTimers() and a fixed timestamp."`}
       <div id="review-exercise">
       <TimedExercise minutes={10} title="Hands-on Challenge">
         <p>
-          Open the test file you generated in Step 4. Apply the review checklist
+          Open the test file you generated in Exercise A. Apply the review checklist
           above. Find at least two items that need fixing, use a Copilot Chat
           follow-up prompt to fix them, and verify the improved tests still pass.
         </p>

@@ -11,7 +11,7 @@ import TimedExercise from '../../components/TimedExercise';
 const AiTestingPatterns: React.FC = () => (
   <Layout>
     <div className="workshop-page">
-      <span className="step-badge">Step 11</span>
+      <span className="step-badge">Reference</span>
       <h1>Testing AI-Powered Features</h1>
       <PageMeta duration="20 min" difficulty="advanced" />
       <p className="page-lead">
