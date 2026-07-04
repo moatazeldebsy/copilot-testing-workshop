@@ -7,4 +7,4 @@ This folder contains optional exercises for advanced workshop concepts:
 - `../.github/skills/api-contract-review/SKILL.md` for contract-focused test review
 - `../.github/skills/mcp-test-investigation/SKILL.md` for investigation workflow drills
 
-Use these after completing the core Step 4 through Step 11 exercises.
+Use these after completing the core Exercise A through Exercise E workshop exercises.
