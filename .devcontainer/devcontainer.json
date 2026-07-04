@@ -1,0 +1,26 @@
+{
+  "name": "GenAI in Testing Workshop",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/workshop-exercises",
+  "forwardPorts": [3006, 4000],
+  "portsAttributes": {
+    "3006": { "label": "Store UI", "onAutoForward": "openPreview" },
+    "4000": { "label": "API + Swagger docs (/docs)", "onAutoForward": "notify" }
+  },
+  "postCreateCommand": "cd workshop-exercises && npm install && npx playwright install --with-deps chromium",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "dbaeumer.vscode-eslint",
+        "orta.vscode-jest",
+        "ms-playwright.playwright"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "remoteUser": "node"
+}

@@ -115,20 +115,43 @@ code --list-extensions | grep copilot`}</CodeBlock>
           then verify that chat is available from the Copilot UI before the workshop starts.
         </div>
 
-        <h2>Clone the Starter Repository</h2>
+        <h2>Get Your Own Copy of the Starter Repository</h2>
         <p>
-          A starter repository with sample services and test scaffolding is
-          provided ahead of time. Clone it before the workshop:
+          The starter repository is a <strong>GitHub template</strong>, so you get your own
+          writable copy instead of a fork — needed if an exercise has you push a branch or
+          open a PR. Open{' '}
+          <a href="https://github.com/moatazeldebsy/copilot-testing-workshop" target="_blank" rel="noreferrer">
+            github.com/moatazeldebsy/copilot-testing-workshop
+          </a>
+          , click <strong>Use this template → Create a new repository</strong>, then clone
+          your new copy:
         </p>
-        <CodeBlock language="bash">{`git clone https://github.com/YOUR_ORG/copilot-testing-starter.git
-cd copilot-testing-starter
+        <CodeBlock language="bash">{`git clone https://github.com/YOUR_USERNAME/copilot-testing-workshop.git
+cd copilot-testing-workshop/workshop-exercises
 npm install`}</CodeBlock>
         <VerifyBlock>{`added 412 packages in 8s`}</VerifyBlock>
 
         <div className="callout callout-info">
-          <strong>📌 Note</strong> — The starter repository URL will be shared in the session
-          intro. It contains a small TypeScript REST API with intentionally incomplete test
-          coverage for the hands-on exercises.
+          <strong>📌 Note</strong> — The exercises live in the <code>workshop-exercises/</code>
+          folder of the repo above. It contains a small TypeScript REST API with intentionally
+          incomplete test coverage for the hands-on exercises. If you only plan to read along
+          without pushing anything, a plain <code>git clone</code> of the original repo works too.
+        </div>
+
+        <h2>No Local Setup? Use GitHub Codespaces</h2>
+        <p>
+          If Node.js, npm, or VS Code aren't cooperating on your machine, skip local setup
+          entirely. On your own copy of the repo, click <strong>Code → Codespaces → Create
+          codespace on master</strong>. The container builds in about 1–2 minutes, installs
+          dependencies and the Playwright browser automatically, and opens VS Code in the
+          browser with <code>workshop-exercises/</code> as the working folder and GitHub
+          Copilot pre-installed.
+        </p>
+        <CodeBlock language="bash">{`npm run dev:api   # backend on port 4000
+npm run dev       # frontend on port 3006`}</CodeBlock>
+        <div className="callout callout-info">
+          <strong>📌 Note</strong> — Codespaces forwards ports 3006 and 4000 automatically;
+          a notification will offer to open them in your browser.
         </div>
 
         <h2>Knowledge Prerequisites</h2>

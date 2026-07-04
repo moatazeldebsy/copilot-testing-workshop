@@ -22,11 +22,11 @@ export interface ExerciseRepository {
 }
 
 export const exerciseRepository: ExerciseRepository = {
-  name: 'copilot-testing-workshop-exercises',
-  url: 'https://github.com/YOUR_ORG/copilot-testing-workshop-exercises',
-  cloneUrl: 'https://github.com/YOUR_ORG/copilot-testing-workshop-exercises.git',
-  issuesUrl: 'https://github.com/YOUR_ORG/copilot-testing-workshop-exercises/issues',
-  defaultBranch: 'main',
+  name: 'copilot-testing-workshop',
+  url: 'https://github.com/moatazeldebsy/copilot-testing-workshop',
+  cloneUrl: 'https://github.com/moatazeldebsy/copilot-testing-workshop.git',
+  issuesUrl: 'https://github.com/moatazeldebsy/copilot-testing-workshop/issues',
+  defaultBranch: 'master',
 };
 
 export interface WorkshopSection {

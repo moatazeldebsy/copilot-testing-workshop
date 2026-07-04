@@ -30,8 +30,26 @@ _Friday, 10 Jul 2026 · Room R2 · 12:15 pm – 2:15 pm WEDT (UTC+02:00)_
 
 **Prerequisites:** Node.js 20.19+ or 22+, GitHub Copilot subscription
 
+This repo is a GitHub template. Click **Use this template → Create a new repository**
+on [github.com/moatazeldebsy/copilot-testing-workshop](https://github.com/moatazeldebsy/copilot-testing-workshop)
+to get your own writable copy — needed if an exercise has you push a branch or open a PR.
+A plain `git clone` works too if you're only following along locally.
+
+**No local setup? Use Codespaces.** If Node, npm, or VS Code aren't cooperating on your
+machine, skip local setup entirely:
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/moatazeldebsy/copilot-testing-workshop?quickstart=1)
+
+Click the badge (or **Code → Codespaces → Create codespace on master** on your own
+copy of the repo) and wait ~1–2 minutes for the container to build. Dependencies and
+the Playwright browser install automatically; VS Code opens with `workshop-exercises/`
+as the working folder and the GitHub Copilot extension pre-installed. Then just run
+`npm run dev:api` and `npm run dev` in the integrated terminal as below — Codespaces
+forwards ports 3006 and 4000 automatically.
+
 ```bash
-cd workshop-exercises
+git clone https://github.com/YOUR_USERNAME/copilot-testing-workshop.git
+cd copilot-testing-workshop/workshop-exercises
 npm install
 
 # Run the backend API (port 4000)
