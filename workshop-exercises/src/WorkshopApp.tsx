@@ -4,6 +4,7 @@ import LoginPage from './ui/pages/LoginPage';
 import StorePage from './ui/pages/StorePage';
 
 const AUTH_TOKEN_KEY = 'workshop-auth-token';
+const SIGNED_OUT_KEY = 'workshop-signed-out';
 
 type UserRole = 'admin' | 'viewer' | 'user';
 
@@ -59,9 +60,11 @@ const WorkshopApp: React.FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-login with workshop credentials so the store works on first load
+  // Auto-login with workshop credentials so the store works on first load.
+  // Skip it once the user has explicitly signed out — otherwise sign-out would
+  // be silently undone by the next reload or a direct visit to /store.
   useEffect(() => {
-    if (token) {
+    if (token || window.localStorage.getItem(SIGNED_OUT_KEY) === 'true') {
       setAutoLogging(false);
       return;
     }
@@ -89,6 +92,7 @@ const WorkshopApp: React.FC = () => {
     setToken(nextToken);
     if (nextToken) {
       window.localStorage.setItem(AUTH_TOKEN_KEY, nextToken);
+      window.localStorage.removeItem(SIGNED_OUT_KEY);
     } else {
       window.localStorage.removeItem(AUTH_TOKEN_KEY);
     }
@@ -144,6 +148,7 @@ const WorkshopApp: React.FC = () => {
   const handleLogout = () => {
     persistToken('');
     setSessionUser(null);
+    window.localStorage.setItem(SIGNED_OUT_KEY, 'true');
     navigate('/login');
   };
 
@@ -151,10 +156,13 @@ const WorkshopApp: React.FC = () => {
     if (autoLogging) {
       return <div className="screen-shell" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading…</div>;
     }
+    if (!sessionUser) {
+      return <LoginPage onLogin={handleLogin} onNavigateRegister={() => navigate('/register')} />;
+    }
     return (
       <StorePage
-        userId={sessionUser?.id ?? ''}
-        userEmail={sessionUser?.email ?? ''}
+        userId={sessionUser.id}
+        userEmail={sessionUser.email}
         token={token}
         onLogout={handleLogout}
       />
@@ -189,10 +197,13 @@ const WorkshopApp: React.FC = () => {
   if (autoLogging) {
     return <div className="screen-shell" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading…</div>;
   }
+  if (!sessionUser) {
+    return <LoginPage onLogin={handleLogin} onNavigateRegister={() => navigate('/register')} />;
+  }
   return (
     <StorePage
-      userId={sessionUser?.id ?? ''}
-      userEmail={sessionUser?.email ?? ''}
+      userId={sessionUser.id}
+      userEmail={sessionUser.email}
       token={token}
       onLogout={handleLogout}
     />
