@@ -112,4 +112,4 @@ Ask participants to compare assertion specificity in the two outputs.
 - Participants can identify weak assertions and rewrite them.
 - Participants understand what the flaky test moment illustrates.
 - Participants leave with one immediate action for their own repo.
-- Participants have the Trust Playbook (`docs/ai-testing-trust-playbook.md`) as a reference.
+- Participants have the Trust Playbook (`workshop-exercises/docs/ai-testing-trust-playbook.md`) as a reference.
