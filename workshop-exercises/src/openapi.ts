@@ -13,6 +13,7 @@ export const openApiSpec = {
   },
   servers: [{ url: 'http://localhost:4000', description: 'Local dev' }],
   tags: [
+    { name: 'Health',       description: 'Service status' },
     { name: 'Auth',         description: 'Registration and login' },
     { name: 'Users',        description: 'User management (protected)' },
     { name: 'Cart',         description: 'Shopping cart (protected)' },
@@ -112,6 +113,34 @@ export const openApiSpec = {
     },
   },
   paths: {
+    // ── Health ──────────────────────────────────────────────
+    '/api/health': {
+      get: {
+        tags: ['Health'],
+        summary: 'Check service health',
+        responses: {
+          200: {
+            description: 'Service is healthy',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      type: 'object',
+                      properties: {
+                        status:   { type: 'string', example: 'ok' },
+                        services: { type: 'array', items: { type: 'string' } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     // ── Auth ────────────────────────────────────────────────
     '/api/auth/register': {
       post: {
