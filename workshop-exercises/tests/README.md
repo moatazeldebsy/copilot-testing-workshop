@@ -10,13 +10,14 @@ The workshop starts with incomplete stubs — that's intentional. You fill them 
 | `api/` | C | Supertest API tests for the full checkout pipeline |
 | `components/` | D | React Testing Library tests for `StorePage` |
 | `e2e/` | D | Playwright end-to-end checkout scenarios (live demo) |
+| `integration/` | Demo | Service-layer pipeline wiring (Cart → Discount → Fraud → Payment → Notification), no HTTP |
 | `fixtures/` | Backup | Pre-generated examples if Copilot or Wi-Fi is unavailable |
 
 ## Starting Files
 
 ### Exercise A & B — Unit tests (core)
 - `unit/calculateDiscount.weak.test.ts` — pre-seeded weak AI tests; **read before writing your own** (Exercise B)
-- `unit/calculateDiscount.test.ts` — does not exist yet; create it (Exercise A)
+- `unit/calculateDiscount.test.ts` — stub with `it.todo` placeholders; fill it in (Exercise A)
 - `unit/notificationService.test.ts` — stubs + a deliberately flaky test demo (Exercise E; do not fix the marked test)
 
 ### Bonus — Unit tests for pipeline services (if you finish early)
@@ -34,6 +35,12 @@ These stubs cover the full pipeline at the unit level. They are **not** part of 
 ### Exercise D — Component & E2E
 - `components/CartPage.test.tsx` — stubs, fill in
 - `e2e/checkout.spec.ts` — stubs, fill in
+
+### Integration demo (not a timed exercise)
+- `integration/checkout.pipeline.test.ts` — stubs; calls `cartService`, `discountService`,
+  `fraudService`, `paymentService`, and `notificationService` directly (exported from
+  `src/app.ts`), bypassing HTTP entirely. Contrast with Exercise C, which drives the
+  same pipeline through Supertest.
 
 ## Key Testing Notes
 
@@ -57,6 +64,7 @@ These stubs cover the full pipeline at the unit level. They are **not** part of 
 npm test                          # All Jest tests
 npm test -- --coverage            # With coverage report
 npm run test:api                  # API tests only
+npm run test:integration          # Service-layer integration demo only
 npm run test:component            # Component tests only
 npm run test:e2e                  # Playwright
 ```

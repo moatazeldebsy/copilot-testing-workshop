@@ -63,6 +63,14 @@ This test uses Date.now() timing assertions. Rewrite it to be deterministic
 using jest.useFakeTimers() or by asserting a structural property instead of timing.
 ```
 
+## Integration Tests Demo (optional, after Exercise C)
+
+`tests/integration/checkout.pipeline.test.ts` calls the exported service
+singletons (`cartService`, `discountService`, `fraudService`, `paymentService`,
+`notificationService`) directly, bypassing HTTP entirely. Use it to contrast
+with Exercise C: same pipeline, different layer. Solution on branch
+`07-service-integration`. Time permitting only — not part of the core 120-minute flow.
+
 ## Context Engineering Demo (Exercise E)
 
 Show the difference between prompting with and without domain context:
