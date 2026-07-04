@@ -104,12 +104,10 @@ workshop-exercises/
     components/                ← Exercise D stubs (fill these in)
     e2e/                       ← Exercise D Playwright stubs (fill these in)
     fixtures/                  ← Pre-generated backup examples
-
-.copilot/
-  context/domain-rules.md      ← Business rules — attach to Copilot Chat prompts
-  skills/unit-testing.md       ← Prompt template + review checklist
-
-.github/copilot-instructions.md ← Repo-level Copilot behavior standards
+  .copilot/
+    context/domain-rules.md    ← Business rules — attach to Copilot Chat prompts
+    skills/unit-testing.md     ← Prompt template + review checklist
+  .github/copilot-instructions.md ← Repo-level Copilot behavior standards
 
 docs/
   ai-testing-trust-playbook.md ← Session takeaway

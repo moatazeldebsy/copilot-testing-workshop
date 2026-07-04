@@ -13,7 +13,7 @@ This tutorial gives a practical path to three advanced Copilot concepts used in 
 - Node.js installed
 
 ```bash
-cd /Users/mnabil/copilot-testing-workshop/workshop-exercises
+cd workshop-exercises
 npm install
 npm run dev
 ```
@@ -183,6 +183,6 @@ Treat Copilot output as a draft until human-reviewed and validated in CI.
 
 ## Next Steps
 
-- Return to the workshop Step 2 page for Copilot fundamentals
-- Continue to Step 5 and apply the same skill/MCP workflow on API test evolution
+- Return to the **[Copilot Overview](../../src/pages/workshop/CopilotOverview.tsx)** workshop page for Copilot fundamentals
+- Continue to **Exercise C — API Tests** and apply the same skill/MCP workflow on API test evolution
 - Revisit `practice/mcp-practice.md` whenever introducing a new contract or auth change

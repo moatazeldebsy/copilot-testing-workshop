@@ -104,7 +104,7 @@ Ask participants to compare assertion specificity in the two outputs.
 - **"How do we trust AI-generated tests?"** — same gates as human code: fail-first + CI coverage threshold.
 - **"Where does AI help most?"** — boilerplate, scaffolding, edge-case enumeration, test data factories.
 - **"Where is human judgment essential?"** — domain rules, risk assessment, boundary decisions, security review.
-- **"What should we adopt first next week?"** — `.copilot-instructions.md` + 80% coverage gate + fix one weak assertion pattern.
+- **"What should we adopt first next week?"** — `.github/copilot-instructions.md` + 80% coverage gate + fix one weak assertion pattern.
 
 ## Exit Criteria
 

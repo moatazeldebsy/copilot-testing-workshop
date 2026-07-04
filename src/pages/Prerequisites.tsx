@@ -86,15 +86,15 @@ const Prerequisites: React.FC = () => {
 git --version
 
 # Node.js
-node --version   # must be 18+
+node --version   # must be 22+
 npm --version
 
 # VS Code — open from terminal
 code --version`}</CodeBlock>
 
         <VerifyBlock>{`git version 2.x.x
-v18.x.x (or higher)
-9.x.x
+v22.x.x (or higher)
+10.x.x
 1.9x.x (or higher)`}</VerifyBlock>
 
         <h2>Verify GitHub Copilot is Active</h2>
