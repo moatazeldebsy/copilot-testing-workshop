@@ -7,7 +7,7 @@
     "3006": { "label": "Store UI", "onAutoForward": "openPreview" },
     "4000": { "label": "API + Swagger docs (/docs)", "onAutoForward": "notify" }
   },
-  "postCreateCommand": "cd workshop-exercises && npm install && npx playwright install --with-deps chromium",
+  "postCreateCommand": "bash .devcontainer/postCreate.sh",
   "customizations": {
     "vscode": {
       "extensions": [
