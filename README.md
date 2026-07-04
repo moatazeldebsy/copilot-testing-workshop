@@ -69,6 +69,19 @@ Open `http://localhost:3006` for the store UI and `http://localhost:4000/docs` f
 
 Login with: `alice@example.com` / `workshop-password`
 
+## Running the Docs Site
+
+This repo's root is a separate React + Vite app — the workshop tutorial/agenda site itself
+(prerequisites, exercise walkthroughs, session flow), independent of the `workshop-exercises/`
+hands-on app above. Run it from the repo root, not from inside `workshop-exercises/`:
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:3005`.
+
 ## Repository Layout
 
 ```
