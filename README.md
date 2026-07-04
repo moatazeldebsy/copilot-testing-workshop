@@ -28,7 +28,7 @@ _Friday, 10 Jul 2026 · Room R2 · 12:15 pm – 2:15 pm WEDT (UTC+02:00)_
 
 ## Getting Started
 
-**Prerequisites:** Node.js 20.19+ or 22+, GitHub Copilot subscription
+**Prerequisites:** Node.js 22+, GitHub Copilot subscription
 
 This repo is a GitHub template. Click **Use this template → Create a new repository**
 on [github.com/moatazeldebsy/copilot-testing-workshop](https://github.com/moatazeldebsy/copilot-testing-workshop)
@@ -108,9 +108,8 @@ workshop-exercises/
     context/domain-rules.md    ← Business rules — attach to Copilot Chat prompts
     skills/unit-testing.md     ← Prompt template + review checklist
   .github/copilot-instructions.md ← Repo-level Copilot behavior standards
-
-docs/
-  ai-testing-trust-playbook.md ← Session takeaway
+  docs/
+    ai-testing-trust-playbook.md ← Session takeaway
 ```
 
 ## Recovery Checkpoints (Progressive Branches)
@@ -125,6 +124,7 @@ If you fall behind on any exercise, checkout the corresponding branch to see the
 | `04-integration-testing` | Component tests for `StorePage` |
 | `05-ci-guardrails` | CI workflow with coverage gates |
 | `06-review-patterns` | Trust Playbook + Copilot instructions |
+| `07-service-integration` | Service-layer integration pipeline demo (optional, not timed) |
 
 ```bash
 # Example: catch up after Exercise B
