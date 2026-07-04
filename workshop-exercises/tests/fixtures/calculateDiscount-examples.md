@@ -103,7 +103,8 @@ it('completes a full checkout flow', async () => {
   const login = await request(app)
     .post('/api/auth/login')
     .send({ email: 'alice@example.com', password: 'workshop-password' });
-  const { token, userId } = login.body.data;
+  const { token, user } = login.body.data;
+  const userId = user.id;
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -125,7 +126,7 @@ it('completes a full checkout flow', async () => {
   const fraud = await request(app)
     .post('/api/fraud/check')
     .set(headers)
-    .send({ userId, amount: 90, itemCount: 2, shippingCountry: 'DE' });
+    .send({ userId, orderAmount: 90, itemCount: 2, ipCountry: 'DE' });
   expect(fraud.body.data.approved).toBe(true);
 
   // 5. Charge
@@ -146,7 +147,13 @@ it('completes a full checkout flow', async () => {
   const receipt = await request(app)
     .post('/api/notifications/receipt')
     .set(headers)
-    .send({ userId, orderId: paymentId, amount: 90 });
+    .send({
+      userId,
+      email: 'alice@example.com',
+      subject: 'Your order is confirmed!',
+      body: `Payment ${paymentId} captured. Thank you!`,
+      metadata: { paymentId },
+    });
   expect(receipt.body.data.type).toBe('receipt');
 });
 ```
