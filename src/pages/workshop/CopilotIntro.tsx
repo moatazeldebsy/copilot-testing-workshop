@@ -638,11 +638,31 @@ Rule of thumb: the more precise your #selection, the better the suggestion.`}</C
       </table>
       <p>
         Configure MCP servers in VS Code by adding a <code>.vscode/mcp.json</code>
-        file (or workspace settings). Example using the remote GitHub MCP server:
+        file (or workspace settings). The exercises repository ships one for
+        the Playwright MCP server, used in Exercise D's live E2E demo:
       </p>
-      <CodeBlock language="json">{`// .vscode/mcp.json
+      <CodeBlock language="json">{`// workshop-exercises/.vscode/mcp.json
 {
   "servers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}`}</CodeBlock>
+      <p>
+        With this server running, Copilot can drive a real browser — navigate,
+        click, and read the page — to write E2E tests grounded in what's
+        actually on screen, instead of guessing selectors. The same file can
+        list multiple servers; here's the remote GitHub MCP server added
+        alongside it:
+      </p>
+      <CodeBlock language="json">{`{
+  "servers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
@@ -725,8 +745,64 @@ Rule of thumb: the more precise your #selection, the better the suggestion.`}</C
             <td>Project context</td>
             <td>Copilot reads it when exploring — a well-written README helps Agent mode navigate your project faster</td>
           </tr>
+          <tr>
+            <td><code>.github/prompts/*.prompt.md</code></td>
+            <td>Reusable, invoked on demand</td>
+            <td>Packages a proven prompt as a file the whole team can run with a slash command (for example <code>/generate-tests</code>) instead of retyping it</td>
+          </tr>
+          <tr>
+            <td><code>.github/chatmodes/*.chatmode.md</code></td>
+            <td>Custom chat persona</td>
+            <td>Defines a scoped persona with its own instructions and a limited tool list — a specialist you summon instead of a generalist you nudge</td>
+          </tr>
         </tbody>
       </table>
+
+      <h3>Prompt Files</h3>
+      <p>
+        A prompt file is Markdown with frontmatter, checked into the repo like
+        any other config. Run it from Copilot Chat as a slash command:
+      </p>
+      <CodeBlock language="markdown">{`// .github/prompts/generate-tests.prompt.md
+---
+mode: agent
+description: Generate tests for a file
+---
+
+Write Jest tests for \${file}.
+
+- Cover happy path, edge, and error cases.
+- Reuse factories from tests/factories.
+- Do not test private functions.
+- Stop and ask if behavior is unclear.`}</CodeBlock>
+      <p>
+        Invoke it in chat with <code>/generate-tests</code>. Because it's a
+        file, it's version-controlled and reviewed like code — the whole team
+        gets the same prompt, not whatever each person happened to type.
+      </p>
+
+      <h3>Custom Chat Modes</h3>
+      <p>
+        A chat mode restricts Copilot to a persona with its own instructions
+        and a limited tool list — useful when you want a reviewer that can
+        read and run tests but never write feature code:
+      </p>
+      <CodeBlock language="markdown">{`// .github/chatmodes/qa-reviewer.chatmode.md
+---
+description: QA reviewer — harden tests
+tools: [read, search, runTests]
+---
+
+You are a meticulous QA reviewer.
+Critique tests for weak assertions and flaky patterns; suggest fixes. Do not
+write feature code.`}</CodeBlock>
+      <p>
+        Select it from the chat mode dropdown alongside the built-in Ask,
+        Agent, and Plan modes. Granting only the tools a task needs (read,
+        search, run tests — no file edits) limits the blast radius if the
+        model goes off track.
+      </p>
+
       <p>
         In this workshop, participants can copy practical starter files from the
         exercises repository:
@@ -739,6 +815,20 @@ Rule of thumb: the more precise your #selection, the better the suggestion.`}</C
         <li>
           <code>workshop-exercises/.github/copilot-instructions.md</code> for
           repository-wide coding and testing conventions.
+        </li>
+        <li>
+          <code>workshop-exercises/.github/prompts/generate-tests.prompt.md</code> —
+          run with <code>/generate-tests</code>.
+        </li>
+        <li>
+          <code>workshop-exercises/.github/chatmodes/qa-reviewer.chatmode.md</code> —
+          a review-only persona.
+        </li>
+        <li>
+          <code>workshop-exercises/.github/skills/</code> — three reusable playbooks:
+          <code>pact-contracts</code> (API contract review), <code>flaky-test-hunt</code>
+          (timing/order/shared-state flakiness), and <code>test-generation</code>
+          (scaffold tests from a target file).
         </li>
       </ul>
 
