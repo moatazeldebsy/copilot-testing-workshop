@@ -104,7 +104,7 @@ export const workshopSections: WorkshopSection[] = [
           primaryFiles: [
             'workshop-exercises/tests/unit/calculateDiscount.weak.test.ts',
             'workshop-exercises/src/services/calculateDiscount.ts',
-            '.github/copilot-instructions.md',
+            'workshop-exercises/.github/copilot-instructions.md',
           ],
           solutionCheckpoints: ['02-unit-testing'],
         },
@@ -125,7 +125,7 @@ export const workshopSections: WorkshopSection[] = [
           runCommand: 'npm run test:api',
           primaryFiles: [
             'workshop-exercises/tests/api/checkout.test.ts',
-            '.copilot/context/domain-rules.md',
+            'workshop-exercises/.copilot/context/domain-rules.md',
             'workshop-exercises/src/routes/',
           ],
           solutionCheckpoints: ['03-api-testing'],
