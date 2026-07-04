@@ -223,17 +223,38 @@ src/**/*.test.ts          @your-org/qa-leads
 src/**/*.spec.ts          @your-org/qa-leads`}</CodeBlock>
 
       <h2>PR Template for AI-Assisted Code</h2>
-      <CodeBlock language="markdown">{`<!-- .github/pull_request_template.md -->
-## Changes
-<!-- Describe what changed -->
+      <p>
+        This is the actual <code>.github/pull_request_template.md</code> from
+        the exercises repository (on the <code>06-review-patterns</code> checkpoint
+        branch) — not just an illustration:
+      </p>
+      <CodeBlock language="markdown">{`<!--
+Reviewing AI-generated tests checklist (see docs/ai-testing-trust-playbook.md).
+Treat every generated test like a pull request from a junior teammate.
+-->
 
-## AI-Generated Code
-- [ ] This PR contains AI-generated tests
-- [ ] I applied the [AI test review checklist](../docs/tutorials/advanced-scenarios.md)
-- [ ] Assertions are specific (no toBeTruthy/toBeFalsy)
-- [ ] No hardcoded credentials or PII in test data
-- [ ] All tests pass locally
-- [ ] Coverage thresholds met`}</CodeBlock>
+## What changed
+
+<!-- One or two sentences: what behavior does this PR add or change? -->
+
+## Test review checklist
+
+- [ ] Does each new test assert the actual behavior, not an implementation detail?
+- [ ] Would it fail if the code were broken on purpose? (fail-first check)
+- [ ] Are inputs realistic and are edge cases covered?
+- [ ] Is the test isolated, deterministic, and free of hidden state or timing dependence?
+- [ ] Is the test name a clear statement of the behavior under test?
+- [ ] Does it avoid leaking secrets, tokens, or real user data?
+
+## Quality gates (enforced in CI)
+
+- [ ] All tests green
+- [ ] Coverage threshold met (80% lines/functions/statements, 70% branches)
+- [ ] No flaky reruns needed to pass
+- [ ] Security scan clean (\`npm audit --omit=dev --audit-level=high\`)
+
+A human reviewer owns this checklist — AI-assisted generation speeds up
+authoring, but does not replace review.`}</CodeBlock>
 
       <h2>Team Adoption Strategy</h2>
       <table className="info-table">

@@ -26,7 +26,7 @@ const Prerequisites: React.FC = () => {
             { label: 'VS Code', icon: '💻' },
             { label: 'Copilot Extension', icon: '⚡' },
             { label: 'Git', icon: '📦' },
-            { label: 'Node.js 18+', icon: '🟩' },
+            { label: 'Node.js 22+', icon: '🟩' },
           ]}
           connections={[
             { from: 0, to: 1, label: 'activates' },
@@ -73,7 +73,7 @@ const Prerequisites: React.FC = () => {
               <td><a href="https://git-scm.com/downloads" target="_blank" rel="noopener noreferrer">Install Git</a></td>
             </tr>
             <tr>
-              <td><strong>Node.js 18+</strong></td>
+              <td><strong>Node.js 22+</strong></td>
               <td>Runtime for the sample application and test tools (Jest, Supertest)</td>
               <td><a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer">Install Node.js</a></td>
             </tr>
