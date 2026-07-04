@@ -85,10 +85,13 @@ POST /api/auth/login  →  POST /api/cart/:id/items  →  POST /api/discount/app
 ```
 
 Tip: use `#file:src/openapi.ts` and `#file:.copilot/context/domain-rules.md` in your Copilot Chat prompt.
+(`domain-rules.md` lives at the repo root — `../.copilot/context/domain-rules.md`
+relative to this folder — since Copilot Chat resolves `#file:` against the
+VS Code workspace root, not your terminal's working directory.)
 
 ### Exercise D — Component & E2E Tests
 
-- `tests/components/CartPage.test.tsx` — React Testing Library tests for `StorePage`
+- `tests/components/StorePage.test.tsx` — React Testing Library tests for `StorePage`
 - `tests/e2e/checkout.spec.ts` — Playwright end-to-end scenarios
 
 ### Integration Tests — service-layer demo (not timed)
@@ -101,7 +104,9 @@ contract tests.
 
 ### Exercise E — CI Guardrails
 
-Explore `.github/copilot-instructions.md` and `.copilot/context/domain-rules.md`. Try context engineering: attach domain-rules.md to a Copilot Chat session and compare the test quality vs without it.
+Explore `.github/copilot-instructions.md` (in this folder) and `.copilot/context/domain-rules.md`
+(at the repo root). Try context engineering: attach domain-rules.md to a
+Copilot Chat session and compare the test quality vs without it.
 
 ## Seeded Test Data
 
@@ -142,8 +147,8 @@ git checkout master               # Back to the workshop starting point
 ## Extra Practice
 
 - `copilot.md` — prompt-writing drills for generation, refactoring, and review
-- `.copilot/skills/unit-testing.md` — reusable prompt template and review checklist
-- `.copilot/context/domain-rules.md` — business rules reference for context engineering
+- `../.copilot/skills/unit-testing.md` (repo root) — reusable prompt template and review checklist
+- `../.copilot/context/domain-rules.md` (repo root) — business rules reference for context engineering
 - `.github/skills/pact-contracts/SKILL.md` — contract-focused API test review
 - `.github/skills/flaky-test-hunt/SKILL.md` — flaky test investigation workflow
 - `.github/skills/test-generation/SKILL.md` — scaffold new tests from a target file

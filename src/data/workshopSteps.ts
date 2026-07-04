@@ -125,7 +125,7 @@ export const workshopSections: WorkshopSection[] = [
           runCommand: 'npm run test:api',
           primaryFiles: [
             'workshop-exercises/tests/api/checkout.test.ts',
-            'workshop-exercises/.copilot/context/domain-rules.md',
+            '.copilot/context/domain-rules.md',
             'workshop-exercises/src/routes/',
           ],
           solutionCheckpoints: ['03-api-testing'],
@@ -169,8 +169,8 @@ export const workshopSections: WorkshopSection[] = [
             'Add enforceable quality gates: coverage threshold, flaky test identification, and .github/copilot-instructions.md to steer future Copilot output.',
           runCommand: 'npm test -- --coverage --coverageReporters=json-summary',
           primaryFiles: [
-            '.github/workflows/test.yml',
-            '.github/copilot-instructions.md',
+            'workshop-exercises/.github/workflows/test.yml',
+            'workshop-exercises/.github/copilot-instructions.md',
             'workshop-exercises/tests/unit/notificationService.test.ts',
             'workshop-exercises/jest.config.ts',
           ],

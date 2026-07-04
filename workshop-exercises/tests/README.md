@@ -33,7 +33,7 @@ These stubs cover the full pipeline at the unit level. They are **not** part of 
 - `api/checkout.test.ts` — stubs, fill in
 
 ### Exercise D — Component & E2E
-- `components/CartPage.test.tsx` — stubs, fill in
+- `components/StorePage.test.tsx` — stubs, fill in
 - `e2e/checkout.spec.ts` — stubs, fill in
 
 ### Integration demo (not a timed exercise)
