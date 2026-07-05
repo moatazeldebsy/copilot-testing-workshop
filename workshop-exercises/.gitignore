@@ -1,6 +1,11 @@
 node_modules
 dist
 playwright-report
+test-results
 coverage
 .env
 .env.test
+
+# Claude Code local state (machine-specific, not shared)
+.claude/settings.local.json
+.claude/shell-snapshots/

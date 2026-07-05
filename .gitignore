@@ -3,3 +3,7 @@ dist/
 build/
 .DS_Store
 *.local
+
+# Claude Code local state (machine-specific, not shared)
+.claude/settings.local.json
+.claude/shell-snapshots/
