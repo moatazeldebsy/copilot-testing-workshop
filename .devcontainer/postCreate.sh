@@ -11,6 +11,11 @@
 # reinstall if that fails.
 set -euo pipefail
 
+# workspaceFolder is set to workshop-exercises/, not the repo root, so the
+# working directory when this script is invoked can't be relied on. Anchor
+# every relative path below to the repo root regardless of caller CWD.
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 install_dir() {
   local dir="$1"
   echo "==> Installing dependencies in $dir"
