@@ -68,8 +68,8 @@ using jest.useFakeTimers() or by asserting a structural property instead of timi
 `tests/integration/checkout.pipeline.test.ts` calls the exported service
 singletons (`cartService`, `discountService`, `fraudService`, `paymentService`,
 `notificationService`) directly, bypassing HTTP entirely. Use it to contrast
-with Exercise C: same pipeline, different layer. Solution on branch
-`07-service-integration`. Time permitting only — not part of the core 120-minute flow.
+with Exercise C: same pipeline, different layer. Solution on the `solutions` branch.
+Time permitting only — not part of the core 120-minute flow.
 
 ## Context Engineering Demo (Exercise E)
 
@@ -94,8 +94,7 @@ Ask participants to compare assertion specificity in the two outputs.
 | Problem | Action |
 |---|---|
 | Copilot unavailable | Use `tests/fixtures/calculateDiscount-examples.md` — paste the strong tests directly |
-| Participant stuck on Exercise A | `git checkout 02-unit-testing` to see the solution |
-| Participant stuck on Exercise C | `git checkout 03-api-testing` |
+| Participant stuck on any exercise | `git checkout solutions` to see the completed answer key |
 | Tests fail unexpectedly | Narrate the triage flow: reproduce → localize → hypothesize → verify → patch |
 | Time short | Skip Exercise D; keep Exercise E and wrap-up |
 

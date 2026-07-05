@@ -36,9 +36,17 @@ if ! (npx --no-install vite --version >/tmp/vite-root-check.log 2>&1); then
   npx --no-install vite --version
 fi
 
-# The actual hands-on workshop app (plain vite@7, not affected by the above,
-# but installed the same safe way for consistency).
+# The actual hands-on workshop app. Also verified post-install: it ships its
+# own vite@7 plus jest, and a broken/incomplete install here is exactly what
+# leaves participants staring at "jest: not found" or a 502 on the forwarded
+# dev server ports.
 install_dir workshop-exercises
+if ! (cd workshop-exercises && npx --no-install vite --version >/tmp/vite-workshop-check.log 2>&1 \
+      && npx --no-install jest --version >>/tmp/vite-workshop-check.log 2>&1); then
+  echo "==> vite/jest failed to load after install in workshop-exercises — see /tmp/vite-workshop-check.log"
+  clean_reinstall workshop-exercises
+  (cd workshop-exercises && npx --no-install vite --version && npx --no-install jest --version)
+fi
 
 echo "==> Installing Playwright's Chromium browser for E2E exercises"
 (cd workshop-exercises && npx playwright install --with-deps chromium)

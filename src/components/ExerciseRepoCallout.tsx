@@ -57,16 +57,20 @@ const ExerciseRepoCallout: React.FC<ExerciseRepoCalloutProps> = ({
         ))}
       </ul>
 
-      <p>
-        <strong>Recovery checkpoints</strong>
-      </p>
-      <ul className="exercise-repo-callout__checkpoints">
-        {exercise.solutionCheckpoints.map((checkpoint) => (
-          <li key={checkpoint}>
-            <code>{checkpoint}</code>
-          </li>
-        ))}
-      </ul>
+      {exercise.solutionCheckpoints.length > 0 && (
+        <>
+          <p>
+            <strong>Recovery checkpoint</strong>
+          </p>
+          <ul className="exercise-repo-callout__checkpoints">
+            {exercise.solutionCheckpoints.map((checkpoint) => (
+              <li key={checkpoint}>
+                <code>{checkpoint}</code>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <div className="exercise-repo-callout__links">
         <a

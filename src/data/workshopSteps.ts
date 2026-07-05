@@ -36,14 +36,14 @@ export interface WorkshopSection {
 
 export const workshopSections: WorkshopSection[] = [
   {
-    title: 'GenAI Testing Workshop',
+    title: 'GenAI in Testing',
     items: [
       { label: 'Home', path: '/' },
       { label: 'Prerequisites', path: '/prerequisites' },
     ],
   },
   {
-    title: 'Getting Started',
+    title: 'Intro & Setup',
     items: [
       {
         label: 'Intro, Setup & Tour',
@@ -59,7 +59,7 @@ export const workshopSections: WorkshopSection[] = [
             'workshop-exercises/src/services/calculateDiscount.ts',
             'workshop-exercises/README.md',
           ],
-          solutionCheckpoints: ['01-baseline'],
+          solutionCheckpoints: [],
         },
       },
       { label: 'Introduction to GitHub Copilot', path: '/workshop/copilot-intro' },
@@ -67,7 +67,7 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
-    title: 'Exercise A — Unit Tests',
+    title: 'Exercise A — Unit tests',
     items: [
       {
         label: 'Unit Test Generation',
@@ -84,13 +84,13 @@ export const workshopSections: WorkshopSection[] = [
             'workshop-exercises/tests/unit/calculateDiscount.weak.test.ts',
             'workshop-exercises/tests/README.md',
           ],
-          solutionCheckpoints: ['02-unit-testing'],
+          solutionCheckpoints: ['solutions'],
         },
       },
     ],
   },
   {
-    title: 'Exercise B — Review AI Tests',
+    title: 'Exercise B — Review AI tests',
     items: [
       {
         label: 'Reviewing AI Tests & Guardrails',
@@ -106,13 +106,13 @@ export const workshopSections: WorkshopSection[] = [
             'workshop-exercises/src/services/calculateDiscount.ts',
             'workshop-exercises/.github/copilot-instructions.md',
           ],
-          solutionCheckpoints: ['02-unit-testing'],
+          solutionCheckpoints: ['solutions'],
         },
       },
     ],
   },
   {
-    title: 'Exercise C — API Tests',
+    title: 'Exercise C — API tests',
     items: [
       {
         label: 'API & Integration Tests',
@@ -128,13 +128,13 @@ export const workshopSections: WorkshopSection[] = [
             'workshop-exercises/.copilot/context/domain-rules.md',
             'workshop-exercises/src/routes/',
           ],
-          solutionCheckpoints: ['03-api-testing'],
+          solutionCheckpoints: ['solutions'],
         },
       },
     ],
   },
   {
-    title: 'Exercise D — Component Tests',
+    title: 'Exercise D — Component tests',
     items: [
       {
         label: 'Component Testing with RTL',
@@ -150,14 +150,26 @@ export const workshopSections: WorkshopSection[] = [
             'workshop-exercises/tests/components/StorePage.test.tsx',
             'workshop-exercises/tests/e2e/checkout.spec.ts',
           ],
-          solutionCheckpoints: ['04-integration-testing'],
+          solutionCheckpoints: ['solutions'],
         },
       },
       { label: 'E2E Testing with Playwright', path: '/workshop/e2e-playwright' },
     ],
   },
   {
-    title: 'Exercise E — CI Guardrails',
+    title: 'Test data and mocks',
+    items: [
+      { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
+    ],
+  },
+  {
+    title: 'Configuring Copilot for your team',
+    items: [
+      { label: 'Configuring Copilot for Your Team', path: '/workshop/copilot-configuration' },
+    ],
+  },
+  {
+    title: 'Exercise E — CI guardrails',
     items: [
       {
         label: 'CI/CD & Team Adoption',
@@ -174,7 +186,7 @@ export const workshopSections: WorkshopSection[] = [
             'workshop-exercises/tests/unit/notificationService.test.ts',
             'workshop-exercises/jest.config.ts',
           ],
-          solutionCheckpoints: ['05-ci-guardrails', '06-review-patterns'],
+          solutionCheckpoints: ['solutions'],
         },
       },
     ],
@@ -182,12 +194,11 @@ export const workshopSections: WorkshopSection[] = [
   {
     title: 'Reference',
     items: [
-      { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
       { label: 'Testing AI-Powered Features', path: '/workshop/ai-testing-patterns' },
     ],
   },
   {
-    title: 'Wrap-up',
+    title: 'Wrap-up & Q&A',
     items: [
       { label: 'Key Takeaways', path: '/workshop/takeaways' },
     ],

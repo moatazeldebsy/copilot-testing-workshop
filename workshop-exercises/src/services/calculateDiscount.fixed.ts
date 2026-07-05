@@ -1,5 +1,5 @@
 /**
- * Fixed version of calculateDiscount — for the 02-unit-testing solution branch.
+ * Fixed version of calculateDiscount — reference for Exercise A's solution.
  * Compare with calculateDiscount.ts to see all three bug fixes.
  *
  * Copy this file over calculateDiscount.ts to make the unit tests go green.

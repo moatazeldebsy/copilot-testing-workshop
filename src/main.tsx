@@ -11,6 +11,7 @@ const TutorialDetail = lazy(() => import('./pages/TutorialDetail'));
 const Setup = lazy(() => import('./pages/workshop/Setup'));
 const CopilotIntro = lazy(() => import('./pages/workshop/CopilotIntro'));
 const CopilotOverview = lazy(() => import('./pages/workshop/CopilotOverview'));
+const CopilotConfiguration = lazy(() => import('./pages/workshop/CopilotConfiguration'));
 const UnitTesting = lazy(() => import('./pages/workshop/UnitTesting'));
 const ApiIntegration = lazy(() => import('./pages/workshop/ApiIntegration'));
 const TestDataMocks = lazy(() => import('./pages/workshop/TestDataMocks'));
@@ -35,6 +36,7 @@ root.render(
             <Route path="/workshop/setup" element={<Setup />} />
             <Route path="/workshop/copilot-intro" element={<CopilotIntro />} />
             <Route path="/workshop/copilot-overview" element={<CopilotOverview />} />
+            <Route path="/workshop/copilot-configuration" element={<CopilotConfiguration />} />
             <Route path="/workshop/unit-testing" element={<UnitTesting />} />
             <Route path="/workshop/api-integration" element={<ApiIntegration />} />
             <Route path="/workshop/test-data-mocks" element={<TestDataMocks />} />

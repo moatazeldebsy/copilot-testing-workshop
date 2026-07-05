@@ -78,6 +78,9 @@ key points:
 - Don't mock the module under test — only its dependencies; prefer real service instances over mocks where
   practical.
 - No `Math.random()`/`Date.now()`/wall-clock dependence in tests — seed or fix timestamps.
-- Solution files end in `.solution.test.ts(x)` and exist on the matching recovery branch — don't edit them.
-- Recovery branches (`01-baseline` through `07-service-integration`) hold progressively completed states;
-  check one out to catch up on a specific exercise instead of debugging from scratch.
+- Two branches only: `master` is the practice starting point; `solutions` has every
+  exercise fully solved (including the 4 bonus unit-test files and the e2e spec). Check
+  out `solutions` to catch up or compare, rather than debugging from scratch.
+- `calculateDiscount.ts` stays intentionally buggy on both branches — Exercise A's lesson
+  is that strong tests expose the 3 bugs, not that the implementation gets fixed. 6
+  assertions in `calculateDiscount.test.ts` correctly fail on `solutions` too.

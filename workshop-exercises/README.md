@@ -127,17 +127,12 @@ npm test -- --coverage            # With coverage report
 
 API tests call `resetWorkshopData()` from `src/app.ts` in `beforeEach` to reset state.
 
-## Recovery Branches
+## Recovery Branch
 
-If you fall behind, checkout the solution branch for the exercise you need:
+If you fall behind, checkout `solutions` — every exercise fully solved:
 
 ```bash
-git checkout 02-unit-testing      # Exercise A solution
-git checkout 03-api-testing       # Exercise C solution
-git checkout 04-integration-testing  # Exercise D solution
-git checkout 05-ci-guardrails     # CI workflow
-git checkout 06-review-patterns   # Trust Playbook + instructions
-git checkout 07-service-integration  # Integration pipeline demo solution
+git checkout solutions
 git checkout master               # Back to the workshop starting point
 ```
 

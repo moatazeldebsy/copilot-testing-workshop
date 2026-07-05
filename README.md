@@ -112,23 +112,16 @@ workshop-exercises/
     ai-testing-trust-playbook.md ← Session takeaway
 ```
 
-## Recovery Checkpoints (Progressive Branches)
+## Recovery: the `solutions` Branch
 
-If you fall behind on any exercise, checkout the corresponding branch to see the completed solution:
-
-| Branch | Contains |
-|---|---|
-| `01-baseline` | Starting point — all TODO stubs, buggy `calculateDiscount.ts` |
-| `02-unit-testing` | Strong unit tests for `calculateDiscount` (expose all 3 bugs) |
-| `03-api-testing` | Complete API tests for the checkout pipeline (18 tests) |
-| `04-integration-testing` | Component tests for `StorePage` |
-| `05-ci-guardrails` | CI workflow with coverage gates |
-| `06-review-patterns` | Trust Playbook + Copilot instructions |
-| `07-service-integration` | Service-layer integration pipeline demo (optional, not timed) |
+Two branches, nothing to memorize: `master` is the practice starting point (all TODO
+stubs, buggy `calculateDiscount.ts`); `solutions` has every exercise fully solved. If you
+fall behind on any exercise, check out `solutions` and compare the matching file:
 
 ```bash
-# Example: catch up after Exercise B
-git checkout 03-api-testing
+git checkout solutions
+# or, to diff just one file against your own work:
+git diff master solutions -- workshop-exercises/tests/api/checkout.test.ts
 ```
 
 ## Tech Stack
