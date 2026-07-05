@@ -17,27 +17,21 @@ describe('DiscountService', () => {
     discountService = new DiscountService(repo);
   });
 
-  it('validates a valid promo code without error', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('validates a valid promo code without error');
 
-  it('throws INVALID_DISCOUNT_CODE for an unknown code', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('throws INVALID_DISCOUNT_CODE for an unknown code');
 
-  it('throws DISCOUNT_EXPIRED for an expired code', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('throws DISCOUNT_EXPIRED for an expired code');
 
-  it('applies a percent discount correctly (SAVE10)', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('applies a percent discount correctly (SAVE10)');
 
-  it('applies a flat discount correctly (FLAT5)', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('applies a flat discount correctly (FLAT5)');
 
-  it('throws ORDER_BELOW_MINIMUM when order is too small for FLAT5', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('throws ORDER_BELOW_MINIMUM when order is too small for FLAT5');
 });

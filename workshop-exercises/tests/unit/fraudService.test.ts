@@ -15,23 +15,18 @@ describe('FraudService', () => {
     fraudService = new FraudService();
   });
 
-  it('approves a low-risk order', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('approves a low-risk order');
 
-  it('flags an order over $1000 as high risk', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('flags an order over $1000 as high risk');
 
-  it('flags an order with more than 20 items', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('flags an order with more than 20 items');
 
-  it('rejects an order from a high-risk country', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('rejects an order from a high-risk country');
 
-  it('returns the correct riskScore and reasons array', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('returns the correct riskScore and reasons array');
 });

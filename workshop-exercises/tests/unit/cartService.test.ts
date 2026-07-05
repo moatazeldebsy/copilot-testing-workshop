@@ -16,27 +16,21 @@ describe('CartService', () => {
     cartService = new CartService(repo);
   });
 
-  it('returns an empty cart for a new user', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('returns an empty cart for a new user');
 
-  it('adds an item to the cart', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('adds an item to the cart');
 
-  it('increases quantity when the same product is added again', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('increases quantity when the same product is added again');
 
-  it('removes an item from the cart', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('removes an item from the cart');
 
-  it('throws ITEM_NOT_FOUND when removing a non-existent item', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('throws ITEM_NOT_FOUND when removing a non-existent item');
 
-  it('calculates the correct subtotal', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('calculates the correct subtotal');
 });

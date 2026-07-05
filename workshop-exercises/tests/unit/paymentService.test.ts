@@ -17,27 +17,21 @@ describe('PaymentService', () => {
     paymentService = new PaymentService(repo);
   });
 
-  it('creates a payment intent in pending state', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('creates a payment intent in pending state');
 
-  it('captures a pending payment intent', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('captures a pending payment intent');
 
-  it('throws INVALID_PAYMENT_STATE when capturing a non-pending intent', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('throws INVALID_PAYMENT_STATE when capturing a non-pending intent');
 
-  it('refunds a captured payment intent', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('refunds a captured payment intent');
 
-  it('throws INVALID_PAYMENT_STATE when refunding a pending intent', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('throws INVALID_PAYMENT_STATE when refunding a pending intent');
 
-  it('throws PAYMENT_NOT_FOUND for an unknown intent ID', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('throws PAYMENT_NOT_FOUND for an unknown intent ID');
 });

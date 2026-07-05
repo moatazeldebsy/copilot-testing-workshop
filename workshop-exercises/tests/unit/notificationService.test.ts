@@ -22,21 +22,17 @@ describe('NotificationService', () => {
     service = new NotificationService();
   });
 
-  it('logs a receipt notification and returns a NotificationLog', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('logs a receipt notification and returns a NotificationLog');
 
-  it('stores notifications so they can be retrieved by userId', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('stores notifications so they can be retrieved by userId');
 
-  it('supports multiple notification types (receipt, order_confirmation, refund)', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('supports multiple notification types (receipt, order_confirmation, refund)');
 
-  it('reset() clears all stored notifications', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('reset() clears all stored notifications');
 
   /**
    * FLAKY TEST DEMO — do not fix; leave as-is for the workshop discussion.

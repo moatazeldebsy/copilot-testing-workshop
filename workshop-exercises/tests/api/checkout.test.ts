@@ -17,53 +17,42 @@ describe('Checkout pipeline API', () => {
   });
 
   // --- Cart ---
-  it('returns an empty cart for a new user', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('returns an empty cart for a new user');
 
-  it('adds an item to the cart', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('adds an item to the cart');
 
-  it('removes an item from the cart', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('removes an item from the cart');
 
   // --- Discount ---
-  it('validates a valid promo code', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('validates a valid promo code');
 
-  it('applies SAVE10 discount and returns final total', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('applies SAVE10 discount and returns final total');
 
-  it('rejects an expired promo code with 400', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('rejects an expired promo code with 400');
 
   // --- Fraud ---
-  it('approves a low-risk order', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('approves a low-risk order');
 
-  it('rejects a high-risk order', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('rejects a high-risk order');
 
   // --- Payment ---
-  it('creates, captures, and refunds a payment intent', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('creates, captures, and refunds a payment intent');
 
   // --- Notification ---
-  it('sends a receipt notification and retrieves logs', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('sends a receipt notification and retrieves logs');
 
   // --- Full flow ---
-  it('completes the full checkout pipeline end-to-end', async () => {
-    // TODO: use Copilot to generate this test
-    // Hint: add to cart → apply discount → check fraud → charge → capture → send receipt
-  });
+  // TODO: use Copilot to generate this test
+  // Hint: add to cart → apply discount → check fraud → charge → capture → send receipt
+  it.todo('completes the full checkout pipeline end-to-end');
 });

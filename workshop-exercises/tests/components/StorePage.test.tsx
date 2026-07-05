@@ -17,24 +17,19 @@ describe('StorePage', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the store header and product grid', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('renders the store header and product grid');
 
-  it('shows an empty cart state initially', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('shows an empty cart state initially');
 
-  it('calls the cart API when Add is clicked', async () => {
-    // TODO: use Copilot to generate this test
-    // Hint: mock fetch to return a cart with one item, click Add, assert fetch was called
-  });
+  // TODO: use Copilot to generate this test
+  // Hint: mock fetch to return a cart with one item, click Add, assert fetch was called
+  it.todo('calls the cart API when Add is clicked');
 
-  it('disables Pay button when cart is empty', () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('disables Pay button when cart is empty');
 
-  it('shows order summary with discount when promo code is applied', async () => {
-    // TODO: use Copilot to generate this test
-  });
+  // TODO: use Copilot to generate this test
+  it.todo('shows order summary with discount when promo code is applied');
 });
