@@ -1,14 +1,12 @@
-/**
- * INTEGRATION DEMO — service-layer pipeline
- *
- * Unlike tests/api (HTTP via Supertest) or tests/unit (one function in
- * isolation), this tier exercises real wiring across modules by calling the
- * exported service singletons directly: Cart -> Discount -> Fraud -> Payment
- * -> Notification. No HTTP layer, no mocks — just the real objects wired
- * together, the way they run in production.
- */
-
-import { resetWorkshopData, cartService, discountService, fraudService, paymentService, notificationService, userService } from '../../src/app';
+import {
+  resetWorkshopData,
+  cartService,
+  discountService,
+  fraudService,
+  paymentService,
+  notificationService,
+  userService,
+} from '../../src/app';
 
 describe('checkout pipeline (integration)', () => {
   let userId: string;
@@ -19,15 +17,114 @@ describe('checkout pipeline (integration)', () => {
     userId = user.id;
   });
 
-  it.todo('adds an item via cartService and reflects it in the cart total');
+  it('adds an item via cartService and reflects it in the cart total', async () => {
+    const cart = await cartService.addItem(userId, {
+      productId: 'prod_1',
+      name: 'Workshop T-Shirt',
+      price: 25,
+      quantity: 2,
+    });
 
-  it.todo('applies a discount via discountService on top of the cart subtotal');
+    expect(cart.items).toHaveLength(1);
+    expect(cart.subtotal).toBe(50);
+  });
 
-  it.todo('approves a low-risk order via fraudService for the same cart');
+  it('applies a discount via discountService on top of the cart subtotal', async () => {
+    const cart = await cartService.addItem(userId, {
+      productId: 'prod_1',
+      name: 'Workshop T-Shirt',
+      price: 100,
+      quantity: 1,
+    });
 
-  it.todo('charges, captures, and refunds a payment via paymentService');
+    const result = discountService.apply('SAVE10', cart.subtotal);
 
-  it.todo('sends and retrieves a receipt via notificationService after payment');
+    expect(result.discountAmount).toBe(10);
+    expect(result.finalTotal).toBe(90);
+  });
 
-  it.todo('runs the full pipeline end-to-end and asserts the final order state');
+  it('approves a low-risk order via fraudService for the same cart', async () => {
+    const cart = await cartService.addItem(userId, {
+      productId: 'prod_1',
+      name: 'Workshop T-Shirt',
+      price: 25,
+      quantity: 1,
+    });
+
+    const result = fraudService.check({
+      userId,
+      orderAmount: cart.subtotal,
+      itemCount: cart.items.length,
+      ipCountry: 'DE',
+    });
+
+    expect(result.approved).toBe(true);
+    expect(result.riskLevel).toBe('low');
+  });
+
+  it('charges, captures, and refunds a payment via paymentService', () => {
+    const intent = paymentService.charge({ userId, amount: 25 });
+    expect(intent.status).toBe('pending');
+
+    const captured = paymentService.capture(intent.id);
+    expect(captured.status).toBe('captured');
+
+    const refunded = paymentService.refund(intent.id);
+    expect(refunded.status).toBe('refunded');
+  });
+
+  it('sends and retrieves a receipt via notificationService after payment', () => {
+    const intent = paymentService.charge({ userId, amount: 25 });
+    paymentService.capture(intent.id);
+
+    notificationService.send({
+      userId,
+      type: 'receipt',
+      email: 'alice@example.com',
+      subject: `Receipt for ${intent.id}`,
+      body: `Your payment ${intent.id} has been captured.`,
+    });
+
+    const logs = notificationService.getLogsForUser(userId);
+    expect(logs).toHaveLength(1);
+    expect(logs[0].subject).toContain(intent.id);
+  });
+
+  it('runs the full pipeline end-to-end and asserts the final order state', async () => {
+    const cart = await cartService.addItem(userId, {
+      productId: 'prod_1',
+      name: 'Workshop T-Shirt',
+      price: 100,
+      quantity: 1,
+    });
+
+    const discount = discountService.apply('SAVE10', cart.subtotal);
+
+    const fraudResult = fraudService.check({
+      userId,
+      orderAmount: discount.finalTotal,
+      itemCount: cart.items.length,
+      ipCountry: 'DE',
+    });
+    expect(fraudResult.approved).toBe(true);
+
+    const intent = paymentService.charge({ userId, amount: discount.finalTotal });
+    const captured = paymentService.capture(intent.id);
+    expect(captured.status).toBe('captured');
+
+    notificationService.send({
+      userId,
+      type: 'receipt',
+      email: 'alice@example.com',
+      subject: `Receipt for ${intent.id}`,
+      body: `Your payment ${intent.id} has been captured.`,
+    });
+
+    const logs = notificationService.getLogsForUser(userId);
+    expect(logs).toHaveLength(1);
+
+    await cartService.clearCart(userId);
+    const clearedCart = await cartService.getCart(userId);
+    expect(clearedCart.items).toHaveLength(0);
+  });
 });

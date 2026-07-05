@@ -6,6 +6,7 @@
  * Use this file if you finish early or want to compare service vs pure-function testing.
  */
 
+import { ApiError } from '../../src/errors/apiError';
 import { DiscountRepository } from '../../src/repositories/discountRepository';
 import { DiscountService } from '../../src/services/discountService';
 
@@ -17,21 +18,58 @@ describe('DiscountService', () => {
     discountService = new DiscountService(repo);
   });
 
-  // TODO: use Copilot to generate this test
-  it.todo('validates a valid promo code without error');
+  it('validates a valid promo code without error', () => {
+    expect(() => discountService.validate('SAVE10')).not.toThrow();
+  });
 
-  // TODO: use Copilot to generate this test
-  it.todo('throws INVALID_DISCOUNT_CODE for an unknown code');
+  it('throws INVALID_DISCOUNT_CODE for an unknown code', () => {
+    expect.assertions(2);
 
-  // TODO: use Copilot to generate this test
-  it.todo('throws DISCOUNT_EXPIRED for an expired code');
+    try {
+      discountService.validate('NOPE');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('INVALID_DISCOUNT_CODE');
+    }
+  });
 
-  // TODO: use Copilot to generate this test
-  it.todo('applies a percent discount correctly (SAVE10)');
+  it('throws DISCOUNT_EXPIRED for an expired code', () => {
+    expect.assertions(2);
 
-  // TODO: use Copilot to generate this test
-  it.todo('applies a flat discount correctly (FLAT5)');
+    try {
+      discountService.validate('EXPIRED');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('DISCOUNT_EXPIRED');
+    }
+  });
 
-  // TODO: use Copilot to generate this test
-  it.todo('throws ORDER_BELOW_MINIMUM when order is too small for FLAT5');
+  it('applies a percent discount correctly (SAVE10)', () => {
+    // Act
+    const result = discountService.apply('SAVE10', 100);
+
+    // Assert
+    expect(result.discountAmount).toBe(10);
+    expect(result.finalTotal).toBe(90);
+  });
+
+  it('applies a flat discount correctly (FLAT5)', () => {
+    // Act
+    const result = discountService.apply('FLAT5', 50);
+
+    // Assert
+    expect(result.discountAmount).toBe(5);
+    expect(result.finalTotal).toBe(45);
+  });
+
+  it('throws ORDER_BELOW_MINIMUM when order is too small for FLAT5', () => {
+    expect.assertions(2);
+
+    try {
+      discountService.apply('FLAT5', 10);
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('ORDER_BELOW_MINIMUM');
+    }
+  });
 });

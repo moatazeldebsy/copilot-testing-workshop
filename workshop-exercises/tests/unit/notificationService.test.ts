@@ -22,17 +22,53 @@ describe('NotificationService', () => {
     service = new NotificationService();
   });
 
-  // TODO: use Copilot to generate this test
-  it.todo('logs a receipt notification and returns a NotificationLog');
+  it('logs a receipt notification and returns a NotificationLog', () => {
+    // Act
+    const log = service.send(basePayload);
 
-  // TODO: use Copilot to generate this test
-  it.todo('stores notifications so they can be retrieved by userId');
+    // Assert
+    expect(log.id).toBeDefined();
+    expect(log.userId).toBe('user-1');
+    expect(log.type).toBe('receipt');
+    expect(log.email).toBe('alice@example.com');
+    expect(log.subject).toBe('Your receipt');
+    expect(log.sentAt).toBeInstanceOf(Date);
+  });
 
-  // TODO: use Copilot to generate this test
-  it.todo('supports multiple notification types (receipt, order_confirmation, refund)');
+  it('stores notifications so they can be retrieved by userId', () => {
+    // Arrange
+    service.send(basePayload);
+    service.send({ ...basePayload, userId: 'user-2' });
 
-  // TODO: use Copilot to generate this test
-  it.todo('reset() clears all stored notifications');
+    // Act
+    const logsForUser1 = service.getLogsForUser('user-1');
+
+    // Assert
+    expect(logsForUser1).toHaveLength(1);
+    expect(logsForUser1[0].userId).toBe('user-1');
+  });
+
+  it('supports multiple notification types (receipt, order_confirmation, refund)', () => {
+    // Act
+    service.send({ ...basePayload, type: 'receipt' });
+    service.send({ ...basePayload, type: 'order_confirmation' });
+    service.send({ ...basePayload, type: 'refund' });
+
+    // Assert
+    const types = service.getLogsForUser('user-1').map((log) => log.type);
+    expect(types).toEqual(['receipt', 'order_confirmation', 'refund']);
+  });
+
+  it('reset() clears all stored notifications', () => {
+    // Arrange
+    service.send(basePayload);
+
+    // Act
+    service.reset();
+
+    // Assert
+    expect(service.getLogsForUser('user-1')).toEqual([]);
+  });
 
   /**
    * FLAKY TEST DEMO — do not fix; leave as-is for the workshop discussion.

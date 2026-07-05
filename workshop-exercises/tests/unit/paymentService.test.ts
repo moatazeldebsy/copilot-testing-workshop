@@ -6,6 +6,7 @@
  * the state machine (pending → captured → refunded) is a good prompt target.
  */
 
+import { ApiError } from '../../src/errors/apiError';
 import { PaymentRepository } from '../../src/repositories/paymentRepository';
 import { PaymentService } from '../../src/services/paymentService';
 
@@ -17,21 +18,78 @@ describe('PaymentService', () => {
     paymentService = new PaymentService(repo);
   });
 
-  // TODO: use Copilot to generate this test
-  it.todo('creates a payment intent in pending state');
+  it('creates a payment intent in pending state', () => {
+    // Act
+    const intent = paymentService.charge({ userId: 'user-1', amount: 100 });
 
-  // TODO: use Copilot to generate this test
-  it.todo('captures a pending payment intent');
+    // Assert
+    expect(intent.status).toBe('pending');
+    expect(intent.amount).toBe(100);
+    expect(intent.id).toMatch(/^pi_/);
+  });
 
-  // TODO: use Copilot to generate this test
-  it.todo('throws INVALID_PAYMENT_STATE when capturing a non-pending intent');
+  it('captures a pending payment intent', () => {
+    // Arrange
+    const intent = paymentService.charge({ userId: 'user-1', amount: 100 });
 
-  // TODO: use Copilot to generate this test
-  it.todo('refunds a captured payment intent');
+    // Act
+    const captured = paymentService.capture(intent.id);
 
-  // TODO: use Copilot to generate this test
-  it.todo('throws INVALID_PAYMENT_STATE when refunding a pending intent');
+    // Assert
+    expect(captured.status).toBe('captured');
+  });
 
-  // TODO: use Copilot to generate this test
-  it.todo('throws PAYMENT_NOT_FOUND for an unknown intent ID');
+  it('throws INVALID_PAYMENT_STATE when capturing a non-pending intent', () => {
+    expect.assertions(2);
+
+    // Arrange — capture once so the intent is no longer pending
+    const intent = paymentService.charge({ userId: 'user-1', amount: 100 });
+    paymentService.capture(intent.id);
+
+    // Act
+    try {
+      paymentService.capture(intent.id);
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('INVALID_PAYMENT_STATE');
+    }
+  });
+
+  it('refunds a captured payment intent', () => {
+    // Arrange
+    const intent = paymentService.charge({ userId: 'user-1', amount: 100 });
+    paymentService.capture(intent.id);
+
+    // Act
+    const refunded = paymentService.refund(intent.id);
+
+    // Assert
+    expect(refunded.status).toBe('refunded');
+  });
+
+  it('throws INVALID_PAYMENT_STATE when refunding a pending intent', () => {
+    expect.assertions(2);
+
+    // Arrange — never captured
+    const intent = paymentService.charge({ userId: 'user-1', amount: 100 });
+
+    // Act
+    try {
+      paymentService.refund(intent.id);
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('INVALID_PAYMENT_STATE');
+    }
+  });
+
+  it('throws PAYMENT_NOT_FOUND for an unknown intent ID', () => {
+    expect.assertions(2);
+
+    try {
+      paymentService.capture('pi_does-not-exist');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('PAYMENT_NOT_FOUND');
+    }
+  });
 });

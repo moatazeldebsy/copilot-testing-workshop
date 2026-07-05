@@ -32,3 +32,6 @@ jobs:
           COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json'); console.log(s.total.lines.pct)")
           echo "Line coverage: $COVERAGE%"
           node -e "if (Number(process.argv[1]) < 80) { process.exit(1) }" "$COVERAGE"
+
+      - name: Security scan (production dependencies)
+        run: npm audit --omit=dev --audit-level=high
