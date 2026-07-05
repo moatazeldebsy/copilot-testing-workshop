@@ -70,7 +70,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
 
       {error ? <p role="alert">{error}</p> : null}
 
-      <button type="submit" disabled={isLoading}>
+      <button className="btn btn--primary" type="submit" disabled={isLoading}>
         Submit
       </button>
     </form>
