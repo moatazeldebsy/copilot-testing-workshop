@@ -29,18 +29,6 @@ const ReviewingTests: React.FC = () => (
         <a href="#review-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 7 min review checklist, 7 min guardrail patterns, 6 min applied challenge and debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "This is where trust is won or lost. AI-generated tests do not get special treatment.
-        We apply a severity-first checklist, remove vague assertions,
-        and enforce the same review standards as any critical code path."
-      </div>
-
       <PollBlock
         mode="quiz"
         quizId="reviewing-tests-assertion-priority"

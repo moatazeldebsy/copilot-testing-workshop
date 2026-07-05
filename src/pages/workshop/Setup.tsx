@@ -28,18 +28,6 @@ const Setup: React.FC = () => (
         <a href="#setup-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 5 min environment prep, 5 min Copilot verification, 5 min guided setup challenge.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "By the end of this step, everyone should have the same baseline: repo cloned,
-        dependencies installed, Copilot active, and one accepted suggestion. If this is broken,
-        every later exercise slows down. I will pause now for environment blockers before we continue."
-      </div>
-
       <ArchDiagram
         title="Your Setup"
         nodes={[

@@ -32,18 +32,6 @@ const TestDataMocks: React.FC = () => (
         <a href="#mocks-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 5 min fixture strategy, 5 min mock/stub patterns, 5 min factory challenge and debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "Factories and mocks are high-leverage AI territory because they are repetitive.
-        We still enforce guardrails: deterministic defaults, override flexibility,
-        and zero secrets or realistic PII in fixtures."
-      </div>
-
       <PollBlock
         question="When Copilot generates fixtures, what is your first review priority?"
         options={[

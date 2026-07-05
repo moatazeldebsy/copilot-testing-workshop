@@ -32,19 +32,6 @@ const ComponentTesting: React.FC = () => (
         <a href="#component-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 7 min RTL strategy and StorePage walkthrough, 6 min generated test review, 7 min refactor challenge and debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "In component tests, behavior beats implementation details.
-        We will steer Copilot toward accessible queries, mocked fetch, and
-        waitFor assertions. If a test only checks internals or class names,
-        it is fragile and low value."
-      </div>
-
       <PollBlock
         question="When an RTL test breaks after UI refactoring, what should fail first?"
         options={[

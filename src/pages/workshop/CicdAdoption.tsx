@@ -28,18 +28,6 @@ const CicdAdoption: React.FC = () => (
         <a href="#cicd-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 5 min pipeline gates, 5 min policy and adoption, 5 min workflow challenge and debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "Guardrails must live in CI, not in memory. Lint, tests, coverage, security scans,
-        and ownership checks define production trust. AI code passes the exact same gates
-        as human code, with no bypass path."
-      </div>
-
       <ArchDiagram
         title="CI Pipeline with AI Test Guardrails"
         nodes={[

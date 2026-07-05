@@ -31,18 +31,6 @@ const UnitTesting: React.FC = () => (
         <a href="#unit-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 5 min concept framing, 10 min generation and review, 10 min hands-on and debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "Unit tests are where Copilot gives immediate ROI. We will draft quickly,
-        then upgrade quality by tightening assertions and edge cases. A fast draft is useful,
-        but only if it fails when behavior is wrong."
-      </div>
-
       <ArchDiagram
         title="Unit Test Generation Flow"
         nodes={[

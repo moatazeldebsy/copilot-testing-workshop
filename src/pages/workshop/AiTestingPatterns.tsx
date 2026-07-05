@@ -29,18 +29,6 @@ const AiTestingPatterns: React.FC = () => (
         <a href="#ai-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 6 min non-deterministic patterns, 6 min injection and agentic examples, 8 min challenge and debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "AI features need different tests: structure over exact text,
-        explicit malformed-output paths, and injection resistance.
-        We are validating safety and contracts, not snapshotting model phrasing."
-      </div>
-
       <PollBlock
         mode="quiz"
         quizId="ai-testing-confidence-strategy"

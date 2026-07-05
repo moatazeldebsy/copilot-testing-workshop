@@ -23,18 +23,6 @@ const CopilotIntro: React.FC = () => (
         <a href="#intro-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 8 min Copilot fundamentals and interaction surfaces, 4 min prompting technique, 3 min prompt challenge and recap.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "Copilot is a collaborator, not an authority. You choose the right mode,
-        provide context, and review the output. The better your prompt and scope,
-        the better the draft. Our goal today is controlled acceleration, not blind automation."
-      </div>
-
       <ArchDiagram
         title="How GitHub Copilot Works"
         nodes={[
