@@ -225,8 +225,7 @@ src/**/*.spec.ts          @your-org/qa-leads`}</CodeBlock>
       <h2>PR Template for AI-Assisted Code</h2>
       <p>
         This is the actual <code>.github/pull_request_template.md</code> from
-        the exercises repository (on the <code>06-review-patterns</code> checkpoint
-        branch) — not just an illustration:
+        the exercises repository — not just an illustration:
       </p>
       <CodeBlock language="markdown">{`<!--
 Reviewing AI-generated tests checklist (see docs/ai-testing-trust-playbook.md).
