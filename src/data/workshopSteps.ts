@@ -62,7 +62,6 @@ export const workshopSections: WorkshopSection[] = [
           solutionCheckpoints: [],
         },
       },
-      { label: 'Introduction to GitHub Copilot', path: '/workshop/copilot-intro' },
       { label: 'Copilot for Testing: The Big Picture', path: '/workshop/copilot-overview' },
     ],
   },
@@ -157,6 +156,18 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
+    title: 'Test Data & Mocks',
+    items: [
+      { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
+    ],
+  },
+  {
+    title: 'Configuring Copilot for Your Team',
+    items: [
+      { label: 'Introduction to GitHub Copilot', path: '/workshop/copilot-intro' },
+    ],
+  },
+  {
     title: 'Exercise E — CI Guardrails',
     items: [
       {
@@ -182,7 +193,6 @@ export const workshopSections: WorkshopSection[] = [
   {
     title: 'Reference',
     items: [
-      { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
       { label: 'Testing AI-Powered Features', path: '/workshop/ai-testing-patterns' },
     ],
   },
