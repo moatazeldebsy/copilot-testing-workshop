@@ -7,3 +7,6 @@ build/
 # Claude Code local state (machine-specific, not shared)
 .claude/settings.local.json
 .claude/shell-snapshots/
+
+# Playwright MCP debug snapshots/screenshots (local scratch output)
+.playwright-mcp/
