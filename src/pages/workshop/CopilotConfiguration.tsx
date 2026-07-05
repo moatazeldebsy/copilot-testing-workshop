@@ -23,18 +23,6 @@ const CopilotConfiguration: React.FC = () => (
         <a href="#config-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 5 min skills &amp; MCP, 10 min customization files (instructions, prompt files, chat modes, AGENTS.md), 5 min config cheat-sheet recap.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "A great prompt helps one person, once. A committed instructions file,
-        prompt file, or chat mode helps the whole team, every time. This is how
-        you turn a personal Copilot workflow into a team standard."
-      </div>
-
       <h2 id="config-skills">GitHub Copilot Skills (<code>@github</code>)</h2>
       <p>
         The <code>@github</code> chat participant unlocks <strong>GitHub-specific

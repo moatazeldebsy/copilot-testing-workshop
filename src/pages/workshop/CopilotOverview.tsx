@@ -26,18 +26,6 @@ const CopilotOverview: React.FC = () => (
         <a href="#overview-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 8 min trust model and risk framing, 8 min checklist walkthrough, 4 min challenge debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "This is the trust model for the whole workshop: generate, review, fix.
-        Copilot helps most with structure and speed, while humans own intent,
-        risk, and correctness. If you remember one slide today, remember this loop."
-      </div>
-
       <PollBlock
         question="How many of you have accepted a Copilot test suggestion without fully reading it?"
         options={[

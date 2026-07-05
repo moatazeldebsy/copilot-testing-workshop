@@ -30,18 +30,6 @@ const E2EPlaywright: React.FC = () => (
         <a href="#e2e-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 8 min page-object generation, 7 min fixture/CI patterns, 10 min refactor challenge and debrief.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "E2E tests fail fast when selector strategy is weak.
-        We will use role/label-first locators and page objects to keep tests maintainable.
-        Copilot drafts the structure, and we harden it for long-term stability."
-      </div>
-
       <PollBlock
         question="Which locator strategy do you trust most for long-term E2E test stability?"
         options={[

@@ -33,18 +33,6 @@ const ApiIntegration: React.FC = () => (
         <a href="#api-debrief">Jump to debrief</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 7 min checkout pipeline tour and prompt, 8 min scaffold review and fixes, 10 min hands-on challenge.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute speaker script</strong>
-        "Copilot scaffolds the structure fast, but only you know the domain.
-        We will add domain-rules.md as context so Copilot generates the right
-        error codes and boundary cases for every checkout step."
-      </div>
-
       <PollBlock
         mode="quiz"
         quizId="api-integration-default-strategy"

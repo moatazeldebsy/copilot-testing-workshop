@@ -19,18 +19,6 @@ const Takeaways: React.FC = () => (
         <a href="#takeaways-next">Jump to next steps</a>
       </div>
 
-      <div className="callout callout-info">
-        <strong>Presenter checkpoint</strong>
-        Live pacing target: 4 min summary, 3 min resource handoff, 3 min Q&A and close.
-      </div>
-
-      <div className="callout callout-info">
-        <strong>2-minute close script</strong>
-        Your immediate next move is simple: adopt Generate → Review → Fix,
-        enforce CI guardrails, and track quality metrics that matter.
-        Use Copilot to accelerate delivery, but keep judgment and ownership human.
-      </div>
-
       <h2 id="takeaways-summary">The 5 Things That Matter Most</h2>
       <div className="summary-card">
         <ol style={{ paddingLeft: '1.5rem', lineHeight: '2rem' }}>
