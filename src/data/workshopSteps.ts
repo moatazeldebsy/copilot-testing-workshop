@@ -36,14 +36,14 @@ export interface WorkshopSection {
 
 export const workshopSections: WorkshopSection[] = [
   {
-    title: 'GenAI Testing Workshop',
+    title: 'GenAI in Testing',
     items: [
       { label: 'Home', path: '/' },
       { label: 'Prerequisites', path: '/prerequisites' },
     ],
   },
   {
-    title: 'Getting Started',
+    title: 'Intro & Setup',
     items: [
       {
         label: 'Intro, Setup & Tour',
@@ -66,7 +66,7 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
-    title: 'Exercise A — Unit Tests',
+    title: 'Exercise A — Unit tests',
     items: [
       {
         label: 'Unit Test Generation',
@@ -89,7 +89,7 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
-    title: 'Exercise B — Review AI Tests',
+    title: 'Exercise B — Review AI tests',
     items: [
       {
         label: 'Reviewing AI Tests & Guardrails',
@@ -111,7 +111,7 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
-    title: 'Exercise C — API Tests',
+    title: 'Exercise C — API tests',
     items: [
       {
         label: 'API & Integration Tests',
@@ -133,7 +133,7 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
-    title: 'Exercise D — Component Tests',
+    title: 'Exercise D — Component tests',
     items: [
       {
         label: 'Component Testing with RTL',
@@ -156,19 +156,19 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
-    title: 'Test Data & Mocks',
+    title: 'Test data and mocks',
     items: [
       { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
     ],
   },
   {
-    title: 'Configuring Copilot for Your Team',
+    title: 'Configuring Copilot for your team',
     items: [
       { label: 'Introduction to GitHub Copilot', path: '/workshop/copilot-intro' },
     ],
   },
   {
-    title: 'Exercise E — CI Guardrails',
+    title: 'Exercise E — CI guardrails',
     items: [
       {
         label: 'CI/CD & Team Adoption',
@@ -197,7 +197,7 @@ export const workshopSections: WorkshopSection[] = [
     ],
   },
   {
-    title: 'Wrap-up',
+    title: 'Wrap-up & Q&A',
     items: [
       { label: 'Key Takeaways', path: '/workshop/takeaways' },
     ],

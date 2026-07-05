@@ -220,31 +220,31 @@ const Home: React.FC = () => {
               </tr>
               <tr>
                 <td>12:30</td>
-                <td>Exercise A — Unit Tests</td>
+                <td>Exercise A — Unit tests</td>
                 <td>Generate tests for <code>calculateDiscount()</code>; discover that weak prompts produce weak tests</td>
                 <td>25 min</td>
               </tr>
               <tr>
                 <td>12:55</td>
-                <td>Exercise B — Review AI Tests</td>
+                <td>Exercise B — Review AI tests</td>
                 <td>Read the weak test file; identify what passes but shouldn't; rewrite with strong assertions</td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>13:05</td>
-                <td>Exercise C — API Tests</td>
+                <td>Exercise C — API tests</td>
                 <td>Supertest for the full checkout pipeline; use domain-rules.md as Copilot context</td>
                 <td>25 min</td>
               </tr>
               <tr>
                 <td>13:30</td>
-                <td>Exercise D — Component Tests</td>
+                <td>Exercise D — Component tests</td>
                 <td>StorePage RTL tests hands-on; Playwright shown as live demo / optional extra</td>
                 <td>20 min</td>
               </tr>
               <tr>
                 <td>13:50</td>
-                <td>Exercise E — CI Guardrails</td>
+                <td>Exercise E — CI guardrails</td>
                 <td>Coverage gates, flaky test demo, <code>.github/copilot-instructions.md</code>, context engineering</td>
                 <td>10 min</td>
               </tr>
