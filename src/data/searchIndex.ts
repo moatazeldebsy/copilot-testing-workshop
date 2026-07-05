@@ -27,8 +27,8 @@ export const searchIndex: SearchEntry[] = [
   {
     title: 'Introduction to GitHub Copilot',
     path: '/workshop/copilot-intro',
-    keywords: 'github copilot introduction what is copilot llm large language model tokens context window inline completions chat slash commands tests explain fix fixTestFailure interaction modes prompts mcp model context protocol skills agents instructions copilot-instructions.md customization',
-    description: 'What GitHub Copilot is, how tokens work, interaction modes, slash commands, MCP servers, GitHub skills, and customization files',
+    keywords: 'github copilot introduction what is copilot llm large language model tokens context window inline completions chat modes slash commands tests explain fix fixTestFailure interaction surfaces model selection prompts',
+    description: 'What GitHub Copilot is, interaction surfaces, chat modes, model selection, slash commands, tokens, and prompting technique',
   },
   {
     title: 'Copilot for Testing: The Big Picture',
@@ -53,6 +53,12 @@ export const searchIndex: SearchEntry[] = [
     path: '/workshop/test-data-mocks',
     keywords: 'test data mock fixture factory faker seed copilot generate stub secret hardcoded',
     description: 'Generate fixtures, mock factories, and test data with Copilot safely',
+  },
+  {
+    title: 'Configuring Copilot for Your Team',
+    path: '/workshop/copilot-configuration',
+    keywords: 'configuring copilot team instructions copilot-instructions.md agents.md prompt files chat modes chatmode skills mcp model context protocol customization files agent personas',
+    description: 'Custom instructions, prompt files, chat modes, GitHub skills, agent personas, and MCP servers for team-wide consistency',
   },
   {
     title: 'Reviewing AI Tests & Guardrails',

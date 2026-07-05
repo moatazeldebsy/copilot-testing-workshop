@@ -62,6 +62,7 @@ export const workshopSections: WorkshopSection[] = [
           solutionCheckpoints: [],
         },
       },
+      { label: 'Introduction to GitHub Copilot', path: '/workshop/copilot-intro' },
       { label: 'Copilot for Testing: The Big Picture', path: '/workshop/copilot-overview' },
     ],
   },
@@ -164,7 +165,7 @@ export const workshopSections: WorkshopSection[] = [
   {
     title: 'Configuring Copilot for your team',
     items: [
-      { label: 'Introduction to GitHub Copilot', path: '/workshop/copilot-intro' },
+      { label: 'Configuring Copilot for Your Team', path: '/workshop/copilot-configuration' },
     ],
   },
   {
