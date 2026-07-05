@@ -8,6 +8,7 @@
     "4000": { "label": "API + Swagger docs (/docs)", "onAutoForward": "notify" }
   },
   "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/postCreate.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/postStart.sh",
   "customizations": {
     "vscode": {
       "extensions": [
