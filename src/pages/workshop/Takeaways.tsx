@@ -130,11 +130,7 @@ const Takeaways: React.FC = () => (
           </tr>
           <tr>
             <td><code>docs/tutorials/</code></td>
-            <td>Getting started guide and advanced scenarios reference</td>
-          </tr>
-          <tr>
-            <td><code>docs/tutorials/facilitator-cheat-sheet.md</code></td>
-            <td>One-page delivery script with timings, fallback paths, and fail-first demo flow</td>
+            <td>Advanced scenarios and MCP/skills practice reference guides</td>
           </tr>
         </tbody>
       </table>

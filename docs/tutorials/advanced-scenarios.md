@@ -55,21 +55,29 @@ List all issues found with line numbers.
 
 ## 2. ESLint Rules for AI-Generated Test Quality
 
-Add these rules to your `.eslintrc.json` to catch common Copilot output problems automatically:
+This exercises repo does not ship an ESLint config today — the block below is a
+suggested starting point if you want to add one to catch common Copilot output
+problems automatically (flat config, for ESLint 9+):
 
-```json
-{
-  "plugins": ["jest"],
-  "rules": {
-    "jest/no-truthy-falsy": "error",
-    "jest/prefer-expect-assertions": "warn",
-    "jest/no-identical-title": "error",
-    "jest/valid-expect": "error",
-    "jest/no-disabled-tests": "warn",
-    "jest/no-focused-tests": "error",
-    "jest/expect-expect": "error"
-  }
-}
+```js
+// eslint.config.js
+import jest from 'eslint-plugin-jest';
+
+export default [
+  {
+    files: ['tests/**/*.ts', 'tests/**/*.tsx'],
+    plugins: { jest },
+    rules: {
+      'jest/no-truthy-falsy': 'error',
+      'jest/prefer-expect-assertions': 'warn',
+      'jest/no-identical-title': 'error',
+      'jest/valid-expect': 'error',
+      'jest/no-disabled-tests': 'warn',
+      'jest/no-focused-tests': 'error',
+      'jest/expect-expect': 'error',
+    },
+  },
+];
 ```
 
 ---
@@ -87,6 +95,10 @@ Policy baseline: AI-generated code must pass the exact same gates as human-writt
 | Dependency and SAST | Snyk, Dependabot, Trivy | Catch vulnerable packages and insecure dependencies |
 | Secret scanning | gitleaks, truffleHog | Block leaked tokens, credentials, and accidental secrets |
 
+None of these are wired into this repo's actual CI yet (see below for what's really
+enforced today) — treat this table as a menu to add from, not a description of the
+current pipeline.
+
 ### CI Outcome Semantics (for clear ownership)
 
 | Exit code | Meaning | Required action |
@@ -95,15 +107,18 @@ Policy baseline: AI-generated code must pass the exact same gates as human-writt
 | `1` | Failure | Block merge until fixed |
 | `2` | Unclear / ambiguous | Route to human triage with explicit reviewer sign-off |
 
-### Minimal GitHub Actions Workflow
+### The Actual Workshop Workflow
+
+This is the real `workshop-exercises/.github/workflows/test.yml` running in this repo today:
 
 ```yaml
-# .github/workflows/test.yml
-name: Test & Quality Gates
+name: Test And Quality Gates
 
 on:
   pull_request:
-    branches: [main]
+    branches: [master]
+  push:
+    branches: [master]
 
 jobs:
   test:
@@ -111,44 +126,60 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      # Guardrail 1: Lint (catches vague assertions via ESLint jest rules)
-      - run: npm run lint
+      - name: Build UI
+        run: npm run build
 
-      # Guardrail 2: Secret scan (catches AI-generated credentials)
-      - uses: gitleaks/gitleaks-action@v2
+      - name: Run tests with coverage
+        run: npm test -- --coverage --coverageReporters=json-summary
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json'); console.log(s.total.lines.pct)")
+          echo "Line coverage: $COVERAGE%"
+          node -e "if (Number(process.argv[1]) < 80) { process.exit(1) }" "$COVERAGE"
+```
+
+It runs build + coverage-gated tests, nothing more. Lint and secret-scanning are **not**
+part of it — if you want those guardrails, add steps like these yourself:
+
+```yaml
+      # Add after "Install dependencies" once you have an eslint.config.js (see section 2)
+      - name: Lint
+        run: npx eslint .
+
+      # Add anywhere before the test step
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Guardrail 3: Tests with coverage
-      - run: npm test -- --coverage
-
-      # Guardrail 4: Coverage threshold (fail if below 80%)
-      - name: Coverage gate
-        run: |
-          node -e "
-            const s = require('./coverage/coverage-summary.json');
-            const pct = s.total.lines.pct;
-            console.log('Line coverage:', pct + '%');
-            if (pct < 80) { console.error('FAIL: Coverage below 80%'); process.exit(1); }
-          "
 ```
 
 ### Jest Coverage Threshold
 
+The real `workshop-exercises/jest.config.ts`:
+
 ```typescript
-// jest.config.ts
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'jsdom',
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
+  testMatch: ['<rootDir>/tests/**/*.test.ts', '<rootDir>/tests/**/*.test.tsx'],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/main.tsx'],
   coverageThreshold: {
     global: {
       lines: 80,
@@ -157,10 +188,6 @@ const config: Config = {
       statements: 80,
     },
   },
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-  ],
 };
 
 export default config;
@@ -169,6 +196,9 @@ export default config;
 ---
 
 ## 4. CODEOWNERS for AI-Generated Tests
+
+This repo doesn't have a CODEOWNERS file today. If your team wants mandatory
+reviewer routing for test changes, add one like this:
 
 ```bash
 # .github/CODEOWNERS
@@ -182,21 +212,41 @@ src/**/*.spec.ts  @your-org/qa-leads
 
 ## 5. PR Template
 
-```markdown
-<!-- .github/pull_request_template.md -->
-## Changes
-<!-- What changed and why -->
+The real `workshop-exercises/.github/pull_request_template.md`:
 
-## AI-Generated Code
-- [ ] This PR contains AI-generated tests
-- [ ] I applied the AI test review checklist
-- [ ] Assertions are specific (no toBeTruthy/toBeFalsy)
-- [ ] No hardcoded credentials or PII in test data
-- [ ] All tests pass locally (`npm test`)
-- [ ] Coverage thresholds met (`npm test -- --coverage`)
+```markdown
+<!--
+Reviewing AI-generated tests checklist (see docs/ai-testing-trust-playbook.md).
+Treat every generated test like a pull request from a junior teammate.
+-->
+
+## What changed
+
+<!-- One or two sentences: what behavior does this PR add or change? -->
+
+## Test review checklist
+
+- [ ] Does each new test assert the actual behavior, not an implementation detail?
+- [ ] Would it fail if the code were broken on purpose? (fail-first check)
+- [ ] Are inputs realistic and are edge cases covered?
+- [ ] Is the test isolated, deterministic, and free of hidden state or timing dependence?
+- [ ] Is the test name a clear statement of the behavior under test?
+- [ ] Does it avoid leaking secrets, tokens, or real user data?
+
+## Quality gates (enforced in CI)
+
+- [ ] All tests green
+- [ ] Coverage threshold met (80% lines/functions/statements, 70% branches)
+- [ ] No flaky reruns needed to pass
+- [ ] Security scan clean (`npm audit --omit=dev --audit-level=high`)
+
+A human reviewer owns this checklist — AI-assisted generation speeds up
+authoring, but does not replace review.
 ```
 
 ### Optional: Auto-label AI-Assisted PRs
+
+Not present in this repo — a pattern to adopt if useful:
 
 ```yaml
 # .github/workflows/label-ai-pr.yml
@@ -312,6 +362,6 @@ Debrief line for audience:
 
 ## Next Steps
 
-- Return to the **[CI/CD & Team Adoption](../../src/pages/workshop/CicdAdoption.tsx)** workshop step for the hands-on exercise
-- Review the **[Key Takeaways](../../src/pages/workshop/Takeaways.tsx)** page
+- Return to the **[CI/CD & Team Adoption](/workshop/cicd-adoption)** workshop step for the hands-on exercise
+- Review the **[Key Takeaways](/workshop/takeaways)** page
 - Share the prompt templates and review checklist with your team

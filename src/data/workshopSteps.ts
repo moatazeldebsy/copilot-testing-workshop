@@ -204,6 +204,7 @@ export const workshopSections: WorkshopSection[] = [
     items: [
       { label: 'Testing AI-Powered Features', path: '/workshop/ai-testing-patterns' },
       { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
+      { label: 'Tutorials', path: '/tutorials' },
     ],
   },
   {

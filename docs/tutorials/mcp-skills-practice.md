@@ -20,11 +20,15 @@ npm run dev
 
 ## 2. MCP Server Setup (Local VS Code)
 
-Create or update `.vscode/mcp.json` in your workspace.
+The exercises repo already ships `workshop-exercises/.vscode/mcp.json` with two servers:
 
 ```json
 {
   "servers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
@@ -33,17 +37,31 @@ Create or update `.vscode/mcp.json` in your workspace.
 }
 ```
 
-If your organization uses additional MCP servers, add them in the same file using the server settings provided by your platform team.
+`playwright` drives a real browser for the Exercise D E2E work; `github` gives Copilot
+Chat access to repo/PR/issue context. If your organization uses additional MCP servers,
+add them in the same file using the server settings provided by your platform team.
 
 ### Verify MCP access
 
-In Copilot Chat, run a simple MCP-oriented prompt:
+`@github` and skill discovery are two separate things — the `github` MCP server gives
+Copilot Chat access to repo/PR/issue data, while skills are read locally from
+`.github/skills/`. Verify each independently.
+
+Verify the `github` MCP server with a real repo-oriented prompt:
 
 ```text
-@github what skills are available in this workspace?
+@github what are the open pull requests in this repo?
 ```
 
-You should see GitHub-related capabilities and tool access reflected in the response.
+You should see a response reflecting real GitHub data, not a generic answer.
+
+Verify skill discovery with a plain Copilot Chat prompt (no `@github` prefix):
+
+```text
+what skills are available in this workspace?
+```
+
+You should see the three skills listed in the next section reflected in the response.
 
 ## 3. Skill Practice in the Exercises Repo
 
@@ -63,7 +81,9 @@ If you use GitHub CLI in environments where skill discovery is enabled, you can
 
 ### Pact contracts drill
 
-Use this prompt:
+Despite the name, this skill isn't Pact consumer-driven-contract testing — it reviews
+API tests against the Express route/response-envelope contract in `src/app.ts`. Use
+this prompt:
 
 ```text
 Use the pact-contracts skill to inspect tests/api/auth-and-users.test.ts against src/app.ts.
@@ -97,10 +117,10 @@ Open:
 
 Complete at least these sections:
 
-1. API test generation prompt
-2. Refactor prompt
-3. Review prompt
-4. Prompt iteration table
+1. Exercise A — Generate Unit Tests for `calculateDiscount` (weak vs. strong prompt)
+2. Exercise C — API Tests for the Checkout Pipeline (cart / full pipeline / error paths prompts)
+3. Exercise E — Context Engineering (generate with context / review for CI prompts)
+4. Prompt Iteration Drill (the comparison table at the end)
 
 Goal: compare weak vs. specific prompts and record output quality differences.
 
@@ -110,12 +130,15 @@ Open:
 
 - `practice/mcp-practice.md`
 
-Suggested sequence:
+It has three drills — work through at least the first:
 
-1. Break one API assertion intentionally
-2. Reproduce failure with `npm run test:api`
-3. Investigate with the workflow (reproduce -> localize -> hypothesize -> validate -> patch)
-4. Restore green test state
+1. **Investigate an API Failure** — break one assertion in `tests/api/auth-and-users.test.ts`,
+   run `npm run test:api`, work the reproduce → localize → hypothesize → validate → fix loop,
+   then restore green state.
+2. **Contract Drift Detection** — change one response field in `src/app.ts`, re-run the API
+   tests, and decide whether to fix the implementation or update the tests.
+3. **Auth Boundary Checks** — add tests for a missing Bearer token, a malformed Bearer token,
+   and the valid-token path.
 
 ## 6. Validation Checklist
 
@@ -183,6 +206,5 @@ Treat Copilot output as a draft until human-reviewed and validated in CI.
 
 ## Next Steps
 
-- Return to the **[Copilot Overview](../../src/pages/workshop/CopilotOverview.tsx)** workshop page for Copilot fundamentals
+- Return to the **[Copilot Overview](/workshop/copilot-overview)** workshop page for Copilot fundamentals
 - Continue to **Exercise C — API Tests** and apply the same skill/MCP workflow on API test evolution
-- Revisit `practice/mcp-practice.md` whenever introducing a new contract or auth change

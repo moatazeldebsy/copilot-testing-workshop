@@ -11,11 +11,6 @@ type TutorialItem = {
 const Tutorials: React.FC = () => {
   const tutorials: TutorialItem[] = [
     {
-      title: 'Getting Started with Copilot for Testing',
-      description: 'Install and activate GitHub Copilot, write your first AI-assisted test, and learn the Generate → Review → Fix loop.',
-      slug: 'getting-started',
-    },
-    {
       title: 'Advanced Scenarios',
       description: 'Guardrail prompt templates, CI/CD integration with quality gates and secret scanning, and team adoption patterns.',
       slug: 'advanced-scenarios',
@@ -24,11 +19,6 @@ const Tutorials: React.FC = () => {
       title: 'MCP, Skills, and copilot.md Practice',
       description: 'Hands-on guide for MCP server setup, skill-based workflows, and prompt drills using the workshop-exercises repository.',
       slug: 'mcp-skills-practice',
-    },
-    {
-      title: 'Facilitator Cheat Sheet',
-      description: 'One-page delivery aid with minute-by-minute timing, fail-first demo sequence, fallback paths, and Q&A anchors.',
-      slug: 'facilitator-cheat-sheet',
     },
   ];
 

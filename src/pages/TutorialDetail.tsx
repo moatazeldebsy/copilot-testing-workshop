@@ -3,12 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Layout from '../components/Layout';
+import CodeBlock from '../components/CodeBlock';
 import './TutorialDetail.css';
 
-import gettingStartedMd from '../../docs/tutorials/getting-started.md?raw';
 import advancedScenariosMd from '../../docs/tutorials/advanced-scenarios.md?raw';
 import mcpPracticeMd from '../../docs/tutorials/mcp-skills-practice.md?raw';
-import facilitatorCheatSheetMd from '../../docs/tutorials/facilitator-cheat-sheet.md?raw';
 
 type TutorialDoc = {
   title: string;
@@ -16,10 +15,6 @@ type TutorialDoc = {
 };
 
 const tutorialDocs: Record<string, TutorialDoc> = {
-  'getting-started': {
-    title: 'Getting Started with Copilot for Testing',
-    markdown: gettingStartedMd,
-  },
   'advanced-scenarios': {
     title: 'Advanced Scenarios',
     markdown: advancedScenariosMd,
@@ -27,10 +22,6 @@ const tutorialDocs: Record<string, TutorialDoc> = {
   'mcp-skills-practice': {
     title: 'MCP, Skills, and copilot.md Practice',
     markdown: mcpPracticeMd,
-  },
-  'facilitator-cheat-sheet': {
-    title: 'Facilitator Cheat Sheet',
-    markdown: facilitatorCheatSheetMd,
   },
 };
 
@@ -60,7 +51,22 @@ const TutorialDetail: React.FC = () => {
           <Link to="/tutorials">← Back to tutorials</Link>
         </p>
         <div className="tutorial-doc__content">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{doc.markdown}</ReactMarkdown>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              pre: ({ children }) => <>{children}</>,
+              code: ({ className, children }) => {
+                const match = /language-(\w+)/.exec(className || '');
+                const text = String(children).replace(/\n$/, '');
+                if (match) {
+                  return <CodeBlock language={match[1]}>{text}</CodeBlock>;
+                }
+                return <code className={className}>{children}</code>;
+              },
+            }}
+          >
+            {doc.markdown}
+          </ReactMarkdown>
         </div>
       </article>
     </Layout>
