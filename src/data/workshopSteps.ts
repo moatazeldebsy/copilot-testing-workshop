@@ -195,6 +195,7 @@ export const workshopSections: WorkshopSection[] = [
     title: 'Reference',
     items: [
       { label: 'Testing AI-Powered Features', path: '/workshop/ai-testing-patterns' },
+      { label: 'Tutorials', path: '/tutorials' },
     ],
   },
   {
