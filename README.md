@@ -22,7 +22,7 @@ _Friday, 10 Jul 2026 · Room R2 · 12:15 pm – 2:15 pm WEDT (UTC+02:00)_
 | 12:30 | **Exercise A — Unit Tests** | Use Copilot to generate tests for `calculateDiscount()` (3 hidden bugs); weak vs strong prompt comparison | 25 min |
 | 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite the weak assertions | 10 min |
 | 13:05 | **Exercise C — API Tests** | Generate Supertest tests for the full checkout pipeline: cart → discount → fraud → payment → notification | 25 min |
-| 13:30 | **Exercise D — Component Tests** | React Testing Library tests for `StorePage`; Playwright E2E shown as live demo / optional for early finishers | 20 min |
+| 13:30 | **Exercise D — Component & E2E Tests** | React Testing Library tests for `StorePage`; Playwright E2E checkout flow (`test.fixme` fill-in) | 20 min |
 | 13:50 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.github/copilot-instructions.md`, context engineering | 10 min |
 | 14:00 | **Wrap-up & Q&A** | Trust Playbook walkthrough, one action to take back, open discussion | 15 min |
 

@@ -10,7 +10,7 @@ Use this as a live delivery aid for the 120-minute workshop.
 | 12:30 | **Exercise A — Unit Tests** | Generate tests for `calculateDiscount()`; discover that weak prompts produce weak tests | 25 min |
 | 12:55 | **Exercise B — Review AI Tests** | Read `calculateDiscount.weak.test.ts`; identify what passes but shouldn't; rewrite | 10 min |
 | 13:05 | **Exercise C — API Tests** | Supertest for the full pipeline; use domain-rules.md as context | 25 min |
-| 13:30 | **Exercise D — Component Tests** | StorePage RTL tests hands-on; Playwright shown as live demo / optional extra | 20 min |
+| 13:30 | **Exercise D — Component & E2E Tests** | StorePage RTL tests hands-on; Playwright E2E checkout flow (`test.fixme` fill-in) | 20 min |
 | 13:50 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.github/copilot-instructions.md`, context engineering | 10 min |
 | 14:00 | **Wrap-up & Q&A** | Trust Playbook walkthrough, one action to take back, open discussion | 15 min |
 
@@ -96,7 +96,7 @@ Ask participants to compare assertion specificity in the two outputs.
 | Copilot unavailable | Use `tests/fixtures/calculateDiscount-examples.md` — paste the strong tests directly |
 | Participant stuck on any exercise | `git checkout solutions` to see the completed answer key |
 | Tests fail unexpectedly | Narrate the triage flow: reproduce → localize → hypothesize → verify → patch |
-| Time short | Skip Exercise D; keep Exercise E and wrap-up |
+| Time short | Skip Exercise D (component + E2E); keep Exercise E and wrap-up |
 
 ## Q&A Anchors
 
