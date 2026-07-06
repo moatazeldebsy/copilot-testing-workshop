@@ -239,6 +239,11 @@ const CopilotConfiguration: React.FC = () => (
             <td>Custom chat persona</td>
             <td>Defines a scoped persona with its own instructions and a limited tool list — a specialist you summon instead of a generalist you nudge</td>
           </tr>
+          <tr>
+            <td><code>.github/agents/*.agent.md</code></td>
+            <td>Selectable agent persona</td>
+            <td>A full agent-mode persona with its own tools and (optionally) preferred model, chosen from the VS Code agents dropdown or <code>/agents</code> — or run as a cloud background agent from <code>github.com/copilot/agents</code>. Distinct from a chat mode: it can act end-to-end (edit files, run tests), not just converse</td>
+          </tr>
         </tbody>
       </table>
 
@@ -287,6 +292,33 @@ write feature code.`}</CodeBlock>
         model goes off track.
       </p>
 
+      <h3>Custom Agents</h3>
+      <p>
+        A custom agent goes further than a chat mode: it's a full agent-mode
+        persona with its own tools, an optional preferred model, and its own
+        validation command — it can read, edit, and run tests end-to-end
+        instead of just critiquing in conversation. Define one as an{' '}
+        <code>.agent.md</code> file under <code>.github/agents/</code>:
+      </p>
+      <CodeBlock language="markdown">{`// .github/agents/unit-test.agent.md
+---
+name: unit-test-agent
+description: Generates and hardens unit tests for pure functions and services.
+tools: [read, search, edit, runTests]
+---
+
+You are a focused unit-testing agent.
+Scope: pure functions/services in src/services/. Do not modify files under src/.
+Avoid weak assertions (toBeTruthy, toBeDefined) when a specific value can be checked.
+Run npm run test:unit before reporting a task complete.`}</CodeBlock>
+      <p>
+        Pick it from the agents dropdown in Chat, or type <code>/agents</code>{' '}
+        to open the agent picker. Because it's checked into the repo, the
+        whole team gets the same tool restrictions and validation command —
+        and organizations can define shared agents once in <code>.github</code>{' '}
+        for every repository to pick up.
+      </p>
+
       <p>
         In this workshop, participants can copy practical starter files from the
         exercises repository:
@@ -314,6 +346,11 @@ write feature code.`}</CodeBlock>
           (timing/order/shared-state flakiness), and <code>test-generation</code>
           (scaffold tests from a target file).
         </li>
+        <li>
+          <code>workshop-exercises/.github/agents/</code> — three tier-scoped agent
+          personas: <code>unit-test-agent</code>, <code>api-test-agent</code>, and{' '}
+          <code>e2e-test-agent</code>, each with its own tools and validation command.
+        </li>
       </ul>
 
       <div className="infographic-diagram">
@@ -326,9 +363,9 @@ write feature code.`}</CodeBlock>
               <div className="filetree-item filetree-item--highlight">📄 .github/copilot-instructions.md <span className="filetree-badge">Chat Standards</span></div>
               <div className="filetree-item">📂 .github/agents/</div>
               <div className="filetree-children">
-                <div className="filetree-item">📄 test-agent.md</div>
-                <div className="filetree-item">📄 api-agent.md</div>
-                <div className="filetree-item">📄 e2e-agent.md</div>
+                <div className="filetree-item">📄 unit-test.agent.md</div>
+                <div className="filetree-item">📄 api-test.agent.md</div>
+                <div className="filetree-item">📄 e2e-test.agent.md</div>
               </div>
               <div className="filetree-item">📂 .vscode/ → settings.json</div>
               <div className="filetree-item">📂 tests/</div>
@@ -336,6 +373,11 @@ write feature code.`}</CodeBlock>
             </div>
           </div>
         </div>
+        <p className="infographic-diagram__caption">
+          This isn't just a suggested layout — every file shown here exists in{' '}
+          <code>workshop-exercises/</code> today, including the three agent
+          personas under <code>.github/agents/</code>.
+        </p>
         <div className="infographic-token-strategy">
           <div className="token-tier token-tier--always">
             <span className="token-tier__badge">⚡ Always Loaded (tiny)</span>
@@ -455,14 +497,32 @@ All API tests must:
         <p className="infographic-diagram__caption">Nested AGENTS.md files let you define different agent personas at each level of your test hierarchy — unit, API, E2E. The nearest file in the directory tree takes precedence.</p>
       </div>
 
-      <TimedExercise minutes={20} title="Hands-on: Put the Configuration Files to Work">
+      <TimedExercise minutes={25} title="Hands-on: Put the Configuration Files to Work">
         <p>
-          Everything above is easy to nod along to and never actually use. All four
+          Everything above is easy to nod along to and never actually use. All six
           mechanisms already exist in <code>workshop-exercises/</code> — spend a few
           minutes actually invoking each one instead of just reading about it.
         </p>
 
-        <h3>1. Run the prompt file</h3>
+        <h3>1. Verify copilot-instructions.md is actually being read</h3>
+        <p>
+          Like AGENTS.md, <code>copilot-instructions.md</code> is passive context — the way
+          to "use" it is to confirm Copilot is honoring it. Open a fresh Copilot Chat
+          without attaching or pasting any files, and ask: <em>"What test framework and
+          assertion style should I use in this repo, and why?"</em>
+        </p>
+        <Collapsible title="What a correct answer looks like" variant="hint">
+          <p>
+            <code>.github/copilot-instructions.md</code>'s Stack/Test conventions section
+            names Jest with <code>ts-jest</code>, exact-value assertions over{' '}
+            <code>toBeTruthy</code>/<code>toBeDefined</code>, and the AAA structure. If
+            Copilot's answer reflects those specifics without you having shown it the file,
+            that confirms the repo-wide instructions are loaded automatically on every
+            request — not just something you'd have to re-paste each time.
+          </p>
+        </Collapsible>
+
+        <h3>2. Run the prompt file</h3>
         <p>
           In Copilot Chat, type <code>/generate-tests</code> and target a file that has no
           tests yet, e.g. <code>#file:src/services/paymentService.ts</code>. Compare the
@@ -470,7 +530,7 @@ All API tests must:
           Exercise A — is the slash command faster? Less controllable?
         </p>
 
-        <h3>2. Switch to the qa-reviewer chat mode</h3>
+        <h3>3. Switch to the qa-reviewer chat mode</h3>
         <p>
           Select <strong>qa-reviewer</strong> from the chat mode dropdown, then paste in
           your Exercise A test file (or <code>calculateDiscount.weak.test.ts</code>) and
@@ -479,7 +539,7 @@ All API tests must:
           edit your files — does its critique match what you found manually in Exercise B?
         </p>
 
-        <h3>3. Try one of the three skills</h3>
+        <h3>4. Try one of the three skills</h3>
         <p>Pick whichever matches something you already have open:</p>
         <ul>
           <li>
@@ -502,7 +562,7 @@ All API tests must:
           </li>
         </ul>
 
-        <h3>4. Verify AGENTS.md is actually being read</h3>
+        <h3>5. Verify AGENTS.md is actually being read</h3>
         <p>
           AGENTS.md is passive context, not something you run — so the way to "use" it is to
           confirm Copilot is actually honoring it. In Copilot Chat, with a file under{' '}
@@ -519,6 +579,18 @@ All API tests must:
             check that you're not in a chat mode that ignores repo context.
           </p>
         </Collapsible>
+
+        <h3>6. Invoke a custom Agent</h3>
+        <p>
+          Type <code>/agents</code> in Copilot Chat (or open the agents dropdown) and select{' '}
+          <strong>unit-test-agent</strong>. Point it at{' '}
+          <code>#file:src/services/cartService.ts</code> — the same target you used with the{' '}
+          <strong>test-generation</strong> skill in step 4. Compare the two runs: the skill is
+          a one-shot playbook you invoke inside whatever mode you're already in, while the
+          agent brings its own restricted tool list (<code>[read, search, edit, runTests]</code>)
+          and runs <code>npm run test:unit</code> itself before handing control back. Which one
+          gave you more confidence in the result without you having to check its work?
+        </p>
       </TimedExercise>
 
       <div id="config-debrief" className="takeaways-section">
@@ -530,7 +602,9 @@ All API tests must:
             <li><strong>Customization files</strong> (<code>.github/copilot-instructions.md</code>, <code>*.instructions.md</code>, <code>AGENTS.md</code>) bake your conventions into every response — no re-typing the same prompt.</li>
             <li><strong>Prompt files</strong> (<code>.github/prompts/*.prompt.md</code>) package a proven prompt as a team-wide slash command.</li>
             <li><strong>Custom chat modes</strong> (<code>*.chatmode.md</code>) scope a persona to a limited, reviewed tool list — a specialist you summon, not a generalist you nudge.</li>
+            <li><strong>Custom agents</strong> (<code>.github/agents/*.agent.md</code>) go a step further than chat modes — a selectable, tool-equipped persona that can edit files and run its own validation command end-to-end, locally or as a cloud background agent.</li>
             <li>Nested <code>AGENTS.md</code> files let different test layers (unit, API, E2E) have different agent personas — the nearest file wins.</li>
+            <li>Repo-wide instructions and AGENTS.md are passive context — verify Copilot is actually honoring them by asking it to state a convention it was never shown directly.</li>
             <li>Layer context by cost: tiny always-loaded files, medium role-scoped docs, large on-demand skill playbooks.</li>
           </ul>
         </div>
