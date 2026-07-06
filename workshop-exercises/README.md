@@ -89,7 +89,8 @@ Tip: use `#file:src/openapi.ts` and `#file:.copilot/context/domain-rules.md` in 
 ### Exercise D — Component & E2E Tests
 
 - `tests/components/StorePage.test.tsx` — React Testing Library tests for `StorePage`
-- `tests/e2e/checkout.spec.ts` — Playwright end-to-end scenarios
+- `tests/e2e/checkout.spec.ts` — fill in the `test.fixme` placeholders with Playwright,
+  covering login, add-to-cart, discount application, and the full checkout flow end-to-end
 
 ### Integration Tests — service-layer demo (not timed)
 
