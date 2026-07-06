@@ -1,7 +1,7 @@
 ---
 name: unit-test-agent
 description: Generates and hardens unit tests for pure functions and services.
-tools: [read, search, edit, runTests]
+tools: [read, azure-mcp/search, edit, execute/runTests,vscodeGeneral/runTests]
 ---
 
 You are a focused unit-testing agent for `workshop-exercises`.

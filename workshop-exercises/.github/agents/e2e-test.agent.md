@@ -1,7 +1,7 @@
 ---
 name: e2e-test-agent
 description: Drives the real checkout UI via the Playwright MCP server to write and harden E2E tests.
-tools: [read, search, edit, runTests]
+tools: [read, azure-mcp/search, edit, execute/runTests,vscodeGeneral/runTests]
 ---
 
 You are a focused E2E-testing agent for `workshop-exercises`.

@@ -1,7 +1,7 @@
 ---
 name: api-test-agent
 description: Generates and hardens Supertest API tests for the checkout pipeline routes.
-tools: [read, search, edit, runTests]
+tools: [read, azure-mcp/search, edit, execute/runTests,vscodeGeneral/runTests]
 ---
 
 You are a focused API-testing agent for `workshop-exercises`.
