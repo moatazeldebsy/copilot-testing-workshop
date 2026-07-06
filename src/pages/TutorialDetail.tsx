@@ -6,8 +6,8 @@ import Layout from '../components/Layout';
 import CodeBlock from '../components/CodeBlock';
 import './TutorialDetail.css';
 
-import advancedScenariosMd from '../../docs/tutorials/advanced-scenarios.md?raw';
-import mcpPracticeMd from '../../docs/tutorials/mcp-skills-practice.md?raw';
+import advancedScenariosMd from '../../workshop-exercises/docs/tutorials/advanced-scenarios.md?raw';
+import mcpPracticeMd from '../../workshop-exercises/docs/tutorials/mcp-skills-practice.md?raw';
 
 type TutorialDoc = {
   title: string;

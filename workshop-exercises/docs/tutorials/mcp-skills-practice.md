@@ -126,19 +126,33 @@ Goal: compare weak vs. specific prompts and record output quality differences.
 
 ## 5. Hands-on MCP Practice Drills
 
-Open:
+Lightweight MCP-style investigation drills, no external services required. Work through
+at least the first.
 
-- `practice/mcp-practice.md`
+### Drill 1 — Investigate an API Failure
 
-It has three drills — work through at least the first:
+1. Intentionally break one assertion in `tests/api/auth-and-users.test.ts`.
+2. Run `npm run test:api`.
+3. Work the investigation loop: reproduce → localize → hypothesize → validate → fix.
+4. Restore the passing state.
 
-1. **Investigate an API Failure** — break one assertion in `tests/api/auth-and-users.test.ts`,
-   run `npm run test:api`, work the reproduce → localize → hypothesize → validate → fix loop,
-   then restore green state.
-2. **Contract Drift Detection** — change one response field in `src/app.ts`, re-run the API
-   tests, and decide whether to fix the implementation or update the tests.
-3. **Auth Boundary Checks** — add tests for a missing Bearer token, a malformed Bearer token,
-   and the valid-token path.
+### Drill 2 — Contract Drift Detection
+
+1. Temporarily change one response field in `src/app.ts`.
+2. Re-run the API tests.
+3. Decide whether to fix the implementation to preserve the contract, or update the tests
+   because the contract intentionally changed.
+
+### Drill 3 — Auth Boundary Checks
+
+1. Add one test for a missing Bearer token.
+2. Add one test for a malformed Bearer token.
+3. Add one test for the valid-token path.
+
+### MCP tooling mindset
+
+Treat each drill as tool-assisted investigation, not guesswork: read the exact failure
+output, inspect only the relevant files first, and prefer small, verifiable changes.
 
 ## 6. Validation Checklist
 

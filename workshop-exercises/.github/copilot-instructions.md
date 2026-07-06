@@ -8,6 +8,9 @@ Testing** workshop.
 - Stack: TypeScript + React + Express
 - Test tools: Jest, Supertest, Playwright (workshop scenarios)
 - Goal: teach high-signal test automation with safe AI-assisted workflows
+- **Domain rules** (discount codes, fraud thresholds, payment states, error codes): [`.copilot/context/domain-rules.md`](../.copilot/context/domain-rules.md) — attach this file when generating or reviewing tests for discount/fraud/payment logic.
+- **Test isolation:** call `resetWorkshopData()` (exported from `src/app.ts`) in `beforeEach` for any test that touches shared in-memory repositories.
+- **Intentional bugs:** `src/services/calculateDiscount.ts` has 3 known bugs used in exercises — do not fix them; the goal is for tests to expose them.
 
 ## Coding Standards
 - Prefer small, explicit changes.

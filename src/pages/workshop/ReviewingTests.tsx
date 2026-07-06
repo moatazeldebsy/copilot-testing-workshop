@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import CodeBlock from '../../components/CodeBlock';
 import PageMeta from '../../components/PageMeta';
+import VerifyBlock from '../../components/VerifyBlock';
 import Collapsible from '../../components/Collapsible';
 import ArchDiagram from '../../components/ArchDiagram';
 import TimedExercise from '../../components/TimedExercise';
@@ -339,15 +340,41 @@ replace the timing assertion with jest.useFakeTimers() and a fixed timestamp."`}
       <div id="review-exercise">
       <TimedExercise minutes={10} title="Hands-on Challenge">
         <p>
-          Open the test file you generated in Exercise A. Apply the review checklist
-          above. Find at least two items that need fixing, use a Copilot Chat
-          follow-up prompt to fix them, and verify the improved tests still pass.
+          Open <code>tests/unit/calculateDiscount.weak.test.ts</code> — five
+          pre-seeded, AI-generated tests that all pass today. Apply the review
+          checklist above to each one, identify what real bug could slip through
+          it, and use a Copilot Chat follow-up prompt to rewrite it with a
+          specific-value assertion. Then add the missing tests called out in the
+          file's own comments and verify your rewrites still pass — but now for
+          the right reason.
         </p>
+
+        <h3>Run It First — Confirm the False Confidence</h3>
+        <CodeBlock language="bash">{`npm test -- tests/unit/calculateDiscount.weak.test.ts`}</CodeBlock>
+        <VerifyBlock>{`PASS  tests/unit/calculateDiscount.weak.test.ts
+  calculateDiscount (weak AI-generated tests)
+    ✓ returns a result object (1 ms)
+    ✓ SAVE10 produces a discount
+    ✓ FLAT5 reduces the total (1 ms)
+    ✓ unknown code does not throw
+    ✓ code is case-insensitive (1 ms)
+
+Tests:       5 passed, 5 total`}</VerifyBlock>
+        <div className="callout callout-info">
+          <strong>💡 This all-green result is correct — and the problem</strong>
+          <ul>
+            <li><code>toBeDefined()</code> / <code>toBeTruthy()</code> pass on any non-empty, non-zero result — so BUG 1 (SAVE10 giving 100% off instead of 10%) still passes, since <code>discountAmount</code> is truthy either way</li>
+            <li><code>not.toThrow()</code> only checks that nothing threw, not what was returned</li>
+            <li><code>finalTotal &lt; discountAmount + finalTotal</code> is tautological — true by arithmetic for any positive discount, so it proves nothing about the actual values</li>
+            <li>The case-insensitivity test compares <code>SAVE10</code> vs <code>save10</code> results to <em>each other</em>, never to a correct expected value — so even though both incorrectly return $100, they match and the test passes</li>
+          </ul>
+        </div>
+
         <Collapsible title="Hint: Where to look first" variant="hint">
           <ul>
-            <li>Check for <code>toBeTruthy()</code> or <code>toBeDefined()</code> — can you make them more specific?</li>
-            <li>Check whether all mocked methods have a call-argument assertion</li>
-            <li>Check whether there is an <code>afterEach(() =&gt; jest.clearAllMocks())</code></li>
+            <li>Every assertion in the file uses <code>toBeDefined()</code>, <code>toBeTruthy()</code>, <code>not.toThrow()</code>, or compares two calls to each other — none assert a specific expected value</li>
+            <li>The case-insensitivity test only checks that <code>SAVE10</code> and <code>save10</code> return the <em>same</em> amount, never that the amount is correct ($10, not $100)</li>
+            <li>The bottom of the file lists 4 missing cases: exact SAVE10 amount, FLAT5 below the $20 minimum, the negative-<code>finalTotal</code> clamp, and edge amounts ($0, very large)</li>
           </ul>
         </Collapsible>
         <Collapsible title="Bonus: Write a PR template" variant="bonus">

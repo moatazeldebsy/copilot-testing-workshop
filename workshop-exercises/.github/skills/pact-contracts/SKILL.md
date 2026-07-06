@@ -1,6 +1,7 @@
 ---
 name: pact-contracts
 summary: Review and harden API tests against route contracts, auth rules, and response envelopes in workshop-exercises.
+description: Review and harden API tests against route contracts, auth rules, and response envelopes in workshop-exercises.
 ---
 
 # Pact Contracts Skill

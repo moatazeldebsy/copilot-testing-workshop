@@ -28,12 +28,22 @@ clean_reinstall() {
   (cd "$dir" && rm -rf node_modules package-lock.json && npm install --no-audit --no-fund)
 }
 
+# Checks run the locally installed binary directly (./node_modules/.bin/<tool>)
+# rather than via `npx --no-install <tool>`. npx falls back to its own global
+# package cache (~/.npm/_npx) when the local binary is missing, which made this
+# check silently pass — and skip the reinstall below — even when
+# node_modules/.bin/<tool> in this project didn't exist at all.
+check_bin() {
+  local dir="$1" bin="$2" log="$3"
+  (cd "$dir" && "./node_modules/.bin/$bin" --version) >"$log" 2>&1
+}
+
 # Docs/marketing site at the repo root.
 install_dir .
-if ! (npx --no-install vite --version >/tmp/vite-root-check.log 2>&1); then
+if ! check_bin . vite /tmp/vite-root-check.log; then
   echo "==> vite failed to load after install in . — see /tmp/vite-root-check.log"
   clean_reinstall .
-  npx --no-install vite --version
+  check_bin . vite /tmp/vite-root-check.log
 fi
 
 # The actual hands-on workshop app. Also verified post-install: it ships its
@@ -41,11 +51,12 @@ fi
 # leaves participants staring at "jest: not found" or a 502 on the forwarded
 # dev server ports.
 install_dir workshop-exercises
-if ! (cd workshop-exercises && npx --no-install vite --version >/tmp/vite-workshop-check.log 2>&1 \
-      && npx --no-install jest --version >>/tmp/vite-workshop-check.log 2>&1); then
+if ! (check_bin workshop-exercises vite /tmp/vite-workshop-check.log \
+      && check_bin workshop-exercises jest /tmp/vite-workshop-check.log); then
   echo "==> vite/jest failed to load after install in workshop-exercises — see /tmp/vite-workshop-check.log"
   clean_reinstall workshop-exercises
-  (cd workshop-exercises && npx --no-install vite --version && npx --no-install jest --version)
+  check_bin workshop-exercises vite /tmp/vite-workshop-check.log
+  check_bin workshop-exercises jest /tmp/vite-workshop-check.log
 fi
 
 echo "==> Installing Playwright's Chromium browser for E2E exercises"

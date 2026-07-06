@@ -57,8 +57,8 @@ export const searchIndex: SearchEntry[] = [
   {
     title: 'Configuring Copilot for Your Team',
     path: '/workshop/copilot-configuration',
-    keywords: 'configuring copilot team instructions copilot-instructions.md agents.md prompt files chat modes chatmode skills mcp model context protocol customization files agent personas',
-    description: 'Custom instructions, prompt files, chat modes, GitHub skills, agent personas, and MCP servers for team-wide consistency',
+    keywords: 'configuring copilot team instructions copilot-instructions.md agents.md prompt files chat modes chatmode qa-reviewer skills mcp model context protocol customization files agent personas review-only agent',
+    description: 'Custom instructions, prompt files, review-only and end-to-end custom agents, GitHub skills, and MCP servers for team-wide consistency',
   },
   {
     title: 'Reviewing AI Tests & Guardrails',

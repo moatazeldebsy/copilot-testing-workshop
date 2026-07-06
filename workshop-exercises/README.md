@@ -146,5 +146,8 @@ git checkout master               # Back to the workshop starting point
 - `.github/skills/flaky-test-hunt/SKILL.md` — flaky test investigation workflow
 - `.github/skills/test-generation/SKILL.md` — scaffold new tests from a target file
 - `tests/integration/checkout.pipeline.test.ts` — service-layer integration demo (Cart → Discount → Fraud → Payment → Notification, no HTTP)
-- `docs/ai-testing-trust-playbook.md` — session takeaway playbook
+- `docs/tutorials/advanced-scenarios.md` — trust framework, guardrails, CI/CD, team adoption
+  (also rendered as the workshop site's `/tutorials/advanced-scenarios` page)
+- `docs/tutorials/mcp-skills-practice.md` — MCP setup, skill drills, copilot.md workbook, MCP
+  practice drills (also rendered as `/tutorials/mcp-skills-practice`)
 - `tests/fixtures/calculateDiscount-examples.md` — backup examples if Copilot is unavailable

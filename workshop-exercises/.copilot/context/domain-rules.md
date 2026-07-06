@@ -48,7 +48,7 @@ captured → refunded  (via POST /api/payment/:id/refund)
 ```
 
 Attempting an invalid transition (e.g. refunding a pending intent) returns
-`INVALID_PAYMENT_STATE` with HTTP 409.
+`INVALID_PAYMENT_STATE` with HTTP 400.
 
 ---
 
@@ -71,7 +71,7 @@ Attempting an invalid transition (e.g. refunding a pending intent) returns
 | ITEM_NOT_FOUND         | 404  | Cart item does not exist                    |
 | DUPLICATE_EMAIL        | 409  | Registration with existing email            |
 | INVALID_PAYMENT_STATE  | 400  | Payment lifecycle transition not allowed    |
-| INVALID_DISCOUNT_CODE  | 400  | Code does not exist                         |
+| INVALID_DISCOUNT_CODE  | 404  | Code does not exist                         |
 | DISCOUNT_EXPIRED       | 400  | Code exists but past its expiry date        |
 | ORDER_BELOW_MINIMUM    | 400  | Subtotal below minOrder for flat discount   |
 | FRAUD_BLOCKED          | 422  | Risk level is high — payment blocked        |

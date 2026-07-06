@@ -1,6 +1,7 @@
 ---
 name: test-generation
 summary: Scaffold new Jest/Supertest/RTL tests from a target file, reusing shared factories and following repo testing standards.
+description: Automatically generate test files for functions, routes, or components using Jest, Supertest, or React Testing Library, following repository testing standards and reusing shared test factories.
 ---
 
 # Test Generation Skill

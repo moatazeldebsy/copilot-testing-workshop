@@ -128,7 +128,7 @@ const ApiIntegration: React.FC = () => (
           language: 'bash',
           code: `Write Supertest tests for the checkout pipeline.
 #file:.copilot/context/domain-rules.md
-#file:src/app.ts
+#file:src/openapi.ts
 
 Cover these routes:
 - POST /api/cart/:userId/items — add item, assert 201 + subtotal
@@ -210,6 +210,7 @@ describe('Discount', () => {
   it('applies SAVE10 and returns the correct discounted total', async () => {
     const res = await request(app)
       .post('/api/discount/apply')
+      .set('Authorization', \`Bearer \${token}\`)
       .send({ code: 'SAVE10', subtotal: 100 });
 
     expect(res.status).toBe(200);
@@ -220,9 +221,10 @@ describe('Discount', () => {
   it('rejects an unknown code with INVALID_DISCOUNT_CODE', async () => {
     const res = await request(app)
       .post('/api/discount/apply')
+      .set('Authorization', \`Bearer \${token}\`)
       .send({ code: 'BOGUS', subtotal: 100 });
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
     expect(res.body.error.code).toBe('INVALID_DISCOUNT_CODE');
   });
 });
@@ -231,6 +233,7 @@ describe('Fraud', () => {
   it('blocks a high-risk order (amount > $1000, country XX)', async () => {
     const res = await request(app)
       .post('/api/fraud/check')
+      .set('Authorization', \`Bearer \${token}\`)
       .send({ orderAmount: 10000, itemCount: 50, ipCountry: 'XX' });
 
     expect(res.status).toBe(200);
@@ -241,6 +244,7 @@ describe('Fraud', () => {
   it('approves a low-risk order', async () => {
     const res = await request(app)
       .post('/api/fraud/check')
+      .set('Authorization', \`Bearer \${token}\`)
       .send({ orderAmount: 50, itemCount: 2, ipCountry: 'DE' });
 
     expect(res.status).toBe(200);
@@ -277,56 +281,114 @@ Tests: 6 passed, 6 total`}</VerifyBlock>
 
       <h2>Part B — Integration Tests with Real State</h2>
       <p>
-        For integration coverage, test that a full checkout flow transitions
-        state correctly — items are added, a discount is applied, and the cart
-        is cleared after checkout.
+        Unlike the Supertest coverage above (HTTP layer) or Exercise A/B's unit tests (one
+        function in isolation), <code>tests/integration/checkout.pipeline.test.ts</code> exercises
+        real cross-module wiring by calling the exported service singletons directly —{' '}
+        <code>cartService</code> → <code>discountService</code> → <code>fraudService</code> →{' '}
+        <code>paymentService</code> → <code>notificationService</code> — with no HTTP layer and no
+        mocks. It ships with 6 <code>it.todo</code> placeholders; fill them in with Copilot.
       </p>
-      <CodeBlock language="bash">{`Write a Jest integration test for the full checkout flow.
-#file:.copilot/context/domain-rules.md
+      <CodeBlock language="bash">{`Fill in the it.todo placeholders in tests/integration/checkout.pipeline.test.ts.
 
-Steps:
-1. Add item (sku-42) to cart for userId 'user-test-01'
-2. Apply discount code SAVE10
-3. Call checkout — verify order status is 'confirmed'
-4. Verify cart is empty after checkout
+Context files:
+- #file:tests/integration/checkout.pipeline.test.ts
+- #file:src/app.ts
+- #file:.copilot/context/domain-rules.md
 
-Use beforeEach to call db.reset() and seedCatalog() so tests are isolated.`}</CodeBlock>
+The services are already imported and exported as singletons from src/app.ts:
+cartService, discountService, fraudService, paymentService, notificationService, userService.
+Note: cartService and userService methods are async; discountService, fraudService, and
+paymentService methods are synchronous (no await, no Promise).
+
+Cover, in order:
+1. adds an item via cartService.addItem and reflects it in cartService.getCart's subtotal
+2. applies a discount via discountService.apply on top of the cart subtotal
+3. approves a low-risk order via fraudService.check for the same cart
+4. charges, captures, and refunds a payment via paymentService
+5. sends and retrieves a receipt via notificationService.send
+6. runs the full pipeline end-to-end and asserts the final order state`}</CodeBlock>
 
       <div className="callout callout-info">
-        <strong>Starter repo branch</strong> — The integration test helpers (<code>db.reset()</code>,{' '}
-        <code>seedCatalog()</code>, <code>addItem()</code>, <code>checkout()</code>) are wired up
-        in the <code>solutions</code> branch. Check that out to run these tests locally.
+        <strong>Solution reference</strong> — A fully filled-in version of this file is on the{' '}
+        <code>solutions</code> branch.
       </div>
 
-      <CodeBlock language="typescript">{`// tests/integration/checkout.int.test.ts
-import { db, seedCatalog } from '../../src/db';
-import { addItem, applyDiscount, checkout, getCart } from '../../src/services';
+      <CodeBlock language="typescript">{`// tests/integration/checkout.pipeline.test.ts  (Copilot-generated — review required)
+import { resetWorkshopData, cartService, discountService, fraudService, paymentService, notificationService, userService } from '../../src/app';
 
-const userId = 'user-test-01';
+describe('checkout pipeline (integration)', () => {
+  let userId: string;
 
-beforeEach(async () => {
-  await db.reset();
-  await seedCatalog();
-});
+  beforeEach(async () => {
+    await resetWorkshopData();
+    const { user } = await userService.authenticate('alice@example.com', 'workshop-password');
+    userId = user.id;
+  });
 
-it('places an order and clears the cart', async () => {
-  const cart = await addItem(userId, 'sku-42', { quantity: 1, price: 25 });
-  const discounted = await applyDiscount(cart.id, 'SAVE10');
+  it('adds an item via cartService and reflects it in the cart total', async () => {
+    const cart = await cartService.addItem(userId, {
+      productId: 'prod_1', name: 'Workshop T-Shirt', price: 25, quantity: 2,
+    });
 
-  expect(discounted.discountAmount).toBe(2.5);  // 10% of $25
+    expect(cart.items).toHaveLength(1);
+    expect(cart.subtotal).toBe(50);
+  });
 
-  const order = await checkout(cart.id);
-  expect(order.status).toBe('confirmed');
+  it('applies a discount via discountService on top of the cart subtotal', async () => {
+    const cart = await cartService.addItem(userId, {
+      productId: 'prod_1', name: 'Workshop T-Shirt', price: 100, quantity: 1,
+    });
 
-  const after = await getCart(userId);
-  expect(after.items).toHaveLength(0);
-});
+    const discounted = discountService.apply('SAVE10', cart.subtotal);
 
-it('blocks checkout when fraud check fails', async () => {
-  const cart = await addItem(userId, 'sku-42', { quantity: 50, price: 250 });
+    expect(discounted.discountAmount).toBe(10);
+    expect(discounted.finalTotal).toBe(90);
+  });
 
-  await expect(checkout(cart.id, { ipCountry: 'XX' }))
-    .rejects.toThrow('FRAUD_BLOCKED');
+  it('approves a low-risk order via fraudService for the same cart', () => {
+    const result = fraudService.check({ userId, orderAmount: 50, itemCount: 2, ipCountry: 'DE' });
+
+    expect(result.approved).toBe(true);
+    expect(result.riskLevel).toBe('low');
+  });
+
+  it('charges, captures, and refunds a payment via paymentService', () => {
+    const intent = paymentService.charge({ userId, amount: 45, currency: 'usd' });
+    expect(intent.status).toBe('pending');
+
+    const captured = paymentService.capture(intent.id);
+    expect(captured.status).toBe('captured');
+
+    const refunded = paymentService.refund(intent.id);
+    expect(refunded.status).toBe('refunded');
+  });
+
+  it('sends and retrieves a receipt via notificationService after payment', () => {
+    const log = notificationService.send({
+      userId, type: 'receipt', email: 'alice@example.com', subject: 'Order confirmed', body: 'Thanks for your order.',
+    });
+
+    expect(log.type).toBe('receipt');
+    expect(log.id).toBeTruthy();
+  });
+
+  it('runs the full pipeline end-to-end and asserts the final order state', async () => {
+    const cart = await cartService.addItem(userId, {
+      productId: 'prod_1', name: 'Workshop T-Shirt', price: 100, quantity: 1,
+    });
+    const discounted = discountService.apply('SAVE10', cart.subtotal);
+    const fraud = fraudService.check({ userId, orderAmount: discounted.finalTotal, itemCount: 1, ipCountry: 'DE' });
+    expect(fraud.approved).toBe(true);
+
+    const intent = paymentService.charge({ userId, amount: discounted.finalTotal, currency: 'usd' });
+    const captured = paymentService.capture(intent.id);
+    expect(captured.status).toBe('captured');
+
+    const log = notificationService.send({
+      userId, type: 'receipt', email: 'alice@example.com', subject: 'Order confirmed', body: 'Thanks for your order.',
+    });
+    expect(log.type).toBe('receipt');
+  });
 });`}</CodeBlock>
 
       <div id="api-exercise">
@@ -339,7 +401,7 @@ it('blocks checkout when fraud check fails', async () => {
         <Collapsible title="Hint: Payment lifecycle rules" variant="hint">
           <ul>
             <li>Valid transitions: <code>pending → captured</code> (POST /api/payment/:id/capture)</li>
-            <li>Invalid transition: refunding a <code>pending</code> intent returns <code>INVALID_PAYMENT_STATE</code> with HTTP 409</li>
+            <li>Invalid transition: refunding a <code>pending</code> intent returns <code>INVALID_PAYMENT_STATE</code> with HTTP 400</li>
             <li>Assert the <code>error.code</code> in the error response — not just the status</li>
           </ul>
         </Collapsible>
@@ -364,7 +426,7 @@ it('blocks checkout when fraud check fails', async () => {
       .post(\`/api/payment/\${paymentId}/refund\`)
       .set('Authorization', \`Bearer \${token}\`);
 
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('INVALID_PAYMENT_STATE');
   });
 });`}</CodeBlock>

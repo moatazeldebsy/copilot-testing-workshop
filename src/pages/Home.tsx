@@ -251,7 +251,7 @@ const Home: React.FC = () => {
               <tr className="schedule-break">
                 <td>14:00</td>
                 <td>🎤 Wrap-up &amp; Q&amp;A</td>
-                <td>Trust Playbook walkthrough, one action to take back, open discussion</td>
+                <td>Trust Framework walkthrough, one action to take back, open discussion</td>
                 <td>15 min</td>
               </tr>
             </tbody>

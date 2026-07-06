@@ -81,8 +81,7 @@ export const workshopSections: WorkshopSection[] = [
           primaryFiles: [
             'workshop-exercises/src/services/calculateDiscount.ts',
             'workshop-exercises/tests/unit/calculateDiscount.test.ts',
-            'workshop-exercises/tests/unit/calculateDiscount.weak.test.ts',
-            'workshop-exercises/tests/README.md',
+            'workshop-exercises/.copilot/context/domain-rules.md',
           ],
           solutionCheckpoints: ['solutions'],
         },
@@ -126,7 +125,7 @@ export const workshopSections: WorkshopSection[] = [
           primaryFiles: [
             'workshop-exercises/tests/api/checkout.test.ts',
             'workshop-exercises/.copilot/context/domain-rules.md',
-            'workshop-exercises/src/routes/',
+            'workshop-exercises/src/openapi.ts',
           ],
           solutionCheckpoints: ['solutions'],
         },
@@ -143,23 +142,32 @@ export const workshopSections: WorkshopSection[] = [
         exercise: {
           stepLabel: 'Exercise D',
           participantGoal:
-            'Use React Testing Library to validate StorePage interactions. Prefer getByRole/getByTestId, avoid implementation details. Playwright checkout flow shown as live demo.',
+            'Use React Testing Library to validate StorePage interactions. Prefer getByRole/getByTestId, avoid implementation details.',
           runCommand: 'npm test -- tests/components/StorePage.test.tsx',
           primaryFiles: [
             'workshop-exercises/src/ui/pages/StorePage.tsx',
             'workshop-exercises/tests/components/StorePage.test.tsx',
-            'workshop-exercises/tests/e2e/checkout.spec.ts',
           ],
           solutionCheckpoints: ['solutions'],
         },
       },
-      { label: 'E2E Testing with Playwright', path: '/workshop/e2e-playwright' },
-    ],
-  },
-  {
-    title: 'Test data and mocks',
-    items: [
-      { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
+      {
+        label: 'E2E Testing with Playwright',
+        path: '/workshop/e2e-playwright',
+        step: 'D',
+        exercise: {
+          stepLabel: 'Exercise D',
+          participantGoal:
+            'Fill in the test.fixme placeholders in checkout.spec.ts using Playwright. Cover login, add-to-cart, discount application, and the full checkout flow end-to-end.',
+          runCommand: 'npx playwright test tests/e2e/checkout.spec.ts',
+          primaryFiles: [
+            'workshop-exercises/tests/e2e/checkout.spec.ts',
+            'workshop-exercises/src/ui/pages/LoginPage.tsx',
+            'workshop-exercises/src/ui/pages/StorePage.tsx',
+          ],
+          solutionCheckpoints: ['solutions'],
+        },
+      },
     ],
   },
   {
@@ -195,6 +203,7 @@ export const workshopSections: WorkshopSection[] = [
     title: 'Reference',
     items: [
       { label: 'Testing AI-Powered Features', path: '/workshop/ai-testing-patterns' },
+      { label: 'Test Data & Mock Generation', path: '/workshop/test-data-mocks' },
       { label: 'Tutorials', path: '/tutorials' },
     ],
   },

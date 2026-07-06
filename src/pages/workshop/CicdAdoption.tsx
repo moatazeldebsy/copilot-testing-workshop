@@ -5,6 +5,7 @@ import PageMeta from '../../components/PageMeta';
 import VerifyBlock from '../../components/VerifyBlock';
 import Collapsible from '../../components/Collapsible';
 import ArchDiagram from '../../components/ArchDiagram';
+import TimedExercise from '../../components/TimedExercise';
 import ExerciseRepoCallout from '../../components/ExerciseRepoCallout';
 
 const CicdAdoption: React.FC = () => (
@@ -216,7 +217,8 @@ src/**/*.spec.ts          @your-org/qa-leads`}</CodeBlock>
         the exercises repository — not just an illustration:
       </p>
       <CodeBlock language="markdown">{`<!--
-Reviewing AI-generated tests checklist (see docs/ai-testing-trust-playbook.md).
+Reviewing AI-generated tests checklist (see the workshop site's Advanced Scenarios
+tutorial — Trust Framework and Anti-Patterns sections — at /tutorials/advanced-scenarios).
 Treat every generated test like a pull request from a junior teammate.
 -->
 
@@ -333,25 +335,95 @@ authoring, but does not replace review.`}</CodeBlock>
         is not a quality metric.
       </div>
 
-      <div id="cicd-exercise" className="challenge-section">
-        <h2>🏋️ Hands-on Challenge</h2>
+      <div id="cicd-exercise">
+      <TimedExercise minutes={15} title="Hands-on Challenge — Fill In and De-Flake NotificationService Tests">
         <p>
-          Ask Copilot to generate the complete <code>.github/workflows/test.yml</code>{' '}
-          for the starter repo. Review it against the checklist: are the thresholds
-          appropriate? Is the secret scan included? Are paths correct?
+          Open <code>tests/unit/notificationService.test.ts</code>. It ships
+          with four <code>it.todo(...)</code> stubs and one deliberately flaky
+          test. Fill in the stubs, then fix the flaky test so it's safe to run
+          in CI.
         </p>
+
+        <h3>The Stubs (what's there today)</h3>
+        <CodeBlock language="typescript">{`// notificationService.test.ts — todos not yet implemented
+
+it.todo('logs a receipt notification and returns a NotificationLog');
+it.todo('stores notifications so they can be retrieved by userId');
+it.todo('supports multiple notification types (receipt, order_confirmation, refund)');
+it.todo('reset() clears all stored notifications');
+
+// 🚨 FLAKY: asserts sentAt is within 50ms of the call — fails under CI load
+it('🚨 FLAKY: sentAt timestamp is within 50 ms of the call (demo — see comment)', () => {
+  const before = Date.now();
+  const log = service.send(basePayload);
+  const after = Date.now();
+  expect(log.sentAt.getTime()).toBeGreaterThanOrEqual(before);
+  expect(log.sentAt.getTime()).toBeLessThanOrEqual(after + 50);
+});`}</CodeBlock>
+
         <Collapsible title="Hint: Prompt template" variant="hint">
-          <CodeBlock language="bash">{`Generate a GitHub Actions workflow for a Node.js TypeScript project.
-Include: npm ci, ESLint lint, Jest tests with coverage, coverage threshold check at 80%, gitleaks secret scan.
-Trigger on: pull_request to main, push to main.`}</CodeBlock>
+          <CodeBlock language="bash">{`Write Jest tests for NotificationService, filling in the it.todo stubs.
+#file:src/services/notificationService.ts
+#file:tests/unit/notificationService.test.ts
+
+Cover:
+- send() logs a receipt notification and returns a NotificationLog
+- sent notifications are retrievable by userId via getLogsForUser()
+- all three notification types (receipt, order_confirmation, refund) are supported
+- reset() clears all stored notifications
+
+Assert exact returned values — no toBeDefined()/toBeTruthy().`}</CodeBlock>
         </Collapsible>
-        <Collapsible title="Bonus: Add a test summary comment" variant="bonus">
+
+        <Collapsible title="Solution: Filled-in tests" variant="solution">
+          <CodeBlock language="typescript">{`it('logs a receipt notification and returns a NotificationLog', () => {
+  const log = service.send(basePayload);
+
+  expect(log.id).toBeDefined();
+  expect(log.userId).toBe('user-1');
+  expect(log.type).toBe('receipt');
+  expect(log.email).toBe('alice@example.com');
+  expect(log.sentAt).toBeInstanceOf(Date);
+});
+
+it('stores notifications so they can be retrieved by userId', () => {
+  service.send(basePayload);
+  service.send({ ...basePayload, userId: 'user-2' });
+
+  const logs = service.getLogsForUser('user-1');
+  expect(logs).toHaveLength(1);
+  expect(logs[0].userId).toBe('user-1');
+});
+
+it('supports multiple notification types (receipt, order_confirmation, refund)', () => {
+  service.send({ ...basePayload, type: 'order_confirmation' });
+  service.send({ ...basePayload, type: 'refund' });
+
+  const logs = service.getLogsForUser('user-1');
+  expect(logs.map((l) => l.type)).toEqual(['order_confirmation', 'refund']);
+});
+
+it('reset() clears all stored notifications', () => {
+  service.send(basePayload);
+  service.reset();
+
+  expect(service.getLogsForUser('user-1')).toEqual([]);
+});`}</CodeBlock>
+        </Collapsible>
+
+        <Collapsible title="Bonus: Fix the flaky test" variant="bonus">
           <p>
-            Add a step to the workflow that posts a test result summary as a PR
-            comment using <code>actions/github-script</code>. Ask Copilot to
-            generate this step and review whether it handles failures correctly.
+            Ask Copilot: <em>"Why is this test flaky in CI, and how should I
+            fix it?"</em> — it should point out that <code>Date.now()</code>{' '}
+            comparisons are timing-dependent and fail when the runner is
+            slow. Replace the 50 ms window assertion with a type check:
           </p>
+          <CodeBlock language="typescript">{`it('sentAt is a Date instance', () => {
+  const log = service.send(basePayload);
+  expect(log.sentAt).toBeInstanceOf(Date);
+});`}</CodeBlock>
         </Collapsible>
+      </TimedExercise>
       </div>
 
       <div id="cicd-debrief" className="takeaways-section">

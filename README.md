@@ -24,7 +24,7 @@ _Friday, 10 Jul 2026 · Room R2 · 12:15 pm – 2:15 pm WEDT (UTC+02:00)_
 | 13:05 | **Exercise C — API Tests** | Generate Supertest tests for the full checkout pipeline: cart → discount → fraud → payment → notification | 25 min |
 | 13:30 | **Exercise D — Component & E2E Tests** | React Testing Library tests for `StorePage`; Playwright E2E checkout flow (`test.fixme` fill-in) | 20 min |
 | 13:50 | **Exercise E — CI Guardrails** | Coverage gates, flaky test demo, `.github/copilot-instructions.md`, context engineering | 10 min |
-| 14:00 | **Wrap-up & Q&A** | Trust Playbook walkthrough, one action to take back, open discussion | 15 min |
+| 14:00 | **Wrap-up & Q&A** | Trust Framework walkthrough, one action to take back, open discussion | 15 min |
 
 ## Getting Started
 
@@ -108,9 +108,15 @@ workshop-exercises/
     context/domain-rules.md    ← Business rules — attach to Copilot Chat prompts
     skills/unit-testing.md     ← Prompt template + review checklist
   .github/copilot-instructions.md ← Repo-level Copilot behavior standards
-  docs/
-    ai-testing-trust-playbook.md ← Session takeaway
+  docs/tutorials/                 ← Trust framework, guardrails, CI/CD, MCP/skills practice
+    advanced-scenarios.md
+    mcp-skills-practice.md
 ```
+
+All narrative/reference documentation for the workshop lives inside `workshop-exercises/` —
+the root site's `TutorialDetail.tsx` imports `workshop-exercises/docs/tutorials/*.md` directly
+(via Vite's `?raw` loader) and renders it as the site's `/tutorials` pages, so there's a single
+source of truth instead of a copy on each side.
 
 ## Recovery: the `solutions` Branch
 
@@ -130,7 +136,3 @@ git diff master solutions -- workshop-exercises/tests/api/checkout.test.ts
 - **Frontend:** React 18 + Vite (port 3006), React Testing Library, Playwright
 - **Auth:** JWT bearer tokens
 - **API docs:** OpenAPI 3.0 served at `/docs` (Swagger UI)
-
-## License
-
-MIT

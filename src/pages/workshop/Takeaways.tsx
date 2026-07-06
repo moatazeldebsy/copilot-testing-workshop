@@ -129,7 +129,7 @@ const Takeaways: React.FC = () => (
             <td>ESLint rules for test quality (no truthy/falsy, etc.)</td>
           </tr>
           <tr>
-            <td><code>docs/tutorials/</code></td>
+            <td><code>workshop-exercises/docs/tutorials/</code></td>
             <td>Advanced scenarios and MCP/skills practice reference guides</td>
           </tr>
         </tbody>
@@ -162,6 +162,12 @@ const Takeaways: React.FC = () => (
             pipeline. These are the two highest-impact guardrails to add first.
           </p>
         </div>
+      </div>
+
+      <div className="callout callout-info">
+        <strong>Optional take-home reading:</strong>{' '}
+        We did not cover this live, but it is worth a look on your own time:{' '}
+        <Link to="/workshop/ai-testing-patterns">Testing AI-Powered Features</Link>.
       </div>
 
       <div className="callout callout-info" style={{ marginTop: '2rem', textAlign: 'center' }}>

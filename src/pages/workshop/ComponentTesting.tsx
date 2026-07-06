@@ -53,28 +53,32 @@ const ComponentTesting: React.FC = () => (
 
       <h2>The Component Under Test — StorePage</h2>
       <p>
-        <code>StorePage</code> renders the product catalog, handles "Add to Cart"
-        interactions, and shows the current cart. It fetches products from{' '}
-        <code>/api/products</code> and posts cart updates to the checkout pipeline.
+        <code>StorePage</code> renders a static product catalog, handles "Add to
+        Cart" interactions, and shows the current cart. It posts cart updates,
+        promo codes, and payment steps to the checkout pipeline via <code>fetch</code>.
       </p>
       <CodeBlock language="typescript">{`// src/ui/pages/StorePage.tsx (abbreviated)
 // Props the component accepts:
 interface StorePageProps {
   userId: string;
+  userEmail: string;
   token: string;
+  onLogout: () => void;
 }
 
 // What it renders:
-// - A product list with one "Add" button per product (data-testid="add-{productId}")
+// - A static product list (no fetch on mount) with one "Add" button per
+//   product (data-testid="add-{productId}")
 // - A cart section (data-testid="cart-items") showing added item names
-// - fetch() is used for both product loading and cart updates`}</CodeBlock>
+// - fetch() is used for cart updates, promo application, and payment —
+//   never for loading the product list`}</CodeBlock>
 
       <h2 id="component-generate">Step 1 — Generate StorePage Tests with Copilot</h2>
       <p>Select <code>StorePage.tsx</code>, open Copilot Chat, and use this prompt:</p>
       <CodeBlock language="bash">{`Write React Testing Library + Jest tests for StorePage.
 #file:src/ui/pages/StorePage.tsx
 
-Props: userId (string), token (string)
+Props: userId (string), userEmail (string), token (string), onLogout (() => void)
 The component:
 - renders a product list with Add buttons (one per product)
 - each Add button has data-testid="add-{productId}"
@@ -116,10 +120,15 @@ export function mockFetchOnce(body: unknown, status = 200) {
       <CodeBlock language="typescript">{`// tests/components/StorePage.test.tsx  (Copilot-generated — review required)
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { StorePage } from '../../src/ui/pages/StorePage';
+import StorePage from '../../src/ui/pages/StorePage';
 import { buildCartItem, mockFetchOnce } from '../factories';
 
-const props = { userId: 'user-test-01', token: 'test-token' };
+const props = {
+  userId: 'user-test-01',
+  userEmail: 'alice@example.com',
+  token: 'test-token',
+  onLogout: jest.fn(),
+};
 
 describe('StorePage', () => {
   beforeEach(() => {
@@ -130,27 +139,21 @@ describe('StorePage', () => {
     jest.resetAllMocks();
   });
 
-  it('renders products with Add buttons', async () => {
-    mockFetchOnce({ data: { products: [{ id: 'prod_1', name: 'Workshop T-Shirt', price: 25 }] } });
-
+  it('renders products with Add buttons', () => {
     render(<StorePage {...props} />);
 
-    await waitFor(() =>
-      expect(screen.getAllByRole('button', { name: /add/i }).length).toBeGreaterThan(0)
-    );
+    expect(screen.getAllByRole('button', { name: /add/i }).length).toBeGreaterThan(0);
   });
 
   it('shows item name in cart after clicking Add', async () => {
     const user = userEvent.setup();
 
-    // First fetch: load product list
-    mockFetchOnce({ data: { products: [{ id: 'prod_1', name: 'Workshop T-Shirt', price: 25 }] } });
-    // Second fetch: cart update response
+    // Only one fetch happens: the cart update from clicking Add.
+    // The product list is a static array, not fetched.
     mockFetchOnce({ data: { items: [buildCartItem()] } });
 
     render(<StorePage {...props} />);
 
-    await waitFor(() => screen.getByTestId('add-prod_1'));
     await user.click(screen.getByTestId('add-prod_1'));
 
     await waitFor(() =>
@@ -193,7 +196,9 @@ Tests: 2 passed, 2 total`}</VerifyBlock>
           problems and generate an improved version:
         </p>
         <CodeBlock language="typescript">{`it('adds item to cart', async () => {
-  const { container } = render(<StorePage userId="u1" token="tok" />);
+  const { container } = render(
+    <StorePage userId="u1" userEmail="a@b.com" token="tok" onLogout={() => {}} />
+  );
 
   fireEvent.click(container.querySelector('.add-button'));
 
@@ -213,7 +218,14 @@ Tests: 2 passed, 2 total`}</VerifyBlock>
   mockFetchOnce({ data: { products: [{ id: 'prod_1', name: 'Workshop T-Shirt', price: 25 }] } });
   mockFetchOnce({ data: { items: [buildCartItem()] } });
 
-  render(<StorePage userId="user-test-01" token="test-token" />);
+  render(
+    <StorePage
+      userId="user-test-01"
+      userEmail="alice@example.com"
+      token="test-token"
+      onLogout={jest.fn()}
+    />
+  );
 
   await waitFor(() => screen.getByTestId('add-prod_1'));
   await user.click(screen.getByTestId('add-prod_1'));
