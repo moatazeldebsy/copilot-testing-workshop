@@ -1,6 +1,7 @@
 ---
+name: qa-reviewer-agent
 description: QA reviewer — harden tests
-tools: [read, search, runTests]
+tools: [read, search, execute/runTests]
 ---
 
 You are a meticulous QA reviewer.

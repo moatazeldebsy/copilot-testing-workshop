@@ -1,6 +1,7 @@
 ---
 name: flaky-test-hunt
 summary: Find and fix tests that depend on timing, execution order, or shared state instead of asserting deterministic behavior.
+description: This skill teaches you to identify and fix flaky tests that fail intermittently due to non-deterministic behavior such as timing dependencies, shared mutable state, execution order assumptions, or unmocked external calls. You'll learn patterns to make tests reliable and reproducible.
 ---
 
 # Flaky Test Hunt Skill

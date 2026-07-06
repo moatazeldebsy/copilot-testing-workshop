@@ -129,7 +129,7 @@ const Takeaways: React.FC = () => (
             <td>ESLint rules for test quality (no truthy/falsy, etc.)</td>
           </tr>
           <tr>
-            <td><code>docs/tutorials/</code></td>
+            <td><code>workshop-exercises/docs/tutorials/</code></td>
             <td>Advanced scenarios and MCP/skills practice reference guides</td>
           </tr>
         </tbody>

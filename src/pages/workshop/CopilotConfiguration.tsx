@@ -235,17 +235,20 @@ const CopilotConfiguration: React.FC = () => (
             <td>Packages a proven prompt as a file the whole team can run with a slash command (for example <code>/generate-tests</code>) instead of retyping it</td>
           </tr>
           <tr>
-            <td><code>.github/chatmodes/*.chatmode.md</code></td>
-            <td>Custom chat persona</td>
-            <td>Defines a scoped persona with its own instructions and a limited tool list — a specialist you summon instead of a generalist you nudge</td>
-          </tr>
-          <tr>
             <td><code>.github/agents/*.agent.md</code></td>
-            <td>Selectable agent persona</td>
-            <td>A full agent-mode persona with its own tools and (optionally) preferred model, chosen from the VS Code agents dropdown or <code>/agents</code> — or run as a cloud background agent from <code>github.com/copilot/agents</code>. Distinct from a chat mode: it can act end-to-end (edit files, run tests), not just converse</td>
+            <td>Selectable persona</td>
+            <td>A scoped persona with its own instructions, tool list, and (optionally) preferred model, chosen from the VS Code agents dropdown or <code>/agents</code> — or run as a cloud background agent from <code>github.com/copilot/agents</code>. Restrict its tools (read/search only, no edit) for a review-only persona, or grant edit + run for one that acts end-to-end</td>
           </tr>
         </tbody>
       </table>
+      <p className="page-lead" style={{ fontSize: '0.95rem' }}>
+        <strong>Terminology change:</strong> Copilot used to split this into two file types —
+        <code>.chatmode.md</code> for a converse-only persona and <code>.agent.md</code> for one that
+        could edit and run commands. VS Code has since unified both under <code>.github/agents/*.agent.md</code>;
+        an old <code>.chatmode.md</code> file now surfaces a rename warning and should be moved. What
+        distinguishes a review-only persona from an end-to-end one is no longer the file extension —
+        it's the <code>tools</code> list in its frontmatter.
+      </p>
 
       <h3>Prompt Files</h3>
       <p>
@@ -270,53 +273,66 @@ Write Jest tests for \${file}.
         gets the same prompt, not whatever each person happened to type.
       </p>
 
-      <h3>Custom Chat Modes</h3>
+      <h3>Review-Only Agents (Read/Search/Run, No Edit)</h3>
       <p>
-        A chat mode restricts Copilot to a persona with its own instructions
-        and a limited tool list — useful when you want a reviewer that can
-        read and run tests but never write feature code:
+        Restrict an agent's <code>tools</code> to read, search, and run-test capabilities
+        — no <code>edit</code> — and you get a reviewer that can inspect and execute the
+        suite but never touch feature code:
       </p>
-      <CodeBlock language="markdown">{`// .github/chatmodes/qa-reviewer.chatmode.md
+      <CodeBlock language="markdown">{`// .github/agents/qa-reviewer.agent.md
 ---
+name: qa-reviewer-agent
 description: QA reviewer — harden tests
-tools: [read, search, runTests]
+tools: [read, search, execute/runTests]
 ---
 
 You are a meticulous QA reviewer.
 Critique tests for weak assertions and flaky patterns; suggest fixes. Do not
 write feature code.`}</CodeBlock>
       <p>
-        Select it from the chat mode dropdown alongside the built-in Ask,
-        Agent, and Plan modes. Granting only the tools a task needs (read,
-        search, run tests — no file edits) limits the blast radius if the
-        model goes off track.
+        Select it from the agents dropdown alongside the built-in Ask, Agent, and Plan
+        modes. Granting only the tools a task needs (read, search, run tests — no file
+        edits) limits the blast radius if the model goes off track. Note the tool names
+        here are VS Code's fully-qualified provider IDs (<code>execute/runTests</code>,
+        not just <code>runTests</code>) — VS Code resolves generic names to these on save,
+        so don't be surprised when your own frontmatter gets rewritten.
       </p>
 
-      <h3>Custom Agents</h3>
+      <h3>End-to-End Agents (Read/Search/Edit/Run)</h3>
       <p>
-        A custom agent goes further than a chat mode: it's a full agent-mode
-        persona with its own tools, an optional preferred model, and its own
-        validation command — it can read, edit, and run tests end-to-end
-        instead of just critiquing in conversation. Define one as an{' '}
-        <code>.agent.md</code> file under <code>.github/agents/</code>:
+        Add <code>edit</code> to the tool list and the same persona can act end-to-end —
+        read, edit, and run tests — instead of just critiquing in conversation. Define one
+        as an <code>.agent.md</code> file under <code>.github/agents/</code>:
       </p>
       <CodeBlock language="markdown">{`// .github/agents/unit-test.agent.md
 ---
 name: unit-test-agent
 description: Generates and hardens unit tests for pure functions and services.
-tools: [read, search, edit, runTests]
+tools: [read, azure-mcp/search, edit, execute/runTests, vscodeGeneral/runTests]
 ---
 
-You are a focused unit-testing agent.
-Scope: pure functions/services in src/services/. Do not modify files under src/.
-Avoid weak assertions (toBeTruthy, toBeDefined) when a specific value can be checked.
-Run npm run test:unit before reporting a task complete.`}</CodeBlock>
+You are a focused unit-testing agent for \`workshop-exercises\`.
+
+## Scope
+\`calculateDiscount\` and other pure functions/services in \`src/services/\`.
+
+## Rules
+- Do not modify files under \`src/\`.
+- One behavior per test, named for the behavior it proves.
+- Avoid weak assertions (\`toBeTruthy\`, \`toBeDefined\`) when a specific value can be checked.
+- Reuse shared factories from \`tests/factories.ts\` instead of inlining fixture data.
+
+## Validation
+Run \`npm run test:unit\` before reporting a task complete. Report findings first,
+then the patch summary.`}</CodeBlock>
       <p>
         Pick it from the agents dropdown in Chat, or type <code>/agents</code>{' '}
         to open the agent picker. Because it's checked into the repo, the
         whole team gets the same tool restrictions and validation command —
         and organizations can define shared agents once in <code>.github</code>{' '}
-        for every repository to pick up.
+        for every repository to pick up. The <code>api-test-agent</code> and{' '}
+        <code>e2e-test-agent</code> follow the same Scope/Rules/Validation shape, scoped
+        to <code>npm run test:api</code> and <code>npm run test:e2e</code> respectively.
       </p>
 
       <p>
@@ -337,19 +353,17 @@ Run npm run test:unit before reporting a task complete.`}</CodeBlock>
           run with <code>/generate-tests</code>.
         </li>
         <li>
-          <code>workshop-exercises/.github/chatmodes/qa-reviewer.chatmode.md</code> —
-          a review-only persona.
-        </li>
-        <li>
           <code>workshop-exercises/.github/skills/</code> — three reusable playbooks:
           <code>pact-contracts</code> (API contract review), <code>flaky-test-hunt</code>
           (timing/order/shared-state flakiness), and <code>test-generation</code>
           (scaffold tests from a target file).
         </li>
         <li>
-          <code>workshop-exercises/.github/agents/</code> — three tier-scoped agent
-          personas: <code>unit-test-agent</code>, <code>api-test-agent</code>, and{' '}
-          <code>e2e-test-agent</code>, each with its own tools and validation command.
+          <code>workshop-exercises/.github/agents/</code> — four personas:{' '}
+          <code>qa-reviewer-agent</code> (review-only — read/search/run, no edit) plus
+          three tier-scoped agents that act end-to-end: <code>unit-test-agent</code>,{' '}
+          <code>api-test-agent</code>, and <code>e2e-test-agent</code>, each with its own
+          tools and validation command.
         </li>
       </ul>
 
@@ -366,6 +380,7 @@ Run npm run test:unit before reporting a task complete.`}</CodeBlock>
                 <div className="filetree-item">📄 unit-test.agent.md</div>
                 <div className="filetree-item">📄 api-test.agent.md</div>
                 <div className="filetree-item">📄 e2e-test.agent.md</div>
+                <div className="filetree-item">📄 qa-reviewer.agent.md</div>
               </div>
               <div className="filetree-item">📂 .vscode/ → settings.json</div>
               <div className="filetree-item">📂 tests/</div>
@@ -375,7 +390,7 @@ Run npm run test:unit before reporting a task complete.`}</CodeBlock>
         </div>
         <p className="infographic-diagram__caption">
           This isn't just a suggested layout — every file shown here exists in{' '}
-          <code>workshop-exercises/</code> today, including the three agent
+          <code>workshop-exercises/</code> today, including the four agent
           personas under <code>.github/agents/</code>.
         </p>
         <div className="infographic-token-strategy">
@@ -530,13 +545,14 @@ All API tests must:
           Exercise A — is the slash command faster? Less controllable?
         </p>
 
-        <h3>3. Switch to the qa-reviewer chat mode</h3>
+        <h3>3. Switch to the qa-reviewer-agent</h3>
         <p>
-          Select <strong>qa-reviewer</strong> from the chat mode dropdown, then paste in
+          Select <strong>qa-reviewer-agent</strong> from the agents dropdown, then paste in
           your Exercise A test file (or <code>calculateDiscount.weak.test.ts</code>) and
-          ask it to critique the assertions. Since this mode's tools are limited to{' '}
-          <code>[read, search, runTests]</code>, it can inspect and run tests but can't
-          edit your files — does its critique match what you found manually in Exercise B?
+          ask it to critique the assertions. Since this persona's tools are limited to{' '}
+          <code>[read, search, execute/runTests]</code>, it can inspect and run tests but
+          can't edit your files — does its critique match what you found manually in
+          Exercise B?
         </p>
 
         <h3>4. Try one of the three skills</h3>
@@ -601,8 +617,7 @@ All API tests must:
             <li><strong>MCP servers</strong> plug Copilot into external tools (GitHub, Playwright, databases, CI) via <code>.vscode/mcp.json</code>.</li>
             <li><strong>Customization files</strong> (<code>.github/copilot-instructions.md</code>, <code>*.instructions.md</code>, <code>AGENTS.md</code>) bake your conventions into every response — no re-typing the same prompt.</li>
             <li><strong>Prompt files</strong> (<code>.github/prompts/*.prompt.md</code>) package a proven prompt as a team-wide slash command.</li>
-            <li><strong>Custom chat modes</strong> (<code>*.chatmode.md</code>) scope a persona to a limited, reviewed tool list — a specialist you summon, not a generalist you nudge.</li>
-            <li><strong>Custom agents</strong> (<code>.github/agents/*.agent.md</code>) go a step further than chat modes — a selectable, tool-equipped persona that can edit files and run its own validation command end-to-end, locally or as a cloud background agent.</li>
+            <li><strong>Custom agents</strong> (<code>.github/agents/*.agent.md</code>) are a selectable, tool-equipped persona — restrict <code>tools</code> to read/search/run for a review-only specialist, or add <code>edit</code> for one that acts end-to-end and runs its own validation command, locally or as a cloud background agent. (<code>.chatmode.md</code> files are the old, now-deprecated form of this — VS Code renamed chat modes to agents.)</li>
             <li>Nested <code>AGENTS.md</code> files let different test layers (unit, API, E2E) have different agent personas — the nearest file wins.</li>
             <li>Repo-wide instructions and AGENTS.md are passive context — verify Copilot is actually honoring them by asking it to state a convention it was never shown directly.</li>
             <li>Layer context by cost: tiny always-loaded files, medium role-scoped docs, large on-demand skill playbooks.</li>

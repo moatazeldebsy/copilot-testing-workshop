@@ -1,10 +1,91 @@
 # Advanced Scenarios: Guardrails, CI/CD, and Team Adoption
 
-This guide covers the patterns needed to use GitHub Copilot for testing responsibly at team scale: guardrail prompt templates, CI/CD integration, and phased adoption.
+This guide covers the patterns needed to use GitHub Copilot for testing responsibly at team scale: a trust framework for judging AI-generated tests, guardrail prompt templates, CI/CD integration, and phased adoption.
 
-## 1. Guardrail Prompt Templates
+## 1. The Trust Framework
 
-When Copilot's output fails your review checklist, use these follow-up prompts in Chat to self-correct:
+AI assistants are optimistic writers. They generate tests that make code *look* tested — high counts, readable names, green CI — while missing the edge cases that matter in production. This section gives you the vocabulary and tools to catch that gap before it ships.
+
+### The Trust Ladder
+
+```
+Level 0 — No tests
+Level 1 — Tests exist (coverage metric passes)
+Level 2 — Tests are deterministic (no flakiness)
+Level 3 — Tests catch real bugs (mutation score > 0)
+Level 4 — Tests encode domain rules (not just happy paths)
+Level 5 — Tests serve as living documentation
+```
+
+AI gets you quickly to Level 1–2. The workshop focuses on reaching Level 3–4.
+
+### Prompting patterns that work
+
+**Pattern 1 — Specify exact assertions**
+
+```
+Write tests for calculateDiscount().
+For SAVE10 on $100, assert discountAmount is exactly 10, not "truthy".
+For FLAT5 on $15 (below $20 minimum), assert discountAmount is exactly 0.
+```
+
+**Pattern 2 — Attach domain rules as context**
+
+```
+#file:.copilot/context/domain-rules.md
+Generate tests that cover every invariant in the discount rules table.
+```
+
+**Pattern 3 — Ask for the adversarial case**
+
+```
+What inputs would break calculateDiscount() if there's a bug in the
+percent calculation? Write tests that would catch that bug.
+```
+
+**Pattern 4 — Review, don't just accept**
+
+```
+Review these AI-generated tests:
+[paste tests]
+Identify: weak assertions, missing edge cases, missing negative paths.
+Rewrite the weak ones.
+```
+
+### The five questions for every AI-generated test file
+
+1. **Would this test fail if the function returned the wrong number?**
+   Run a quick mental mutation: change `/ 100` to `/ 10`. Does the test catch it?
+2. **Is every error code reachable from the tests?**
+   Count the `ApiError` codes in the source. Count the tests that trigger them. They should match.
+3. **Is there a test that passes on an empty or zero-value input?**
+   AI rarely tests `{ subtotal: 0 }` or `{ items: [] }`.
+4. **Are any assertions trivially true?**
+   `expect(a - b).toBeLessThan(a)` is always true when `b > 0`. That's not a test.
+5. **Would this test suite serve as documentation for a new engineer?**
+   If the source file were deleted, could someone reconstruct the behaviour from the tests alone?
+
+**Key takeaways:**
+
+- **Copilot writes fast; you write correctly.** Use it for speed, apply your judgement for quality.
+- **Coverage ≠ confidence.** 100% coverage with weak assertions is worse than 60% with strong ones — it creates false safety.
+- **Context is leverage.** The more domain rules you give Copilot, the better its tests. Invest in `.copilot/context/`.
+- **Make the first test fail.** Before trusting any AI-generated test, temporarily break the function and confirm the test catches it.
+
+---
+
+## 2. Anti-Patterns and Guardrail Prompts
+
+When Copilot's output fails your review checklist, use these follow-up prompts in Chat to self-correct.
+
+| Anti-pattern | Why it's dangerous | Fix |
+|---|---|---|
+| `expect(x).toBeDefined()` / `toBeTruthy()` | Passes even when x has the wrong value; 0 and '' are falsy but valid return values | Assert the exact value, e.g. `.toBe(0)` |
+| Only happy-path tests | All error paths untested | One test per error code |
+| Mock the function under test | Tests the mock, not the code | Only mock dependencies |
+| `Date.now()` / `Math.random()` in assertions | Non-deterministic, fails under CI load | Mock time with `jest.useFakeTimers()`; use fixed seeds |
+| `expect(fn).not.toThrow()` alone | Ignores the return value entirely | Also assert the return value |
+| Mocked dependency called with any args | Doesn't verify correct usage | Assert exact call arguments |
 
 ### Fix Vague Assertions
 
@@ -53,7 +134,7 @@ List all issues found with line numbers.
 
 ---
 
-## 2. ESLint Rules for AI-Generated Test Quality
+## 3. ESLint Rules for AI-Generated Test Quality
 
 This exercises repo does not ship an ESLint config today — the block below is a
 suggested starting point if you want to add one to catch common Copilot output
@@ -82,7 +163,7 @@ export default [
 
 ---
 
-## 3. CI/CD Pipeline with AI Guardrails
+## 4. CI/CD Pipeline with AI Guardrails
 
 Policy baseline: AI-generated code must pass the exact same gates as human-written code.
 
@@ -152,7 +233,7 @@ It runs build + coverage-gated tests, nothing more. Lint and secret-scanning are
 part of it — if you want those guardrails, add steps like these yourself:
 
 ```yaml
-      # Add after "Install dependencies" once you have an eslint.config.js (see section 2)
+      # Add after "Install dependencies" once you have an eslint.config.js (see section 3)
       - name: Lint
         run: npx eslint .
 
@@ -193,9 +274,34 @@ const config: Config = {
 export default config;
 ```
 
+### Additional guardrails worth adding
+
+Beyond the coverage gate this repo already enforces, consider:
+
+- **No `.only` or `.skip`** in merged tests (Copilot sometimes leaves these behind).
+- **Deterministic seed** for any random data in fixtures.
+- **Mutation testing** on critical business logic (`calculateDiscount`, `fraudService`) —
+  a coverage percentage says a line ran, not that a wrong result would be caught.
+- **Snapshot drift policy**: snapshots reviewed in every PR, not auto-approved.
+- **Per-file coverage overrides** for the highest-risk modules:
+
+```json
+"coverageThreshold": {
+  "global": {
+    "lines": 80,
+    "branches": 80,
+    "functions": 80
+  },
+  "./src/services/calculateDiscount.ts": {
+    "lines": 100,
+    "branches": 100
+  }
+}
+```
+
 ---
 
-## 4. CODEOWNERS for AI-Generated Tests
+## 5. CODEOWNERS for AI-Generated Tests
 
 This repo doesn't have a CODEOWNERS file today. If your team wants mandatory
 reviewer routing for test changes, add one like this:
@@ -210,13 +316,14 @@ src/**/*.spec.ts  @your-org/qa-leads
 
 ---
 
-## 5. PR Template
+## 6. PR Template
 
 The real `workshop-exercises/.github/pull_request_template.md`:
 
 ```markdown
 <!--
-Reviewing AI-generated tests checklist (see docs/ai-testing-trust-playbook.md).
+Reviewing AI-generated tests checklist (see this tutorial's Trust Framework
+and Anti-Patterns sections above).
 Treat every generated test like a pull request from a junior teammate.
 -->
 
@@ -279,7 +386,7 @@ jobs:
 
 ---
 
-## 6. Sandboxes and Safe Agent Execution
+## 7. Sandboxes and Safe Agent Execution
 
 As Copilot becomes more agentic, test workflows increasingly involve command execution, file edits, and tool usage. Sandboxes are the safest way to let Copilot act without giving unrestricted access to your machine.
 
@@ -308,7 +415,7 @@ copilot --cloud
 
 ---
 
-## 7. Team Adoption: Phased Rollout
+## 8. Team Adoption: Phased Rollout
 
 | Phase | Timeline | Actions | Success Criteria |
 |---|---|---|---|
@@ -319,7 +426,7 @@ copilot --cloud
 
 ---
 
-## 8. What to Measure
+## 9. What to Measure
 
 Coverage % is not enough. Track these metrics before and after Copilot adoption:
 
@@ -333,7 +440,7 @@ Coverage % is not enough. Track these metrics before and after Copilot adoption:
 
 ---
 
-## 9. Conference-Safe Live Demo Runbook (Fail-First)
+## 10. Conference-Safe Live Demo Runbook (Fail-First)
 
 Use this exact sequence to demonstrate responsible AI usage with minimal risk:
 

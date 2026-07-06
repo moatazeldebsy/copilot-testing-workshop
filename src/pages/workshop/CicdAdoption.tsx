@@ -217,7 +217,8 @@ src/**/*.spec.ts          @your-org/qa-leads`}</CodeBlock>
         the exercises repository — not just an illustration:
       </p>
       <CodeBlock language="markdown">{`<!--
-Reviewing AI-generated tests checklist (see docs/ai-testing-trust-playbook.md).
+Reviewing AI-generated tests checklist (see the workshop site's Advanced Scenarios
+tutorial — Trust Framework and Anti-Patterns sections — at /tutorials/advanced-scenarios).
 Treat every generated test like a pull request from a junior teammate.
 -->
 
