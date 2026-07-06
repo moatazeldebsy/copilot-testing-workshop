@@ -3,6 +3,8 @@ import Layout from '../../components/Layout';
 import CodeBlock from '../../components/CodeBlock';
 import PageMeta from '../../components/PageMeta';
 import ArchDiagram from '../../components/ArchDiagram';
+import TimedExercise from '../../components/TimedExercise';
+import Collapsible from '../../components/Collapsible';
 
 const CopilotConfiguration: React.FC = () => (
   <Layout>
@@ -452,6 +454,72 @@ All API tests must:
         </div>
         <p className="infographic-diagram__caption">Nested AGENTS.md files let you define different agent personas at each level of your test hierarchy — unit, API, E2E. The nearest file in the directory tree takes precedence.</p>
       </div>
+
+      <TimedExercise minutes={20} title="Hands-on: Put the Configuration Files to Work">
+        <p>
+          Everything above is easy to nod along to and never actually use. All four
+          mechanisms already exist in <code>workshop-exercises/</code> — spend a few
+          minutes actually invoking each one instead of just reading about it.
+        </p>
+
+        <h3>1. Run the prompt file</h3>
+        <p>
+          In Copilot Chat, type <code>/generate-tests</code> and target a file that has no
+          tests yet, e.g. <code>#file:src/services/paymentService.ts</code>. Compare the
+          output to what you'd get from a hand-written Chat prompt like the ones in
+          Exercise A — is the slash command faster? Less controllable?
+        </p>
+
+        <h3>2. Switch to the qa-reviewer chat mode</h3>
+        <p>
+          Select <strong>qa-reviewer</strong> from the chat mode dropdown, then paste in
+          your Exercise A test file (or <code>calculateDiscount.weak.test.ts</code>) and
+          ask it to critique the assertions. Since this mode's tools are limited to{' '}
+          <code>[read, search, runTests]</code>, it can inspect and run tests but can't
+          edit your files — does its critique match what you found manually in Exercise B?
+        </p>
+
+        <h3>3. Try one of the three skills</h3>
+        <p>Pick whichever matches something you already have open:</p>
+        <ul>
+          <li>
+            <strong>test-generation</strong> — run its recommended prompt against{' '}
+            <code>src/services/cartService.ts</code> (same target as the Exercise A unit-testing
+            bonus) and compare the result to the <code>.copilot/skills/unit-testing.md</code>{' '}
+            template's output
+          </li>
+          <li>
+            <strong>pact-contracts</strong> — run its recommended prompt against your
+            Exercise C <code>checkout.test.ts</code>, attaching <code>#file:src/app.ts</code>{' '}
+            as the route contract; see if it catches anything your manual review missed
+          </li>
+          <li>
+            <strong>flaky-test-hunt</strong> — open{' '}
+            <code>tests/unit/notificationService.test.ts</code> and look at the test marked{' '}
+            🚨 FLAKY. Use the skill's recommended prompt to have Copilot explain the fix —
+            but per the file's own comment, don't actually apply it; it's left flaky on
+            purpose for Exercise E's CI discussion
+          </li>
+        </ul>
+
+        <h3>4. Verify AGENTS.md is actually being read</h3>
+        <p>
+          AGENTS.md is passive context, not something you run — so the way to "use" it is to
+          confirm Copilot is actually honoring it. In Copilot Chat, with a file under{' '}
+          <code>tests/unit/</code> open, ask: <em>"What are you not allowed to modify while
+          working in this folder, and why?"</em>
+        </p>
+        <Collapsible title="What a correct answer looks like" variant="hint">
+          <p>
+            <code>tests/unit/AGENTS.md</code> states <em>"Do not modify files under{' '}
+            <code>src/</code>."</em> If Copilot's answer reflects that constraint without you
+            having pasted the file into the conversation, that's the nested AGENTS.md being
+            picked up automatically based on which file you have open — confirming the
+            "nearest file wins" behavior from the diagram above. If it doesn't mention this,
+            check that you're not in a chat mode that ignores repo context.
+          </p>
+        </Collapsible>
+      </TimedExercise>
 
       <div id="config-debrief" className="takeaways-section">
         <h2>Key Takeaways</h2>

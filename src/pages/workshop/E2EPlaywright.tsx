@@ -64,12 +64,20 @@ const E2EPlaywright: React.FC = () => (
         generates the boilerplate well; you provide the real selector knowledge.
       </p>
 
+      <div className="callout callout-warning">
+        <strong>⚠️ This app auto-logs-in on first load</strong> — <code>WorkshopApp.tsx</code>{' '}
+        automatically signs in as <code>alice@example.com</code> if no token is stored and the
+        user hasn't explicitly signed out. Clear <code>localStorage</code> (or set{' '}
+        <code>workshop-signed-out=true</code>) at the start of any test that needs to see the
+        login form — otherwise the app may skip straight to <code>/store</code>.
+      </div>
+
       <h2>Step 1 — Generate a Login Page Object</h2>
       <p>Use this prompt in Copilot Chat:</p>
       <CodeBlock language="bash">{`Generate a Playwright Page Object for a login page.
 The page has: an email input (#email), a password input (#password),
 a submit button (role=button, name="Sign in"), and an error alert (.error-message).
-Use TypeScript. Include: fill(), submit(), getErrorMessage(), and waitForDashboard() methods.`}</CodeBlock>
+Use TypeScript. Include: fill(), submit(), getErrorMessage(), and waitForStore() methods.`}</CodeBlock>
 
       <h2>Step 2 — Review the Generated Page Object</h2>
       <CodeBlock language="typescript">{`// tests/e2e/pages/LoginPage.ts  (Copilot-generated — review required)
@@ -108,8 +116,8 @@ export class LoginPage {
     return this.errorMessage.innerText();
   }
 
-  async waitForDashboard() {
-    await this.page.waitForURL('/dashboard');
+  async waitForStore() {
+    await this.page.waitForURL('/store');
   }
 }`}</CodeBlock>
 
@@ -118,16 +126,17 @@ export class LoginPage {
         <ul>
           <li>Do selectors use <code>getByRole</code> / <code>getByLabel</code> before falling back to CSS classes?</li>
           <li>Are role-based locators used where possible (more resilient to UI changes)?</li>
-          <li>Does <code>waitForDashboard()</code> use URL assertion rather than an arbitrary wait?</li>
+          <li>Does <code>waitForStore()</code> use URL assertion rather than an arbitrary wait?</li>
           <li>Are locators declared as <code>readonly</code> to prevent accidental reassignment?</li>
         </ul>
       </div>
 
       <h2>Step 3 — Generate E2E Tests Using the Page Object</h2>
       <CodeBlock language="bash">{`Write Playwright tests for the login flow using the LoginPage page object.
-Test: successful login redirects to /dashboard, wrong password shows error,
-empty email shows validation message.
-Use @playwright/test. Use test.beforeEach to navigate to /login.`}</CodeBlock>
+Test: successful login redirects to /store, wrong password shows error,
+empty email also shows an error (there is no client-side required-field validation —
+submitting blank calls the login API and it responds with an error).
+Use @playwright/test. Use test.beforeEach to clear localStorage, then navigate to /login.`}</CodeBlock>
 
       <CodeBlock language="typescript">{`// tests/e2e/login.spec.ts  (Copilot-generated — review required)
 import { test, expect } from '@playwright/test';
@@ -137,16 +146,21 @@ test.describe('Login flow', () => {
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {
+    // Prevent the app's auto-login from skipping past the login form
+    await page.addInitScript(() => {
+      window.localStorage.setItem('workshop-signed-out', 'true');
+    });
+
     loginPage = new LoginPage(page);
     await loginPage.goto();
   });
 
-  test('successful login redirects to dashboard', async ({ page }) => {
-    await loginPage.fill('alice@example.com', 'correct-password');
+  test('successful login redirects to the store', async ({ page }) => {
+    await loginPage.fill('alice@example.com', 'workshop-password');
     await loginPage.submit();
-    await loginPage.waitForDashboard();
+    await loginPage.waitForStore();
 
-    await expect(page).toHaveURL('/dashboard');
+    await expect(page).toHaveURL('/store');
   });
 
   test('wrong password shows error message', async () => {
@@ -157,11 +171,14 @@ test.describe('Login flow', () => {
     expect(error).toMatch(/invalid credentials/i);
   });
 
-  test('empty email shows validation', async ({ page }) => {
+  test('empty email shows an error', async () => {
+    // No client-side required-field validation exists — submitting blank
+    // still calls the login API, which rejects it.
     await loginPage.fill('', 'some-password');
     await loginPage.submit();
 
-    await expect(page.locator('#email')).toBeFocused();
+    const error = await loginPage.getErrorMessage();
+    expect(error).toBeTruthy();
   });
 });`}</CodeBlock>
 
@@ -173,6 +190,27 @@ test.describe('Login flow', () => {
         page, interact with the UI, and capture evidence before generating or
         repairing tests.
       </p>
+
+      <h3>Step 0 — Install and enable the MCP server</h3>
+      <p>
+        This repo already ships <code>.vscode/mcp.json</code>, pointing at{' '}
+        <code>npx @playwright/mcp@latest</code> — <code>npx</code> downloads it on first run,
+        so no separate <code>npm install</code> is needed. You do need to turn it on in your editor:
+      </p>
+      <ol>
+        <li>Open Copilot Chat and switch to <strong>Agent mode</strong> (MCP tools are only available there, not in Ask/Edit mode)</li>
+        <li>VS Code should detect <code>.vscode/mcp.json</code> and prompt to start the <code>playwright</code> server —
+          click <strong>Start</strong> (or run <em>MCP: List Servers</em> from the Command Palette and start it manually)</li>
+        <li>Confirm it's live: the Chat tool picker (🔧 icon) should now list Playwright tools
+          (<code>browser_navigate</code>, <code>browser_click</code>, <code>browser_snapshot</code>, etc.)</li>
+        <li>Make sure the app is actually running (<code>npm run dev</code>) — the MCP server drives a
+          real browser against <code>http://127.0.0.1:3006</code>, it doesn't read your source code</li>
+      </ol>
+      <div className="callout callout-info">
+        First launch can take a few seconds while <code>npx</code> downloads the package — if the tool
+        picker looks empty right after starting, wait a moment and reopen it.
+      </div>
+
       <CodeBlock language="text">{`Using the Playwright MCP server, open the login page in the running app.
 Inspect the form fields and submit button, then click Sign in with invalid credentials.
 Tell me:
@@ -208,14 +246,14 @@ export const test = base.extend<AuthFixtures>({
   authenticatedPage: async ({ page }, use) => {
     // Log in via API to avoid UI login overhead in every test
     const response = await page.request.post('/api/auth/login', {
-      data: { email: 'test@example.com', password: process.env.TEST_PASSWORD },
+      data: { email: 'alice@example.com', password: 'workshop-password' },
     });
     expect(response.status()).toBe(200);
 
-    const { token } = await response.json();
+    const { data } = await response.json();
     await page.addInitScript((t) => {
-      localStorage.setItem('auth_token', t);
-    }, token);
+      localStorage.setItem('workshop-auth-token', t);
+    }, data.token);
 
     await use(page);
   },
@@ -254,23 +292,22 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22.12'
           cache: 'npm'
 
       - run: npm ci
       - run: npx playwright install --with-deps chromium
 
-      - name: Build app
-        run: npm run build
+      - name: Start API and web dev servers
+        # This app is a live Express API + React frontend, not a static
+        # build — E2E tests need both servers running, matching local dev.
+        run: npm run dev &
 
-      - name: Start preview server
-        run: npx serve dist -p 4173 &
+      - name: Wait for servers to be ready
+        run: npx wait-on http://127.0.0.1:3006 http://127.0.0.1:4000/api/health
 
       - name: Run E2E tests
         run: npx playwright test
-        env:
-          BASE_URL: http://localhost:4173
-          TEST_PASSWORD: \${{ secrets.TEST_PASSWORD }}
 
       - name: Upload test report
         if: failure()
@@ -281,11 +318,38 @@ jobs:
 
       <VerifyBlock>{`Running 3 tests using 1 worker
 
-  ✓ login.spec.ts:11:3 › Login flow › successful login redirects to dashboard (1.2s)
-  ✓ login.spec.ts:19:3 › Login flow › wrong password shows error message (0.8s)
-  ✓ login.spec.ts:26:3 › Login flow › empty email shows validation (0.6s)
+  ✓ login.spec.ts:14:3 › Login flow › successful login redirects to the store (1.2s)
+  ✓ login.spec.ts:22:3 › Login flow › wrong password shows error message (0.8s)
+  ✓ login.spec.ts:29:3 › Login flow › empty email shows an error (0.6s)
 
   3 passed (3.2s)`}</VerifyBlock>
+
+      <h2>Part E — The Real Exercise: Checkout Flow</h2>
+      <p>
+        <code>tests/e2e/checkout.spec.ts</code> has four <code>test.fixme</code> placeholders
+        covering the full store journey — login, add to cart, apply a discount, and complete
+        checkout. Use Copilot Chat with <code>#file:src/ui/pages/LoginPage.tsx</code> and{' '}
+        <code>#file:src/ui/pages/StorePage.tsx</code> attached to fill them in, then run:
+      </p>
+      <CodeBlock language="bash">{`npx playwright test tests/e2e/checkout.spec.ts`}</CodeBlock>
+      <VerifyBlock>{`Running 4 tests using 1 worker
+
+  ✓ checkout.spec.ts:19:3 › Store checkout flow › user can log in and see the store (249ms)
+  ✓ checkout.spec.ts:30:3 › Store checkout flow › user can add an item to the cart (268ms)
+  ✓ checkout.spec.ts:39:3 › Store checkout flow › user can apply a discount code (389ms)
+  ✓ checkout.spec.ts:57:3 › Store checkout flow › user completes checkout and sees confirmation (305ms)
+
+  4 passed (1.8s)`}</VerifyBlock>
+      <div className="callout callout-info">
+        <strong>🔍 Two things Copilot's first draft commonly gets wrong here:</strong>
+        <ul>
+          <li>Forgetting the <code>workshop-signed-out</code> localStorage flag — without it, the
+            app's auto-login races the test past the login form entirely</li>
+          <li>Reading UI state (like <code>checkout-total</code>) immediately after a click that
+            triggers an async update — use <code>expect.poll(...)</code> or an auto-retrying{' '}
+            <code>expect(locator)</code> assertion instead of a one-shot read-and-compare</li>
+        </ul>
+      </div>
 
       <div id="e2e-exercise">
       <TimedExercise minutes={10} title="Hands-on Challenge">
@@ -309,6 +373,70 @@ jobs:
   this.submitButton = page.getByRole('button', { name: 'Sign in' });
   this.errorMessage = page.getByRole('alert');
 }`}</CodeBlock>
+        </Collapsible>
+      </TimedExercise>
+
+      <TimedExercise minutes={15} title="Bonus: Put It All Together">
+        <p>
+          Parts B, C, and D show patterns (MCP-assisted locator discovery, fixtures,
+          CI) without you actually using them. Pick up all three here — optional,
+          time-permitting.
+        </p>
+
+        <h3>1. Use the Playwright MCP server for real</h3>
+        <p>
+          The Playwright MCP server is already configured in <code>.vscode/mcp.json</code>.
+          Run Part B's prompt against the real login page (<code>http://127.0.0.1:3006/login</code>)
+          instead of just reading it. Report back what Copilot finds.
+        </p>
+        <Collapsible title="Hint: What to check your results against" variant="hint">
+          <ul>
+            <li>Locators should match <code>LoginPage.tsx</code>: <code>#email</code>, <code>#password</code>,
+              a submit button named "Sign in"</li>
+            <li>The error is rendered as <code>&lt;div role="alert"&gt;</code> — confirm Copilot identifies
+              it as an alert, not a generic <code>.error-message</code> class</li>
+            <li>Compare the screenshot Copilot captures against what you see manually in the browser</li>
+          </ul>
+        </Collapsible>
+
+        <h3>2. Create the fixture and actually use it</h3>
+        <p>
+          Create <code>tests/e2e/fixtures.ts</code> using Part C's corrected pattern, then refactor
+          one test in <code>checkout.spec.ts</code> to use <code>authenticatedPage</code> instead of
+          calling <code>loginAsAlice(page)</code>.
+        </p>
+        <Collapsible title="Hint: What changes in the test" variant="hint">
+          <ul>
+            <li>Import <code>test</code> and <code>expect</code> from your new <code>fixtures.ts</code>{' '}
+              instead of <code>@playwright/test</code></li>
+            <li>Replace the test's <code>page</code> fixture parameter with <code>authenticatedPage</code></li>
+            <li>Delete the now-unneeded <code>loginAsAlice(page)</code> call at the top of that test</li>
+            <li>Run it — should still pass, just skip the UI login round-trip</li>
+          </ul>
+        </Collapsible>
+
+        <h3>3. Find one more issue in the CI workflow</h3>
+        <p>
+          Part D's workflow is now fixed to start real dev servers and wait for them —
+          but it still has at least one gap. Find it.
+        </p>
+        <Collapsible title="Hint" variant="hint">
+          <ul>
+            <li>What happens to the <code>npm run dev &amp;</code> background process and the two dev
+              servers when the job ends — is anything explicitly cleaned up?</li>
+            <li>Is the Playwright HTML report uploaded on <em>every</em> run, or only on failure — would
+              you want to see it on a passing run too sometimes?</li>
+          </ul>
+        </Collapsible>
+        <Collapsible title="One reasonable answer" variant="solution">
+          <p>
+            Background jobs are killed automatically when the runner's VM is torn down at the end of
+            the job, so explicit cleanup isn't required in GitHub Actions — but it's worth calling out
+            in review since it would matter in a longer-lived environment (e.g. a self-hosted runner).
+            For the report: uploading only <code>if: failure()</code> is a reasonable default to keep
+            artifact storage down, but change it to <code>if: always()</code> if you also want traces
+            from flaky-but-passing runs.
+          </p>
         </Collapsible>
       </TimedExercise>
       </div>

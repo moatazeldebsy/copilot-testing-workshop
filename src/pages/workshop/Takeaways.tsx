@@ -168,6 +168,12 @@ const Takeaways: React.FC = () => (
         </div>
       </div>
 
+      <div className="callout callout-info">
+        <strong>Optional take-home reading:</strong>{' '}
+        We did not cover this live, but it is worth a look on your own time:{' '}
+        <Link to="/workshop/ai-testing-patterns">Testing AI-Powered Features</Link>.
+      </div>
+
       <div className="callout callout-info" style={{ marginTop: '2rem', textAlign: 'center' }}>
         <strong>Thank you for attending!</strong>
         <br />

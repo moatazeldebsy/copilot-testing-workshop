@@ -279,16 +279,50 @@ class CalculateDiscountTest {
 
       <h2>Run the Tests</h2>
       <CodeBlock language="bash">{`npx jest tests/unit/calculateDiscount.test.ts --verbose`}</CodeBlock>
-      <VerifyBlock>{`PASS tests/unit/calculateDiscount.test.ts
+      <div className="callout callout-info">
+        <strong>💡 Expect failures, not green</strong> — <code>calculateDiscount.ts</code>{' '}
+        still has its 3 seeded bugs. Strong, exact-value assertions like the ones above{' '}
+        <em>should</em> fail against it. If you see all green here, your assertions are
+        too loose to catch the bugs — go back and tighten them.
+      </div>
+      <VerifyBlock>{`FAIL tests/unit/calculateDiscount.test.ts
   calculateDiscount
-    ✓ SAVE10 deducts exactly 10% of the subtotal (3 ms)
+    ✕ SAVE10 deducts exactly 10% of the subtotal (2 ms)
     ✓ FLAT5 deducts $5 from a $50 order (1 ms)
-    ✓ FLAT5 is not applied when subtotal is below the $20 minimum (1 ms)
+    ✕ FLAT5 is not applied when subtotal is below the $20 minimum (1 ms)
     ✓ returns zero discount for an unknown code (1 ms)
-    ✓ codes are case-insensitive (1 ms)
-    ✓ finalTotal is never negative when discount exceeds subtotal (1 ms)
+    ✕ codes are case-insensitive (1 ms)
+    ✕ finalTotal is never negative when discount exceeds subtotal (1 ms)
 
-Tests: 6 passed, 6 total`}</VerifyBlock>
+  ● calculateDiscount › SAVE10 deducts exactly 10% of the subtotal
+
+    expect(received).toBe(expected)
+
+    Expected: 10
+    Received: 100   // BUG 1 — divides by 10 instead of 100
+
+  ● calculateDiscount › FLAT5 is not applied when subtotal is below the $20 minimum
+
+    expect(received).toBe(expected)
+
+    Expected: 0
+    Received: 5     // BUG 2 — missing $20 minimum-order guard
+
+  ● calculateDiscount › codes are case-insensitive
+
+    expect(received).toBe(expected)
+
+    Expected: 10
+    Received: 100   // BUG 1 again, via the lowercase path
+
+  ● calculateDiscount › finalTotal is never negative when discount exceeds subtotal
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 0
+    Received:    -2 // BUG 3 — finalTotal is never clamped to 0
+
+Tests: 4 failed, 2 passed, 6 total`}</VerifyBlock>
 
       <div id="unit-exercise">
       <TimedExercise minutes={15} title="Hands-on Challenge — Find and Fix Weak Tests">
@@ -383,6 +417,58 @@ Each test name should describe the behavior it proves, not the code path.`}</Cod
             <li><strong>Exactly-at-minimum boundary</strong> — <code>subtotal: 20</code> with FLAT5 should apply; Copilot may skip this unless explicitly asked</li>
             <li><strong>Domain intent</strong> — whether a 10% discount on a $3 order is a business error or a valid case requires your judgment, not Copilot's</li>
           </ul>
+        </Collapsible>
+      </TimedExercise>
+
+      <TimedExercise minutes={20} title="Bonus: More Services to Practice On">
+        <p>
+          <code>calculateDiscount</code> is one pure function. The rest of the checkout pipeline
+          has its own service classes, each already stubbed with <code>it.todo</code> placeholders
+          in <code>tests/unit/</code> — not timed, not required, just extra reps if you finish early
+          or want more practice with the prompt template from{' '}
+          <code>.copilot/skills/unit-testing.md</code> on real classes instead of one function.
+        </p>
+        <table className="info-table">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>What to practice</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>tests/unit/cartService.test.ts</code></td>
+              <td>Add/remove items, merge duplicate products, subtotal calculation, <code>ITEM_NOT_FOUND</code></td>
+            </tr>
+            <tr>
+              <td><code>tests/unit/discountService.test.ts</code></td>
+              <td>Same discount rules as Exercise A, but testing the class + repository instead of a pure function — compare how the prompt changes</td>
+            </tr>
+            <tr>
+              <td><code>tests/unit/fraudService.test.ts</code></td>
+              <td>Risk-scoring thresholds and country blocks — clear numeric rules make great Copilot prompts</td>
+            </tr>
+            <tr>
+              <td><code>tests/unit/paymentService.test.ts</code></td>
+              <td>The <code>pending → captured → refunded</code> state machine and its invalid-transition errors</td>
+            </tr>
+          </tbody>
+        </table>
+        <Collapsible title="Hint: Reuse the same prompt template" variant="hint">
+          <p>
+            Swap the target file and function/class name into the template from{' '}
+            <code>.copilot/skills/unit-testing.md</code>:
+          </p>
+          <CodeBlock language="bash">{`Context files:
+- #file:src/services/<serviceName>.ts
+- #file:.copilot/context/domain-rules.md
+
+Write a complete Jest test suite for <ServiceClass> that:
+1. Tests the golden path with exact expected values
+2. Tests every boundary condition from the domain rules
+3. Tests every error path (thrown ApiError codes)
+4. Uses AAA pattern, one assertion group per test
+5. Uses .toBe()/.toEqual() — never toBeTruthy()/toBeDefined()`}</CodeBlock>
         </Collapsible>
       </TimedExercise>
 

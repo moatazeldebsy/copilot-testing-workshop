@@ -6,5 +6,6 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:3006',
     trace: 'on-first-retry',
+    headless: false,
   },
 });
