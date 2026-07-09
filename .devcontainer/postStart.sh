@@ -17,7 +17,8 @@
 # holds the port and always starting fresh removes that ambiguity.
 set -uo pipefail
 
-cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/workshop-exercises"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT/workshop-exercises"
 
 mkdir -p /tmp/workshop-logs
 
@@ -60,10 +61,22 @@ echo "==> Starting API (port 4000)"
 setsid nohup npm run dev:api </dev/null >/tmp/workshop-logs/api.log 2>&1 &
 disown
 
-kill_previous "vite$"
+# Both the Store UI and the root docs site (below) run the same plain `vite`
+# binary, so their process command lines both just end in ".../vite" — a
+# bare "vite$" pattern matches either one, meaning restarting one would kill
+# the other. Match each one's own node_modules path to keep them distinct.
+kill_previous "workshop-exercises/node_modules/.bin/vite"
 echo "==> Starting Store UI (port 3006)"
 setsid nohup npm run dev:web </dev/null >/tmp/workshop-logs/web.log 2>&1 &
 disown
+
+# The root-level docs/agenda site (the workshop tutorial itself, separate
+# from workshop-exercises — see repo CLAUDE.md) also needs a running dev
+# server. It's easy to miss because forwardPorts/postStart historically only
+# covered workshop-exercises' own two ports.
+kill_previous "$REPO_ROOT/node_modules/.bin/vite"
+echo "==> Starting Workshop docs/agenda site (port 3005)"
+(cd "$REPO_ROOT" && setsid nohup npm run dev </dev/null >/tmp/workshop-logs/docs.log 2>&1 &)
 
 # wait_for's exit status must actually be checked — without `set -e`
 # (needed above so a slow/failed server doesn't abort the whole script before
@@ -75,17 +88,20 @@ disown
 # servers ready" with no indication anything was wrong.
 api_ok=1
 web_ok=1
+docs_ok=1
 wait_for http://127.0.0.1:4000/api/health "API (port 4000)" || api_ok=0
 wait_for http://127.0.0.1:3006 "Store UI (port 3006)" || web_ok=0
+wait_for http://127.0.0.1:3005 "Workshop docs/agenda site (port 3005)" || docs_ok=0
 
-if [ "$api_ok" -eq 1 ] && [ "$web_ok" -eq 1 ]; then
-  echo "==> Dev servers ready; logs at /tmp/workshop-logs/{api,web}.log"
+if [ "$api_ok" -eq 1 ] && [ "$web_ok" -eq 1 ] && [ "$docs_ok" -eq 1 ]; then
+  echo "==> Dev servers ready; logs at /tmp/workshop-logs/{api,web,docs}.log"
 else
   echo "==> FAILED to start one or more dev servers. Logs:"
   [ "$api_ok" -eq 0 ] && { echo "--- /tmp/workshop-logs/api.log ---"; tail -n 40 /tmp/workshop-logs/api.log 2>/dev/null; }
   [ "$web_ok" -eq 0 ] && { echo "--- /tmp/workshop-logs/web.log ---"; tail -n 40 /tmp/workshop-logs/web.log 2>/dev/null; }
-  echo "==> This is usually a broken node_modules install. Try:"
-  echo "==>   cd workshop-exercises && rm -rf node_modules package-lock.json && npm install"
+  [ "$docs_ok" -eq 0 ] && { echo "--- /tmp/workshop-logs/docs.log ---"; tail -n 40 /tmp/workshop-logs/docs.log 2>/dev/null; }
+  echo "==> This is usually a broken node_modules install. Try, in the relevant directory:"
+  echo "==>   rm -rf node_modules package-lock.json && npm install"
   echo "==> then re-run: bash .devcontainer/postStart.sh"
   exit 1
 fi

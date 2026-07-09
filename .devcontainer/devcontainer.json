@@ -2,8 +2,9 @@
   "name": "GenAI in Testing Workshop",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/workshop-exercises",
-  "forwardPorts": [3006, 4000],
+  "forwardPorts": [3005, 3006, 4000],
   "portsAttributes": {
+    "3005": { "label": "Workshop docs/agenda site", "onAutoForward": "notify" },
     "3006": { "label": "Store UI", "onAutoForward": "openPreview" },
     "4000": { "label": "API + Swagger docs (/docs)", "onAutoForward": "notify" }
   },
