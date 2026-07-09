@@ -43,14 +43,26 @@ wait_for() {
   echo "==> $label is up after ${waited}s"
 }
 
+# postStartCommand runs inside a short-lived `docker exec` session. `nohup
+# ... & disown` alone only guards against SIGHUP — it does NOT move the
+# process into its own session, so it can still be reaped along with the
+# exec session's process group once postStartCommand returns. That produced
+# exactly the failure seen in practice: the server printed its "listening"
+# banner (proving it started and briefly bound the port, which is why
+# wait_for below can even report success), then died once this script
+# exited — while the identical `npm run dev:api` command run directly in a
+# persistent VS Code terminal (a real, long-lived session) stayed up fine.
+# `setsid` detaches the process into a brand-new session immune to that.
+# `</dev/null` avoids the background process inheriting this exec session's
+# stdin/pty, which is the other half of the same class of bug.
 kill_previous "tsx watch src/server.ts"
 echo "==> Starting API (port 4000)"
-nohup npm run dev:api >/tmp/workshop-logs/api.log 2>&1 &
+setsid nohup npm run dev:api </dev/null >/tmp/workshop-logs/api.log 2>&1 &
 disown
 
 kill_previous "vite$"
 echo "==> Starting Store UI (port 3006)"
-nohup npm run dev:web >/tmp/workshop-logs/web.log 2>&1 &
+setsid nohup npm run dev:web </dev/null >/tmp/workshop-logs/web.log 2>&1 &
 disown
 
 # wait_for's exit status must actually be checked — without `set -e`
