@@ -50,13 +50,25 @@ fi
 # own vite@7 plus jest, and a broken/incomplete install here is exactly what
 # leaves participants staring at "jest: not found" or a 502 on the forwarded
 # dev server ports.
+#
+# playwright is checked too: it's not a direct dependency here, only
+# @playwright/test is — playwright is pulled in transitively as
+# @playwright/test's own dependency. A partial/interrupted npm install can
+# leave @playwright/test in place while the nested playwright package is
+# missing or incomplete. npm still exits 0, and the failure only surfaces
+# later at runtime as "Cannot find module 'playwright/lib/program'" from
+# @playwright/test/cli.js (surfaced by `playwright test` and by the VS Code
+# Playwright extension's test server) — same silent-failure class as the
+# vite bug above.
 install_dir workshop-exercises
 if ! (check_bin workshop-exercises vite /tmp/vite-workshop-check.log \
-      && check_bin workshop-exercises jest /tmp/vite-workshop-check.log); then
-  echo "==> vite/jest failed to load after install in workshop-exercises — see /tmp/vite-workshop-check.log"
+      && check_bin workshop-exercises jest /tmp/vite-workshop-check.log \
+      && check_bin workshop-exercises playwright /tmp/vite-workshop-check.log); then
+  echo "==> vite/jest/playwright failed to load after install in workshop-exercises — see /tmp/vite-workshop-check.log"
   clean_reinstall workshop-exercises
   check_bin workshop-exercises vite /tmp/vite-workshop-check.log
   check_bin workshop-exercises jest /tmp/vite-workshop-check.log
+  check_bin workshop-exercises playwright /tmp/vite-workshop-check.log
 fi
 
 echo "==> Installing Playwright's Chromium browser for E2E exercises"
