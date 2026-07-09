@@ -60,15 +60,30 @@ fi
 # @playwright/test/cli.js (surfaced by `playwright test` and by the VS Code
 # Playwright extension's test server) — same silent-failure class as the
 # vite bug above.
+verify_workshop_exercises() {
+  check_bin workshop-exercises vite /tmp/vite-workshop-check.log \
+    && check_bin workshop-exercises jest /tmp/vite-workshop-check.log \
+    && check_bin workshop-exercises playwright /tmp/vite-workshop-check.log
+}
+
 install_dir workshop-exercises
-if ! (check_bin workshop-exercises vite /tmp/vite-workshop-check.log \
-      && check_bin workshop-exercises jest /tmp/vite-workshop-check.log \
-      && check_bin workshop-exercises playwright /tmp/vite-workshop-check.log); then
+if ! verify_workshop_exercises; then
   echo "==> vite/jest/playwright failed to load after install in workshop-exercises — see /tmp/vite-workshop-check.log"
   clean_reinstall workshop-exercises
-  check_bin workshop-exercises vite /tmp/vite-workshop-check.log
-  check_bin workshop-exercises jest /tmp/vite-workshop-check.log
-  check_bin workshop-exercises playwright /tmp/vite-workshop-check.log
+  # Each check must be its own guarded statement — under `set -e`, an
+  # unguarded command that fails here kills the script immediately, skipping
+  # the remaining checks, the Chromium install below, and the "setup
+  # complete" message, with no readable explanation (check_bin's output goes
+  # to a log file, not stdout). If the reinstall genuinely didn't fix things,
+  # we want a clear, actionable failure instead of a silent abort.
+  if ! verify_workshop_exercises; then
+    echo "==> FAILED: vite/jest/playwright still broken after clean reinstall in workshop-exercises."
+    echo "==> Last check output (/tmp/vite-workshop-check.log):"
+    cat /tmp/vite-workshop-check.log 2>/dev/null || true
+    echo "==> Devcontainer setup did NOT complete successfully. Try re-running this script manually,"
+    echo "==> or check disk space / network access, then rebuild the container."
+    exit 1
+  fi
 fi
 
 echo "==> Installing Playwright's Chromium browser for E2E exercises"
