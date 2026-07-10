@@ -1,0 +1,15 @@
+services:
+  workshop:
+    build: .
+    ports:
+      - "3005:3005"
+      - "3006:3006"
+      - "4000:4000"
+    volumes:
+      - .:/workspace
+      - root_node_modules:/workspace/node_modules
+      - exercises_node_modules:/workspace/workshop-exercises/node_modules
+
+volumes:
+  root_node_modules:
+  exercises_node_modules:

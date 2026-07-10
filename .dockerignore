@@ -1,0 +1,11 @@
+node_modules
+workshop-exercises/node_modules
+dist
+build
+workshop-exercises/build
+.git
+.DS_Store
+*.local
+.claude/settings.local.json
+.claude/shell-snapshots/
+.playwright-mcp/
