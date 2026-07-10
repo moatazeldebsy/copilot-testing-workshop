@@ -3,8 +3,8 @@
 Workshop materials for **WeAreDevelopers Berlin 2026**.
 
 **Session:** [GenAI in Testing — WeAreDevelopers World Congress](https://www.wearedevelopers.com/world-congress/agenda/workshops/genai-in-testing-using-github-copilot-to-accelerate-quality-without-losing-trust-1107886)
-**Date:** Friday, 10 Jul 2026 · 12:15 pm – 2:15 pm (W. Europe Daylight Time, UTC+02:00)
-**Room:** R2 · 30 Seats
+**Date:** Friday, 10 Jul 2026
+
 **Slides:** [GenAI-in-testing.pdf](docs/slides/GenAI-in-testing.pdf)
 
 ## Overview
