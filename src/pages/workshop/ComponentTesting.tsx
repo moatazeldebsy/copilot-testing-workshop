@@ -74,24 +74,32 @@ interface StorePageProps {
 //   never for loading the product list`}</CodeBlock>
 
       <h2 id="component-generate">Step 1 — Generate StorePage Tests with Copilot</h2>
-      <p>Select <code>StorePage.tsx</code>, open Copilot Chat, and use this prompt:</p>
-      <CodeBlock language="bash">{`Write React Testing Library + Jest tests for StorePage.
-#file:src/ui/pages/StorePage.tsx
+      <p>
+        Open <code>tests/components/StorePage.test.tsx</code> in Copilot Chat —
+        it already has 5 <code>it.todo</code> stubs and a <code>defaultProps</code>{' '}
+        setup to establish the pattern — and use this prompt:
+      </p>
+      <CodeBlock language="bash">{`Fill in the it.todo placeholders in tests/components/StorePage.test.tsx using
+React Testing Library and Jest.
 
-Props: userId (string), userEmail (string), token (string), onLogout (() => void)
-The component:
-- renders a product list with Add buttons (one per product)
-- each Add button has data-testid="add-{productId}"
-- clicking Add posts to /api/cart/:userId/items via fetch
-- added items appear in data-testid="cart-items"
+Context files:
+- #file:tests/components/StorePage.test.tsx
+- #file:src/ui/pages/StorePage.tsx
 
-Mock global.fetch in beforeEach.
-Test:
-1. Renders at least one Add button
-2. Clicking Add shows the item name in cart-items
+The component takes props: userId (string), userEmail (string), token (string),
+onLogout (() => void) — already set up in defaultProps.
 
-Use getByRole and getByTestId for queries. Use userEvent.setup().
-Use waitFor to await the cart update.`}</CodeBlock>
+Cover, in order:
+1. renders the store header and product grid
+2. shows an empty cart state initially
+3. calls the cart API when Add is clicked (mock fetch, assert it was called with the right
+   URL/body)
+4. disables the Pay button when the cart is empty
+5. shows order summary with discount when a promo code is applied
+
+Use getByRole/getByTestId, userEvent.setup(), and waitFor for async fetch updates.
+Mock global.fetch per test with mockResolvedValueOnce. Assert visible text content,
+not just element existence.`}</CodeBlock>
 
       <h2>Step 2 — The Factory and Fetch Mock Pattern</h2>
       <p>

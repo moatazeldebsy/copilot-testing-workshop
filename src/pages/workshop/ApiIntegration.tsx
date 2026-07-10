@@ -126,17 +126,26 @@ const ApiIntegration: React.FC = () => (
         {
           label: 'TypeScript / Supertest',
           language: 'bash',
-          code: `Write Supertest tests for the checkout pipeline.
-#file:.copilot/context/domain-rules.md
-#file:src/openapi.ts
+          code: `Fill in the it.todo placeholders in tests/api/checkout.test.ts using Supertest.
 
-Cover these routes:
-- POST /api/cart/:userId/items — add item, assert 201 + subtotal
-- POST /api/discount/apply — valid SAVE10 code, unknown code (BOGUS → INVALID_DISCOUNT_CODE)
-- POST /api/fraud/check — high-risk order (amount > $1000, country XX) → approved: false
+Context files:
+- #file:tests/api/checkout.test.ts
+- #file:.copilot/context/domain-rules.md
+- #file:src/openapi.ts
 
-Use Jest and Supertest. Assert both status code AND response body shape.
-Use the error codes from domain-rules.md for error case assertions.`,
+Cover, in order:
+- Cart: empty cart for a new user, add item, remove item
+- Discount: validate a valid promo code, apply SAVE10 and check final total, reject an
+  expired code with 400
+- Fraud: approve a low-risk order, reject a high-risk order
+- Payment: create, capture, and refund a payment intent
+- Notification: send a receipt notification and retrieve logs
+- Full flow: add to cart → apply discount → check fraud → charge → capture → send receipt,
+  end-to-end
+
+Assert both the HTTP status code AND the response body shape for every test.
+Use the exact error codes from domain-rules.md for error cases (e.g. INVALID_DISCOUNT_CODE),
+not generic messages. Use the existing beforeEach (resetWorkshopData + login) already in the file.`,
         },
         {
           label: 'Python / pytest',

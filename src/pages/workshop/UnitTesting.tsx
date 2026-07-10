@@ -112,19 +112,28 @@ export function calculateDiscount({ subtotal, code }: DiscountInput): DiscountRe
         {
           label: 'TypeScript / Jest',
           language: 'bash',
-          code: `Write Jest unit tests for calculateDiscount() in TypeScript.
-#file:src/services/calculateDiscount.ts
-#file:.copilot/context/domain-rules.md
+          code: `You are a senior engineer writing Jest unit tests for a TypeScript Node.js project.
 
-Cover all of these cases:
-- SAVE10 deducts exactly 10% of the subtotal
-- FLAT5 deducts $5 from orders at or above $20
-- FLAT5 is NOT applied when subtotal is below the $20 minimum
-- An unknown code returns zero discount without throwing
-- Codes are case-insensitive (save10 == SAVE10)
-- finalTotal is never negative when discount would exceed subtotal
+Context files:
+- #file:src/services/calculateDiscount.ts
+- #file:.copilot/context/domain-rules.md
 
-Name each test for the behavior it proves, not the code path.`,
+Write a complete Jest test suite for \`calculateDiscount\` that:
+
+1. Tests the golden path (valid inputs → expected outputs with exact values)
+2. Tests every boundary condition listed in the domain rules
+3. Tests every error path (invalid input, edge cases, constraint violations)
+4. Uses the AAA pattern (Arrange / Act / Assert) with a blank line between sections
+5. Names each test: "<subject> <condition> <expected outcome>"
+6. Uses .toBe() for primitives and .toEqual() for objects — never toBeDefined() or toBeTruthy()
+7. Covers negative cases — what happens when the function receives invalid or extreme input?
+
+Do NOT:
+- Mock the function under test
+- Write tests that always pass regardless of the implementation
+- Use toBeTruthy() or toBeDefined() as the primary assertion
+
+Paste the output into tests/unit/calculateDiscount.test.ts`,
         },
         {
           label: 'Python / pytest',

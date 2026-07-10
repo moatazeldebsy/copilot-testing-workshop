@@ -328,10 +328,39 @@ jobs:
       <p>
         <code>tests/e2e/checkout.spec.ts</code> has four <code>test.fixme</code> placeholders
         covering the full store journey — login, add to cart, apply a discount, and complete
-        checkout. Use Copilot Chat with <code>#file:src/ui/pages/LoginPage.tsx</code> and{' '}
-        <code>#file:src/ui/pages/StorePage.tsx</code> attached to fill them in, then run:
+        checkout. Use this prompt in Copilot Chat:
       </p>
-      <CodeBlock language="bash">{`npx playwright test tests/e2e/checkout.spec.ts`}</CodeBlock>
+      <CodeBlock language="bash">{`Fill in the test.fixme placeholders in tests/e2e/checkout.spec.ts using Playwright.
+
+Context files:
+- #file:tests/e2e/checkout.spec.ts
+- #file:src/ui/pages/LoginPage.tsx
+- #file:src/ui/pages/StorePage.tsx
+
+Important app behavior:
+- The app auto-logs-in as alice@example.com on first load unless localStorage
+  has workshop-signed-out=true or a token already set. Set workshop-signed-out=true
+  via page.addInitScript in beforeEach so tests reliably see the login form.
+- Login: #email, #password inputs, button role "Sign in", error shown via role="alert".
+  Successful login navigates to /store (not /dashboard).
+- StorePage: Add buttons have data-testid="add-{productId}", cart shows in
+  data-testid="cart-items", promo input has placeholder "e.g. SAVE10", total is
+  data-testid="checkout-total", pay button is data-testid="pay-btn".
+- Login credentials: alice@example.com / workshop-password.
+
+Implement, in order:
+1. user can log in and see the store — login, assert redirect to /store, assert product grid
+   visible
+2. user can add an item to the cart — login, click an Add button, assert cart-items updates
+3. user can apply a discount code — login, add item, enter SAVE10, click Apply, assert total
+   decreases
+4. user completes checkout and sees confirmation — full golden path: login → add to cart →
+   pay → confirmation screen
+
+Replace test.fixme with test. Use getByRole/getByTestId locators, not CSS classes.`}</CodeBlock>
+      <p>Then run:</p>
+      <CodeBlock language="bash">{`npx playwright test tests/e2e/checkout.spec.ts
+npm run test:e2e`}</CodeBlock>
       <VerifyBlock>{`Running 4 tests using 1 worker
 
   ✓ checkout.spec.ts:19:3 › Store checkout flow › user can log in and see the store (249ms)

@@ -349,6 +349,27 @@ replace the timing assertion with jest.useFakeTimers() and a fixed timestamp."`}
           the right reason.
         </p>
 
+        <h3>The Prompt</h3>
+        <p>Select both files in Copilot Chat and use this prompt:</p>
+        <CodeBlock language="bash">{`You are reviewing a Jest test file for a TypeScript Node.js project.
+
+Context files:
+- #file:tests/unit/calculateDiscount.weak.test.ts
+- #file:src/services/calculateDiscount.ts
+
+For each test in calculateDiscount.weak.test.ts:
+1. State whether the assertion checks a specific value or just existence/truthiness/no-throw.
+2. Explain what bug could exist in the implementation and still make this test pass.
+3. Rewrite the assertion to assert the exact expected value using .toBe()/.toEqual().
+
+Then write the 4 missing test cases listed in the comment at the bottom of the file:
+1. Exact discountAmount for SAVE10 on $100 (should be $10, not $100)
+2. FLAT5 below the $20 minimum (should not apply)
+3. finalTotal should never go negative
+4. Edge cases: $0 subtotal, very large amounts
+
+Do NOT modify src/services/calculateDiscount.ts — only the test file.`}</CodeBlock>
+
         <h3>Run It First — Confirm the False Confidence</h3>
         <CodeBlock language="bash">{`npm test -- tests/unit/calculateDiscount.weak.test.ts`}</CodeBlock>
         <VerifyBlock>{`PASS  tests/unit/calculateDiscount.weak.test.ts
