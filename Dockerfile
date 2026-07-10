@@ -21,6 +21,7 @@ RUN cd workshop-exercises \
 
 COPY . .
 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN cd workshop-exercises && npx playwright install --with-deps chromium
 
 EXPOSE 3005 3006 4000
