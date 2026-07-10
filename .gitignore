@@ -10,3 +10,6 @@ build/
 
 # Playwright MCP debug snapshots/screenshots (local scratch output)
 .playwright-mcp/
+
+# Claude Code project guidance (local-only, not shared via the repo)
+CLAUDE.md

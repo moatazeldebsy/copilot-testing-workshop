@@ -47,6 +47,23 @@ as the working folder and the GitHub Copilot extension pre-installed. Then just 
 `npm run dev:api` and `npm run dev` in the integrated terminal as below — Codespaces
 forwards ports 3006 and 4000 automatically.
 
+**No internet access to Codespaces, or prefer to stay local? Use Docker.** If you have
+Docker Desktop installed, this gets you the same "dependencies just work" guarantee as
+Codespaces, fully offline on your own machine:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/copilot-testing-workshop.git
+cd copilot-testing-workshop
+docker compose up --build
+```
+
+Wait for the `docs`, `api`, and `web` labeled logs to all report ready, then open
+`http://localhost:3005` (workshop docs/agenda site), `http://localhost:3006` (store UI), and
+`http://localhost:4000/docs` (Swagger API explorer). The repo is bind-mounted into the
+container, so edits you make on your host are picked up live by the running dev servers —
+no need to rebuild for code changes, only for dependency changes (`docker compose up --build`
+again). Stop everything with `docker compose down`.
+
 ```bash
 git clone https://github.com/YOUR_USERNAME/copilot-testing-workshop.git
 cd copilot-testing-workshop/workshop-exercises
