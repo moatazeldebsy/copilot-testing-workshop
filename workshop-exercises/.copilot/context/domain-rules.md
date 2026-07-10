@@ -28,9 +28,9 @@ Risk points are additive. Final `riskLevel` is:
 
 | Score range | Level  | Payment allowed? |
 |-------------|--------|-----------------|
-| 0–29        | low    | yes             |
-| 30–59       | medium | yes             |
-| 60+         | high   | no — blocked    |
+| 0–24        | low    | yes             |
+| 25–49       | medium | yes             |
+| 50+         | high   | no — blocked    |
 
 Score contributors:
 - Order total > $1000 → +40 points
