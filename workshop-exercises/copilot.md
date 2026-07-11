@@ -110,6 +110,31 @@ Write Supertest tests for the discount API error paths:
 Assert both the HTTP status code and the error.code field.
 ```
 
+### Prompt: Postman collection
+
+Run this one from inside `workshop-exercises/` so the `#file:` references resolve.
+It produces a standalone `collection.json` — there's no Newman/Postman tooling wired
+into this repo, so run it with `npx newman run collection.json` or import it into the
+Postman app; it is not part of `npm run test:api`. Once generated, open it side-by-side
+with `tests/api/checkout.test.ts` — same three routes, same domain rules, same
+auth-token pattern — and check the assertions actually agree.
+
+```text
+#file:.copilot/context/domain-rules.md
+#file:src/openapi.ts
+
+Generate a Postman collection (collection.json) for the checkout pipeline.
+
+Cover these requests, each with a pm.test() assertion block:
+- POST /api/cart/:userId/items — add item, assert 201 + response.data.subtotal
+- POST /api/discount/apply — valid SAVE10 code, unknown code (BOGUS → INVALID_DISCOUNT_CODE)
+- POST /api/fraud/check — high-risk order (amount > $1000, country XX) → approved: false
+
+Store the auth token from the login request into a collection variable ({{token}})
+in a test script, and reuse it in the Authorization header of every later request.
+Assert both pm.response.code AND the parsed response body — never one without the other.
+```
+
 ---
 
 ## Exercise D — Component Tests for StorePage
