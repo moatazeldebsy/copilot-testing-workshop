@@ -45,8 +45,8 @@ Click the badge (or **Code → Codespaces → Create codespace on master** on yo
 copy of the repo) and wait ~1–2 minutes for the container to build. Dependencies and
 the Playwright browser install automatically; VS Code opens with `workshop-exercises/`
 as the working folder and the GitHub Copilot extension pre-installed. Then just run
-`npm run dev:api` and `npm run dev` in the integrated terminal as below — Codespaces
-forwards ports 3006 and 4000 automatically.
+`npm run dev` in the integrated terminal as below — it starts both the backend API and
+the frontend together, and Codespaces forwards ports 3006 and 4000 automatically.
 
 **No internet access to Codespaces, or prefer to stay local? Use Docker.** If you have
 Docker Desktop installed, this gets you the same "dependencies just work" guarantee as
@@ -70,10 +70,7 @@ git clone https://github.com/YOUR_USERNAME/copilot-testing-workshop.git
 cd copilot-testing-workshop/workshop-exercises
 npm install
 
-# Run the backend API (port 4000)
-npm run dev:api
-
-# In a second terminal — run the frontend (port 3006)
+# Run the backend API (port 4000) and the frontend (port 3006) together
 npm run dev
 
 # Run all tests
