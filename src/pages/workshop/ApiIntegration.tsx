@@ -400,6 +400,124 @@ describe('checkout pipeline (integration)', () => {
   });
 });`}</CodeBlock>
 
+      <h2>Part C — Postman Collection for the Checkout Pipeline</h2>
+      <p>
+        Supertest and Postman check the same contract from different angles: Supertest
+        runs in-process against the Express app, while a Postman collection drives real
+        HTTP requests and can be shared with anyone on the team — or a non-engineer — who
+        just wants to poke at the API. There's no Newman or Postman tooling wired into this
+        repo yet, so treat this as a standalone deliverable: a <code>collection.json</code> you
+        run with <code>npx newman run collection.json</code> or import into the Postman app,
+        not something added to <code>npm run test:api</code>.
+      </p>
+      <p>
+        Run the prompt below from inside <code>workshop-exercises/</code> so the{' '}
+        <code>#file:</code> references resolve. <code>tests/api/checkout.test.ts</code> covers
+        the same three routes, the same domain rules, and the same auth-token pattern — once
+        Copilot generates the collection, open it side-by-side with that file and check that
+        the assertions actually agree.
+      </p>
+      <CodeBlock language="bash">{`#file:.copilot/context/domain-rules.md
+#file:src/openapi.ts
+
+Generate a Postman collection (collection.json) for the checkout pipeline.
+
+Cover these requests, each with a pm.test() assertion block:
+- POST /api/cart/:userId/items — add item, assert 201 + response.data.subtotal
+- POST /api/discount/apply — valid SAVE10 code, unknown code (BOGUS → INVALID_DISCOUNT_CODE)
+- POST /api/fraud/check — high-risk order (amount > $1000, country XX) → approved: false
+
+Store the auth token from the login request into a collection variable ({{token}})
+in a test script, and reuse it in the Authorization header of every later request.
+Assert both pm.response.code AND the parsed response body — never one without the other.`}</CodeBlock>
+
+      <Collapsible title="Example generated collection.json (trimmed)" variant="hint">
+        <CodeBlock language="json">{`{
+  "info": { "name": "Checkout Pipeline", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:4000" }, { "key": "token", "value": "" }],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": { "mode": "raw", "raw": "{\\"email\\":\\"alice@example.com\\",\\"password\\":\\"workshop-password\\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const body = pm.response.json();",
+          "pm.test('login succeeds', () => pm.response.to.have.status(200));",
+          "pm.collectionVariables.set('token', body.data.token);"
+        ] }
+      }]
+    },
+    {
+      "name": "Add cart item",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/cart/:userId/items",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": { "mode": "raw", "raw": "{\\"productId\\":\\"prod_1\\",\\"name\\":\\"Workshop T-Shirt\\",\\"price\\":25,\\"quantity\\":2}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const body = pm.response.json();",
+          "pm.test('status is 201', () => pm.response.to.have.status(201));",
+          "pm.test('subtotal reflects the added item', () => pm.expect(body.data.subtotal).to.eql(50));"
+        ] }
+      }]
+    },
+    {
+      "name": "Apply discount - unknown code",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/discount/apply",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": { "mode": "raw", "raw": "{\\"code\\":\\"BOGUS\\",\\"subtotal\\":100}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const body = pm.response.json();",
+          "pm.test('status is 404', () => pm.response.to.have.status(404));",
+          "pm.test('error code is INVALID_DISCOUNT_CODE', () => pm.expect(body.error.code).to.eql('INVALID_DISCOUNT_CODE'));"
+        ] }
+      }]
+    },
+    {
+      "name": "Fraud check - high risk",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/fraud/check",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": { "mode": "raw", "raw": "{\\"userId\\":\\"{{userId}}\\",\\"orderAmount\\":10000,\\"itemCount\\":2,\\"ipCountry\\":\\"XX\\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const body = pm.response.json();",
+          "pm.test('status is 200', () => pm.response.to.have.status(200));",
+          "pm.test('order is not approved', () => pm.expect(body.data.approved).to.eql(false));"
+        ] }
+      }]
+    }
+  ]
+}`}</CodeBlock>
+      </Collapsible>
+
+      <div className="callout callout-info">
+        <strong>🔍 Review checklist for the generated collection:</strong>
+        <ul>
+          <li>Does the login request's test script store the token with <code>pm.collectionVariables.set('token', ...)</code>, and does every later request read <code>{'{{token}}'}</code> in its Authorization header?</li>
+          <li>Does every <code>pm.test()</code> block assert <em>both</em> <code>pm.response.code</code> and a parsed field from the body — not one alone?</li>
+          <li>Does the unknown-discount-code test check <code>error.code === 'INVALID_DISCOUNT_CODE'</code> from <code>domain-rules.md</code>, not just a 4xx status?</li>
+          <li>Does the fraud test assert <code>approved: false</code> for the high-risk case, matching <code>tests/api/checkout.test.ts</code>?</li>
+          <li>Would <code>npx newman run collection.json</code> actually pass against the running dev server?</li>
+        </ul>
+      </div>
+
       <div id="api-exercise">
       <TimedExercise minutes={10} title="Hands-on Challenge">
         <p>
