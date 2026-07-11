@@ -135,6 +135,10 @@ in a test script, and reuse it in the Authorization header of every later reques
 Assert both pm.response.code AND the parsed response body — never one without the other.
 ```
 
+**Solution reference** — a fully solved `collection.json` (all five requests, including
+the valid-SAVE10 case) ships at `workshop-exercises/collection.json` on the `solutions`
+branch. Run it with `npx newman run collection.json` against the running dev server.
+
 ---
 
 ## Exercise D — Component Tests for StorePage

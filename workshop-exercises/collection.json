@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "Checkout Pipeline (solution)",
+    "description": "Solved Postman collection for the checkout pipeline exercise. Covers login (token capture), cart add-item, discount apply (valid + unknown code), and a high-risk fraud check. Run with `npx newman run collection.json` or import into the Postman app — this repo has no Newman/Postman tooling wired into npm scripts, so this file is a standalone deliverable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"workshop-password\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('response includes a token', () => pm.expect(body.data.token).to.be.a('string'));",
+              "pm.collectionVariables.set('token', body.data.token);",
+              "pm.collectionVariables.set('userId', body.data.user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Add cart item",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cart/{{userId}}/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cart", "{{userId}}", "items"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": \"prod_1\",\n  \"name\": \"Workshop T-Shirt\",\n  \"price\": 25,\n  \"quantity\": 2\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('status is 201', () => pm.response.to.have.status(201));",
+              "pm.test('subtotal reflects the added item', () => pm.expect(body.data.subtotal).to.eql(50));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Apply discount - valid SAVE10",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/discount/apply", "host": ["{{baseUrl}}"], "path": ["api", "discount", "apply"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"SAVE10\",\n  \"subtotal\": 50\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('discountAmount is 10% of subtotal', () => pm.expect(body.data.discountAmount).to.eql(5));",
+              "pm.test('finalTotal is subtotal minus discount', () => pm.expect(body.data.finalTotal).to.eql(45));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Apply discount - unknown code",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/discount/apply", "host": ["{{baseUrl}}"], "path": ["api", "discount", "apply"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"BOGUS\",\n  \"subtotal\": 50\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('status is 404', () => pm.response.to.have.status(404));",
+              "pm.test('error code is INVALID_DISCOUNT_CODE', () => pm.expect(body.error.code).to.eql('INVALID_DISCOUNT_CODE'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fraud check - high risk",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/fraud/check", "host": ["{{baseUrl}}"], "path": ["api", "fraud", "check"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"orderAmount\": 10000,\n  \"itemCount\": 2,\n  \"ipCountry\": \"XX\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('order is not approved', () => pm.expect(body.data.approved).to.eql(false));",
+              "pm.test('risk level is high', () => pm.expect(body.data.riskLevel).to.eql('high'));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

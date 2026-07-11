@@ -431,6 +431,13 @@ Store the auth token from the login request into a collection variable ({{token}
 in a test script, and reuse it in the Authorization header of every later request.
 Assert both pm.response.code AND the parsed response body — never one without the other.`}</CodeBlock>
 
+      <div className="callout callout-info">
+        <strong>Solution reference</strong> — a fully solved <code>collection.json</code> (all
+        five requests, including the valid-SAVE10 case) ships in{' '}
+        <code>workshop-exercises/collection.json</code> on this <code>solutions</code> branch.
+        Run it with <code>npx newman run collection.json</code> against the running dev server.
+      </div>
+
       <Collapsible title="Example generated collection.json (trimmed)" variant="hint">
         <CodeBlock language="json">{`{
   "info": { "name": "Checkout Pipeline", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
