@@ -6,10 +6,10 @@
 FROM node:22-bookworm
 WORKDIR /workspace
 
-# Docs/marketing site at the repo root.
+# Docusaurus docs site at the repo root. Its CLI needs docusaurus.config.ts to run,
+# so the load check happens after `COPY . .` below.
 COPY package.json package-lock.json ./
-RUN npm install --no-audit --no-fund \
-    && ./node_modules/.bin/vite --version
+RUN npm install --no-audit --no-fund
 
 # The hands-on workshop app: its own vite, plus jest and playwright.
 COPY workshop-exercises/package.json workshop-exercises/package-lock.json workshop-exercises/
@@ -20,6 +20,7 @@ RUN cd workshop-exercises \
     && ./node_modules/.bin/playwright --version
 
 COPY . .
+RUN ./node_modules/.bin/docusaurus --version
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN cd workshop-exercises && npx playwright install --with-deps chromium

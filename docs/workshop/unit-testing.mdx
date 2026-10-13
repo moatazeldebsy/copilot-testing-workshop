@@ -1,0 +1,488 @@
+---
+title: "Unit Test Generation"
+sidebar_label: "Unit Test Generation"
+slug: /workshop/unit-testing
+description: "Unit tests are where Copilot delivers the most immediate value — they are self-contained, predictable in structure, and follow well-known patterns. In this exercise you will…"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Unit Test Generation
+
+<div className="page-header-meta">
+  <span className="step-badge">Exercise A</span>
+  <PageMeta duration="25 min" difficulty="intermediate" />
+</div>
+
+<div className="page-lead">
+
+Unit tests are where Copilot delivers the most immediate value — they are self-contained, predictable in structure, and follow well-known patterns. In this exercise you will use Copilot to generate a full suite for `calculateDiscount()`, review every suggestion critically, and expose three bugs that weak assertions miss.
+
+</div>
+
+<ExerciseRepoCallout path="/workshop/unit-testing" />
+
+<ArchDiagram
+  title="Unit Test Generation Flow"
+  nodes={[
+    { label: 'calculateDiscount.ts', icon: '📄' },
+    { label: 'Copilot Chat', icon: '🤖' },
+    { label: 'Generated Tests', icon: '🧪' },
+    { label: 'Review & Fix', icon: '👀' },
+    { label: 'Jest Runner', icon: '✅' },
+  ]}
+  connections={[
+    { from: 0, to: 1, label: 'context for' },
+    { from: 1, to: 2, label: 'generates' },
+    { from: 2, to: 3, label: 'reviewed by' },
+    { from: 3, to: 4, label: 'run in' },
+  ]}
+/>
+
+## The Prompt-First Approach
+
+The quality of Copilot's output depends heavily on the quality of your prompt. Vague prompts produce vague tests.
+
+| Prompt Quality | Example | Result |
+| --- | --- | --- |
+| ❌ Too vague | "Write tests for calculateDiscount" | Happy-path only, `toBeTruthy()` assertions that miss bugs |
+| ⚠️ Better | "Write Jest unit tests for calculateDiscount with SAVE10 and FLAT5" | Correct structure, may miss boundary and negative cases |
+| ✅ Best | "Write Jest unit tests for calculateDiscount. Cover: SAVE10 (10% off), FLAT5 ($5 off orders ≥ $20), unknown codes, case-insensitivity, and the negative-total clamp." | Targeted, boundary-aware, ready to review |
+
+## Step 1 — Explore the Function Under Test
+
+```typescript
+// src/services/calculateDiscount.ts
+export interface DiscountInput {
+  subtotal: number;
+  code: string;
+}
+
+export interface DiscountResult {
+  discountAmount: number;
+  finalTotal: number;
+}
+
+// Active discount codes — see .copilot/context/domain-rules.md for full rules
+// SAVE10 : 10% off,  no minimum
+// FLAT5  : $5 off,   $20 minimum order
+// EXPIRED: 15% off,  expired — no longer applied
+export function calculateDiscount({ subtotal, code }: DiscountInput): DiscountResult {
+  // implementation hidden — your tests will verify the contract
+}
+```
+
+:::tip[💡 Context tip]
+
+Attach `#file:.copilot/context/domain-rules.md` to your Copilot Chat prompt so it knows the discount rules before generating assertions.
+
+:::
+
+## Step 2 — Generate Tests with Copilot {#unit-generate}
+
+Select `calculateDiscount.ts`, open Copilot Chat, and use this prompt:
+
+<Tabs groupId="language">
+<TabItem value="typescript-jest" label="TypeScript / Jest">
+
+```bash
+You are a senior engineer writing Jest unit tests for a TypeScript Node.js project.
+
+Context files:
+- #file:src/services/calculateDiscount.ts
+- #file:.copilot/context/domain-rules.md
+
+Write a complete Jest test suite for `calculateDiscount` that:
+
+1. Tests the golden path (valid inputs → expected outputs with exact values)
+2. Tests every boundary condition listed in the domain rules
+3. Tests every error path (invalid input, edge cases, constraint violations)
+4. Uses the AAA pattern (Arrange / Act / Assert) with a blank line between sections
+5. Names each test: "<subject> <condition> <expected outcome>"
+6. Uses .toBe() for primitives and .toEqual() for objects — never toBeDefined() or toBeTruthy()
+7. Covers negative cases — what happens when the function receives invalid or extreme input?
+
+Do NOT:
+- Mock the function under test
+- Write tests that always pass regardless of the implementation
+- Use toBeTruthy() or toBeDefined() as the primary assertion
+
+Paste the output into tests/unit/calculateDiscount.test.ts
+```
+
+</TabItem>
+<TabItem value="python-pytest" label="Python / pytest">
+
+```bash
+Write pytest unit tests for calculate_discount() in Python.
+Cover:
+- SAVE10 deducts exactly 10% of the subtotal
+- FLAT5 deducts $5.00 from orders >= $20
+- FLAT5 returns zero discount below $20 minimum
+- Unknown codes return zero discount
+- Codes are case-insensitive
+- final_total never goes below 0
+```
+
+</TabItem>
+<TabItem value="java-junit-5" label="Java / JUnit 5">
+
+```bash
+Write JUnit 5 unit tests for calculateDiscount() in Java.
+Use @ParameterizedTest where appropriate.
+Cover: SAVE10 (10%), FLAT5 ($5 off, $20 min), unknown code,
+case-insensitive matching, and the non-negative finalTotal invariant.
+Use @DisplayName to name each test for the behavior.
+```
+
+</TabItem>
+</Tabs>
+
+## Step 3 — Review the Generated Output
+
+Copilot should produce tests that look something like this. Read them carefully before accepting — there are common problems to look for.
+
+<Tabs groupId="language">
+<TabItem value="typescript-jest" label="TypeScript / Jest">
+
+```typescript
+// tests/unit/calculateDiscount.test.ts  (Copilot-generated — review before accepting)
+import { calculateDiscount } from '../../src/services/calculateDiscount';
+
+describe('calculateDiscount', () => {
+  it('SAVE10 deducts exactly 10% of the subtotal', () => {
+    const result = calculateDiscount({ subtotal: 100, code: 'SAVE10' });
+    expect(result.discountAmount).toBe(10);
+    expect(result.finalTotal).toBe(90);
+  });
+
+  it('FLAT5 deducts $5 from a $50 order', () => {
+    const result = calculateDiscount({ subtotal: 50, code: 'FLAT5' });
+    expect(result.discountAmount).toBe(5);
+    expect(result.finalTotal).toBe(45);
+  });
+
+  it('FLAT5 is not applied when subtotal is below the $20 minimum', () => {
+    const result = calculateDiscount({ subtotal: 15, code: 'FLAT5' });
+    expect(result.discountAmount).toBe(0);
+    expect(result.finalTotal).toBe(15);
+  });
+
+  it('returns zero discount for an unknown code', () => {
+    const result = calculateDiscount({ subtotal: 100, code: 'INVALID' });
+    expect(result.discountAmount).toBe(0);
+    expect(result.finalTotal).toBe(100);
+  });
+
+  it('codes are case-insensitive', () => {
+    const result = calculateDiscount({ subtotal: 100, code: 'save10' });
+    expect(result.discountAmount).toBe(10);
+    expect(result.finalTotal).toBe(90);
+  });
+
+  it('finalTotal is never negative when discount exceeds subtotal', () => {
+    const result = calculateDiscount({ subtotal: 3, code: 'FLAT5' });
+    expect(result.finalTotal).toBeGreaterThanOrEqual(0);
+    expect(result.discountAmount).toBeLessThanOrEqual(3);
+  });
+});
+```
+
+</TabItem>
+<TabItem value="python-pytest" label="Python / pytest">
+
+```python
+# tests/unit/test_calculate_discount.py  (Copilot-generated — review before accepting)
+import pytest
+from src.services.calculate_discount import calculate_discount
+
+def test_save10_deducts_10_percent():
+    result = calculate_discount(subtotal=100, code='SAVE10')
+    assert result['discount_amount'] == 10
+    assert result['final_total'] == 90
+
+def test_flat5_deducts_five_dollars():
+    result = calculate_discount(subtotal=50, code='FLAT5')
+    assert result['discount_amount'] == 5
+    assert result['final_total'] == 45
+
+def test_flat5_not_applied_below_minimum():
+    result = calculate_discount(subtotal=15, code='FLAT5')
+    assert result['discount_amount'] == 0
+    assert result['final_total'] == 15
+
+def test_unknown_code_returns_zero_discount():
+    result = calculate_discount(subtotal=100, code='INVALID')
+    assert result['discount_amount'] == 0
+    assert result['final_total'] == 100
+
+def test_codes_are_case_insensitive():
+    result = calculate_discount(subtotal=100, code='save10')
+    assert result['discount_amount'] == 10
+
+def test_final_total_is_never_negative():
+    result = calculate_discount(subtotal=3, code='FLAT5')
+    assert result['final_total'] >= 0
+```
+
+</TabItem>
+<TabItem value="java-junit-5" label="Java / JUnit 5">
+
+```typescript
+// CalculateDiscountTest.java  (Copilot-generated — review before accepting)
+@ExtendWith(MockitoExtension.class)
+class CalculateDiscountTest {
+
+    @Test
+    @DisplayName("SAVE10 deducts exactly 10% of the subtotal")
+    void save10_deducts_ten_percent() {
+        DiscountResult result = calculateDiscount(100, "SAVE10");
+        assertThat(result.getDiscountAmount()).isEqualByComparingTo("10");
+        assertThat(result.getFinalTotal()).isEqualByComparingTo("90");
+    }
+
+    @Test
+    @DisplayName("FLAT5 is not applied when subtotal is below $20 minimum")
+    void flat5_skipped_below_minimum() {
+        DiscountResult result = calculateDiscount(15, "FLAT5");
+        assertThat(result.getDiscountAmount()).isEqualByComparingTo("0");
+        assertThat(result.getFinalTotal()).isEqualByComparingTo("15");
+    }
+
+    @Test
+    @DisplayName("finalTotal is never negative")
+    void finalTotal_never_negative() {
+        DiscountResult result = calculateDiscount(3, "FLAT5");
+        assertThat(result.getFinalTotal()).isGreaterThanOrEqualTo(BigDecimal.ZERO);
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::tip[🔍 Common issues to look for in generated unit tests:]
+
+`toBeTruthy()` or `toBeDefined()` instead of exact value assertions — these mask bugs
+- Tests that only check the happy path — boundaries and edge cases are where bugs hide
+- Missing the negative-total invariant test — the clamp to 0 is a real business rule
+- No case-insensitivity test — easy to miss, commonly broken
+
+:::
+
+## Run the Tests
+
+```bash
+npx jest tests/unit/calculateDiscount.test.ts --verbose
+```
+
+:::tip[💡 Expect failures, not green]
+
+`calculateDiscount.ts` still has its 3 seeded bugs. Strong, exact-value assertions like the ones above _should_ fail against it. If you see all green here, your assertions are too loose to catch the bugs — go back and tighten them.
+
+:::
+
+<VerifyBlock>
+
+```text
+FAIL tests/unit/calculateDiscount.test.ts
+  calculateDiscount
+    ✕ SAVE10 deducts exactly 10% of the subtotal (2 ms)
+    ✓ FLAT5 deducts $5 from a $50 order (1 ms)
+    ✕ FLAT5 is not applied when subtotal is below the $20 minimum (1 ms)
+    ✓ returns zero discount for an unknown code (1 ms)
+    ✕ codes are case-insensitive (1 ms)
+    ✕ finalTotal is never negative when discount exceeds subtotal (1 ms)
+
+  ● calculateDiscount › SAVE10 deducts exactly 10% of the subtotal
+
+    expect(received).toBe(expected)
+
+    Expected: 10
+    Received: 100   // BUG 1 — divides by 10 instead of 100
+
+  ● calculateDiscount › FLAT5 is not applied when subtotal is below the $20 minimum
+
+    expect(received).toBe(expected)
+
+    Expected: 0
+    Received: 5     // BUG 2 — missing $20 minimum-order guard
+
+  ● calculateDiscount › codes are case-insensitive
+
+    expect(received).toBe(expected)
+
+    Expected: 10
+    Received: 100   // BUG 1 again, via the lowercase path
+
+  ● calculateDiscount › finalTotal is never negative when discount exceeds subtotal
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 0
+    Received:    -2 // BUG 3 — finalTotal is never clamped to 0
+
+Tests: 4 failed, 2 passed, 6 total
+```
+
+</VerifyBlock>
+
+<div id="unit-exercise">
+
+<TimedExercise minutes={15} title="Hands-on Challenge — Find and Fix Weak Tests">
+
+Open `tests/unit/calculateDiscount.weak.test.ts`. These tests were AI-generated with a vague prompt. Each one passes today — but none of them would catch the three bugs hidden in the implementation. Find all three bugs and rewrite the assertions.
+
+### The Weak Tests (what Copilot produced)
+
+```typescript
+// calculateDiscount.weak.test.ts — passes today but proves almost nothing
+
+it('SAVE10 produces a discount', () => {
+  const r = calculateDiscount({ subtotal: 100, code: 'SAVE10' });
+  expect(r.discountAmount).toBeTruthy();   // ← passes even if discount is $100
+});
+
+it('FLAT5 processes the order', () => {
+  const r = calculateDiscount({ subtotal: 15, code: 'FLAT5' });
+  expect(r).toBeDefined();                 // ← passes even when discount should be 0
+});
+
+it('handles a discount code', () => {
+  const r = calculateDiscount({ subtotal: 3, code: 'FLAT5' });
+  expect(r.finalTotal).toBeDefined();      // ← passes even if finalTotal is negative
+});
+```
+
+<Collapsible title="Hint: What each weak test misses" variant="hint">
+
+- **Bug 1** — `toBeTruthy()` passes for any non-zero value. If the implementation deducts 100% instead of 10%, this test still passes. Assert the exact amount: `toBe(10)`.
+- **Bug 2** — `subtotal: 15` is below the $20 minimum; `FLAT5` should not apply. `toBeDefined()` passes regardless. Assert `discountAmount` is `0`.
+- **Bug 3** — `subtotal: 3` is below the $5 flat deduction; without the clamp,`finalTotal` could be `-2`. `toBeDefined()` misses this entirely. Assert `finalTotal` `toBeGreaterThanOrEqual(0)`.
+
+</Collapsible>
+
+<Collapsible title="Strong Rewrites" variant="solution">
+
+```typescript
+// Bug 1 fixed — assert exact amount, not just truthy
+it('SAVE10 deducts exactly 10%, not 100%', () => {
+  const r = calculateDiscount({ subtotal: 100, code: 'SAVE10' });
+  expect(r.discountAmount).toBe(10);
+  expect(r.finalTotal).toBe(90);
+});
+
+// Bug 2 fixed — assert the minimum-order guard works
+it('FLAT5 is skipped when subtotal is below the $20 minimum', () => {
+  const r = calculateDiscount({ subtotal: 15, code: 'FLAT5' });
+  expect(r.discountAmount).toBe(0);
+  expect(r.finalTotal).toBe(15);
+});
+
+// Bug 3 fixed — assert the non-negative finalTotal invariant
+it('finalTotal is never negative when discount exceeds subtotal', () => {
+  const r = calculateDiscount({ subtotal: 3, code: 'FLAT5' });
+  expect(r.finalTotal).toBeGreaterThanOrEqual(0);
+  expect(r.discountAmount).toBeLessThanOrEqual(3);
+});
+```
+
+</Collapsible>
+
+<Collapsible title="Bonus: Prompt Copilot to improve weak tests" variant="bonus">
+
+Select the three weak tests in Copilot Chat and paste this prompt:
+
+```bash
+Review these tests. Replace any toBeTruthy/toBeDefined assertions with
+specific value matchers. Add the missing boundary and minimum-order cases.
+Each test name should describe the behavior it proves, not the code path.
+```
+
+</Collapsible>
+
+</TimedExercise>
+
+</div>
+
+<TimedExercise minutes={10} title="Bonus: Prompt Engineering Challenge">
+
+Write a prompt that produces **all six strong tests** from the generated output above in a single Copilot Chat turn. Then identify what Copilot still won't get right even with your best prompt.
+
+<Collapsible title="Hint: What a strong prompt must include" variant="hint">
+
+- Attach `#file:calculateDiscount.ts` and `#file:.copilot/context/domain-rules.md`
+- List every case explicitly: golden path, boundary (exactly at $20), below minimum, unknown code, case-insensitivity, negative clamp
+- Specify the assertion style: _"use toBe() for exact values, not toBeTruthy or toBeDefined"_
+- Specify test names: _"name each test for the behavior it proves"_
+
+</Collapsible>
+
+<Collapsible title="What Copilot still won't get right" variant="bonus">
+
+- **The EXPIRED code** — Copilot won't know it exists unless you add it to the prompt
+- **Exactly-at-minimum boundary** — `subtotal: 20` with FLAT5 should apply; Copilot may skip this unless explicitly asked
+- **Domain intent** — whether a 10% discount on a $3 order is a business error or a valid case requires your judgment, not Copilot's
+
+</Collapsible>
+
+</TimedExercise>
+
+<TimedExercise minutes={20} title="Bonus: More Services to Practice On">
+
+`calculateDiscount` is one pure function. The rest of the checkout pipeline has its own service classes, each already stubbed with `it.todo` placeholders in `tests/unit/` — not timed, not required, just extra reps if you finish early or want more practice with the prompt template from `.copilot/skills/unit-testing.md` on real classes instead of one function.
+
+| File | What to practice |
+| --- | --- |
+| `tests/unit/cartService.test.ts` | Add/remove items, merge duplicate products, subtotal calculation, `ITEM_NOT_FOUND` |
+| `tests/unit/discountService.test.ts` | Same discount rules as Exercise A, but testing the class + repository instead of a pure function — compare how the prompt changes |
+| `tests/unit/fraudService.test.ts` | Risk-scoring thresholds and country blocks — clear numeric rules make great Copilot prompts |
+| `tests/unit/paymentService.test.ts` | The `pending → captured → refunded` state machine and its invalid-transition errors |
+
+<Collapsible title="Hint: Reuse the same prompt template" variant="hint">
+
+Swap the target file and function/class name into the template from `.copilot/skills/unit-testing.md`:
+
+```bash
+Context files:
+- #file:src/services/<serviceName>.ts
+- #file:.copilot/context/domain-rules.md
+
+Write a complete Jest test suite for <ServiceClass> that:
+1. Tests the golden path with exact expected values
+2. Tests every boundary condition from the domain rules
+3. Tests every error path (thrown ApiError codes)
+4. Uses AAA pattern, one assertion group per test
+5. Uses .toBe()/.toEqual() — never toBeTruthy()/toBeDefined()
+```
+
+</Collapsible>
+
+</TimedExercise>
+
+## 🔧 Troubleshooting
+
+<Collapsible title="Tests pass but bugs are present" variant="hint">
+
+Run the weak test file against a broken implementation: `npx jest calculateDiscount.weak.test.ts`. All three tests should still pass despite the bugs — that is the point of the exercise. The strong tests should detect all three failures.
+
+</Collapsible>
+
+<Collapsible title="TypeScript cannot find calculateDiscount" variant="hint">
+
+Check your import path is relative to the test file location: `import { calculateDiscount } from '../../src/services/calculateDiscount'`. Run `npx jest --verbose` to see the full import error.
+
+</Collapsible>
+
+## Key Takeaways {#unit-debrief}
+
+<div className="summary-card">
+
+- Specific prompts with attached context files produce better, targeted test suggestions
+- Always assert exact values — `toBeTruthy()` and `toBeDefined()` hide bugs
+- Boundary cases (exactly at minimum, zero, negative) are where real bugs live
+- Run tests against a broken implementation to verify they actually catch the bug
+- Copilot drafts the cases; you validate the intent and the assertions
+
+</div>

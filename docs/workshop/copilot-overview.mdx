@@ -1,0 +1,145 @@
+---
+title: "Copilot for Testing: The Big Picture"
+sidebar_label: "Copilot for Testing: The Big Picture"
+slug: /workshop/copilot-overview
+description: "Before writing a single test with Copilot, you need a clear mental model: where does AI genuinely help, where does it introduce risk, and where is human judgment still…"
+---
+
+# Copilot for Testing: The Big Picture
+
+<div className="page-header-meta">
+  <span className="step-badge">Step 3</span>
+  <PageMeta duration="20 min" difficulty="intermediate" />
+</div>
+
+<div className="page-lead">
+
+Before writing a single test with Copilot, you need a clear mental model: where does AI genuinely help, where does it introduce risk, and where is human judgment still non-negotiable? This step answers those questions.
+
+</div>
+
+<PollBlock
+  question="How many of you have accepted a Copilot test suggestion without fully reading it?"
+  options={[
+    { emoji: '🙋', label: 'Yes, regularly' },
+    { emoji: '🤔', label: 'A few times' },
+    { emoji: '👋', label: 'Rarely' },
+    { emoji: '✅', label: 'Never — I always review' },
+  ]}
+  note="This is the core challenge we'll tackle in this step."
+/>
+
+<ArchDiagram
+  title="The Copilot Trust Model"
+  nodes={[
+    { label: 'Copilot Suggestion', icon: '🤖' },
+    { label: 'Human Review', icon: '👀' },
+    { label: 'Test Suite', icon: '🧪' },
+    { label: 'CI Pipeline', icon: '🔄' },
+    { label: 'Production', icon: '🚀' },
+  ]}
+  connections={[
+    { from: 0, to: 1, label: 'reviewed by' },
+    { from: 1, to: 2, label: 'merged into' },
+    { from: 2, to: 3, label: 'runs in' },
+    { from: 3, to: 4, label: 'guards' },
+  ]}
+/>
+
+## Where Copilot Genuinely Helps in Testing {#overview-generate}
+
+| Use Case | Why Copilot Helps | Example |
+| --- | --- | --- |
+| Boilerplate generation | Repetitive describe/it/expect blocks take seconds, not minutes | Unit test stubs for a service class |
+| Mock &amp; stub scaffolding | Recognizes dependency patterns and generates matching mocks | `jest.mock()` for an HTTP client |
+| Edge-case discovery | Suggests boundary and negative test cases you might miss | Empty arrays, null inputs, max values |
+| Test data generation | Generates realistic fixture objects from type definitions | Fake user, order, or product objects |
+| Refactoring existing tests | Improves readability of assert-heavy or duplicate test code | Extract shared setup into `beforeEach` |
+
+## Where Human Judgment Is Still Essential
+
+| Risk Area | What Can Go Wrong | Mitigation |
+| --- | --- | --- |
+| Test correctness | Copilot may assert the wrong value or test the wrong behaviour | Always run tests and read what they actually verify |
+| False confidence | High coverage % from low-value tests that don't catch real bugs | Review test intent, not just coverage numbers |
+| Flaky tests | Suggestions may use time-dependent or order-dependent assertions | Check for `Date.now()`, random values, hardcoded delays |
+| Security risks | Generated test data may include real-looking but sensitive values | Never commit tokens, passwords, or PII — even in test files |
+| Business logic gaps | Copilot cannot know your domain rules or compliance requirements | Write domain-critical tests yourself; use Copilot only for scaffolding |
+
+## The Generate → Review → Fix Loop
+
+Every Copilot-assisted test follows the same three-phase loop. Skipping any phase is where quality problems enter the codebase.
+
+```bash
+# Phase 1: GENERATE — let Copilot write the first draft
+# Trigger inline suggestion or use Copilot Chat:
+# "Write unit tests for the UserService.createUser method"
+
+# Phase 2: REVIEW — read every line critically
+# Ask yourself:
+#   - Does this test verify the right behaviour?
+#   - Would it catch a real bug?
+#   - Is the assertion specific enough?
+#   - Any hardcoded secrets or real-looking PII?
+
+# Phase 3: FIX — correct what Copilot got wrong
+# Common fixes:
+#   - Replace vague matchers (toBeTruthy) with precise ones (toBe('created'))
+#   - Add missing edge cases
+#   - Remove tests that only assert Copilot's own generated implementation
+```
+
+:::tip[🧠 Mental Model]
+
+Think of Copilot as a fast junior developer who writes a first draft. Your job is the code review. The suggestion is a starting point, not a finished product.
+
+:::
+
+## Trust Tiers
+
+| Tier | Test Type | Copilot Role | Human Role |
+| --- | --- | --- | --- |
+| ✅ High trust | Boilerplate structure, happy path scaffold | Write first draft | Quick review |
+| ⚠️ Medium trust | Edge cases, error handling | Suggest candidates | Validate each case |
+| 🚫 Low trust | Security, compliance, domain rules | Structural reference only | Write the logic |
+
+<div id="overview-exercise">
+
+<TimedExercise minutes={8} title="Hands-on Challenge">
+
+Open Copilot Chat and paste this prompt. Read the response and identify two things you would change before accepting the output:
+
+```bash
+Write 5 unit test cases for a function that validates an email address in TypeScript using Jest.
+```
+
+<Collapsible title="What to look for in the response" variant="hint">
+
+- Does it test empty string / null inputs?
+- Are assertions specific (exact error message) or vague (`toBeTruthy`)?
+- Does it test RFC edge cases like `user+tag@domain.co.uk`?
+- Does the test name clearly describe the scenario?
+
+</Collapsible>
+
+<Collapsible title="Bonus: The missing test case" variant="bonus">
+
+Add a test case that Copilot likely missed: an email with a valid format but a disposable domain (e.g. `test@mailinator.com`). Is this a unit test concern or a business-rule concern?
+
+</Collapsible>
+
+</TimedExercise>
+
+</div>
+
+## Key Takeaways {#overview-debrief}
+
+<div className="summary-card">
+
+- Copilot accelerates boilerplate, mocks, fixtures, and edge-case discovery
+- It cannot know your domain, compliance rules, or production failures
+- Always follow the Generate → Review → Fix loop — never skip Review
+- Treat coverage numbers from AI-generated tests with extra scepticism
+- Security-critical tests must be written by humans
+
+</div>

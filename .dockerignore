@@ -9,3 +9,4 @@ workshop-exercises/build
 .claude/settings.local.json
 .claude/shell-snapshots/
 .playwright-mcp/
+.docusaurus

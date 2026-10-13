@@ -7,6 +7,8 @@ Workshop materials for **WeAreDevelopers Berlin 2026**.
 
 **Slides:** [GenAI-in-testing.pdf](docs/slides/GenAI-in-testing.pdf)
 
+**Live site:** [moatazeldebsy.github.io/copilot-testing-workshop](https://moatazeldebsy.github.io/copilot-testing-workshop/) · **Updated Oct 2026:** [what's changed in Copilot since the workshop](https://moatazeldebsy.github.io/copilot-testing-workshop/whats-new)
+
 ## Overview
 
 A hands-on workshop exploring how to use GitHub Copilot to speed up testing workflows — unit tests, API integration tests, component tests, E2E with Playwright — without sacrificing trust or quality.
@@ -86,7 +88,7 @@ Login with: `alice@example.com` / `workshop-password`
 
 ## Running the Docs Site
 
-This repo's root is a separate React + Vite app — the workshop tutorial/agenda site itself
+This repo's root is a separate [Docusaurus](https://docusaurus.io/) site — the workshop tutorial/agenda site itself
 (prerequisites, exercise walkthroughs, session flow), independent of the `workshop-exercises/`
 hands-on app above. Run it from the repo root, not from inside `workshop-exercises/`:
 
@@ -95,7 +97,9 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3005`.
+Open `http://localhost:3005`. Pages live in `docs/` as MDX; the sidebar is generated from
+`src/data/workshopSteps.ts`. Run `npm run build && npm run serve` to try the production build,
+which is also where the offline search index is generated.
 
 ## Repository Layout
 
@@ -129,9 +133,9 @@ workshop-exercises/
 ```
 
 All narrative/reference documentation for the workshop lives inside `workshop-exercises/` —
-the root site's `TutorialDetail.tsx` imports `workshop-exercises/docs/tutorials/*.md` directly
-(via Vite's `?raw` loader) and renders it as the site's `/tutorials` pages, so there's a single
-source of truth instead of a copy on each side.
+the root Docusaurus site reads `workshop-exercises/docs/tutorials/*.md` directly (a second docs
+plugin instance) and renders it as the site's `/tutorials` pages, so there's a single source of
+truth instead of a copy on each side.
 
 ## Recovery: the `solutions` Branch
 

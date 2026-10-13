@@ -20,7 +20,7 @@ const ExerciseRepoCallout: React.FC<ExerciseRepoCalloutProps> = ({
   const { exercise } = step;
 
   return (
-    <div className="exercise-repo-callout callout callout-info">
+    <div className="exercise-repo-callout">
       <div className="exercise-repo-callout__header">
         <strong>{title}</strong>
         <span className="exercise-repo-callout__badge">{exercise.stepLabel}</span>

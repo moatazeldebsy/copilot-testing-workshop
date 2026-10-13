@@ -1,4 +1,5 @@
-import React, { useId, useState } from 'react';
+import React from 'react';
+import Details from '@theme/Details';
 import './Collapsible.css';
 
 interface CollapsibleProps {
@@ -7,35 +8,29 @@ interface CollapsibleProps {
   children: React.ReactNode;
 }
 
-const variantIcons: Record<string, string> = {
-  hint: '💡',
-  solution: '✅',
-  bonus: '🌟',
+const variantLabels: Record<NonNullable<CollapsibleProps['variant']>, string> = {
+  hint: 'Hint',
+  solution: 'Solution',
+  bonus: 'Bonus',
 };
 
 const Collapsible: React.FC<CollapsibleProps> = ({ title, variant = 'hint', children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const contentId = useId();
+  // Titles often already start with "Hint:"/"Solution:"; don't repeat it in the pill.
+  const label = variantLabels[variant];
+  const cleanTitle = title.replace(new RegExp(`^${label}\\s*[:—-]\\s*`, 'i'), '');
 
   return (
-    <details
+    <Details
       className={`collapsible collapsible--${variant}`}
-      role="group"
-      onToggle={(event) => setIsOpen((event.currentTarget as HTMLDetailsElement).open)}
+      summary={
+        <summary>
+          <span className={`collapsible-pill collapsible-pill--${variant}`}>{label}</span>
+          <span className="collapsible-title">{cleanTitle}</span>
+        </summary>
+      }
     >
-      <summary
-        className="collapsible-summary"
-        aria-expanded={isOpen}
-        aria-controls={contentId}
-      >
-        <span className="collapsible-icon">{variantIcons[variant]}</span>
-        <span className="collapsible-title">{title}</span>
-        <span className="collapsible-chevron" />
-      </summary>
-      <div id={contentId} className="collapsible-content" role="region" aria-label={title}>
-        {children}
-      </div>
-    </details>
+      {children}
+    </Details>
   );
 };
 

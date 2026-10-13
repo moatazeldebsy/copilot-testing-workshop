@@ -13,3 +13,7 @@ build/
 
 # Claude Code project guidance (local-only, not shared via the repo)
 CLAUDE.md
+
+# Docusaurus
+.docusaurus/
+.cache-loader/

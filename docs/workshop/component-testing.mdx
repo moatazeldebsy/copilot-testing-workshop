@@ -1,0 +1,275 @@
+---
+title: "Component Testing with React Testing Library"
+sidebar_label: "Component Testing with RTL"
+slug: /workshop/component-testing
+description: "React Testing Library (RTL) tests components the way users interact with them — through accessible queries and real events, not internal state. In this exercise you will use…"
+---
+
+# Component Testing with React Testing Library
+
+<div className="page-header-meta">
+  <span className="step-badge">Exercise D</span>
+  <PageMeta duration="20 min" difficulty="intermediate" />
+</div>
+
+<div className="page-lead">
+
+React Testing Library (RTL) tests components the way users interact with them — through accessible queries and real events, not internal state. In this exercise you will use Copilot to generate RTL tests for `StorePage`, the product listing and cart entry point in the checkout pipeline. Copilot generates RTL tests quickly, but often defaults to fragile implementation-detail queries — this step shows how to steer it toward accessible, maintainable assertions.
+
+</div>
+
+<ExerciseRepoCallout path="/workshop/component-testing" />
+
+<PollBlock
+  question="When an RTL test breaks after UI refactoring, what should fail first?"
+  options={[
+    { emoji: '👥', label: 'Only user-visible behavior assertions' },
+    { emoji: '🎨', label: 'CSS class and DOM structure checks' },
+    { emoji: '🏷️', label: 'Test IDs and snapshot diffs' },
+    { emoji: '🤝', label: 'A balanced mix depending on component role' },
+  ]}
+  note="Use this poll to frame your query strategy choices in this step."
+/>
+
+## The RTL Philosophy {#component-generate}
+
+:::tip[Core principle:]
+
+Query elements the way a user (or screen reader) would find them. Prefer `getByRole` → `getByLabelText` → `getByText` →`getByTestId` (last resort). Avoid querying by CSS class or component internals.
+
+:::
+
+## The Component Under Test — StorePage
+
+`StorePage` renders a static product catalog, handles "Add to Cart" interactions, and shows the current cart. It posts cart updates, promo codes, and payment steps to the checkout pipeline via `fetch`.
+
+```typescript
+// src/ui/pages/StorePage.tsx (abbreviated)
+// Props the component accepts:
+interface StorePageProps {
+  userId: string;
+  userEmail: string;
+  token: string;
+  onLogout: () => void;
+}
+
+// What it renders:
+// - A static product list (no fetch on mount) with one "Add" button per
+//   product (data-testid="add-{productId}")
+// - A cart section (data-testid="cart-items") showing added item names
+// - fetch() is used for cart updates, promo application, and payment —
+//   never for loading the product list
+```
+
+## Step 1 — Generate StorePage Tests with Copilot {#component-generate}
+
+Open `tests/components/StorePage.test.tsx` in Copilot Chat — it already has 5 `it.todo` stubs and a `defaultProps` setup to establish the pattern — and use this prompt:
+
+```bash
+Fill in the it.todo placeholders in tests/components/StorePage.test.tsx using
+React Testing Library and Jest.
+
+Context files:
+- #file:tests/components/StorePage.test.tsx
+- #file:src/ui/pages/StorePage.tsx
+
+The component takes props: userId (string), userEmail (string), token (string),
+onLogout (() => void) — already set up in defaultProps.
+
+Cover, in order:
+1. renders the store header and product grid
+2. shows an empty cart state initially
+3. calls the cart API when Add is clicked (mock fetch, assert it was called with the right
+   URL/body)
+4. disables the Pay button when the cart is empty
+5. shows order summary with discount when a promo code is applied
+
+Use getByRole/getByTestId, userEvent.setup(), and waitFor for async fetch updates.
+Mock global.fetch per test with mockResolvedValueOnce. Assert visible text content,
+not just element existence.
+```
+
+## Step 2 — The Factory and Fetch Mock Pattern
+
+When the generated tests reference test data and fetch mocking, Copilot should produce helpers like these. Review them for correct shape.
+
+```typescript
+// tests/factories.ts  (Copilot-generated — matches slide 29)
+export const buildCartItem = (overrides = {}) => ({
+  id: 'item-1',
+  productId: 'prod_1',
+  name: 'Workshop T-Shirt',
+  price: 25,
+  quantity: 1,
+  ...overrides,
+});
+
+export function mockFetchOnce(body: unknown, status = 200) {
+  (global.fetch as jest.Mock).mockResolvedValueOnce({
+    ok: status < 300,
+    status,
+    json: async () => body,
+  });
+}
+```
+
+## Step 3 — Review the Generated Tests
+
+```typescript
+// tests/components/StorePage.test.tsx  (Copilot-generated — review required)
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import StorePage from '../../src/ui/pages/StorePage';
+import { buildCartItem, mockFetchOnce } from '../factories';
+
+const props = {
+  userId: 'user-test-01',
+  userEmail: 'alice@example.com',
+  token: 'test-token',
+  onLogout: jest.fn(),
+};
+
+describe('StorePage', () => {
+  beforeEach(() => {
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('renders products with Add buttons', () => {
+    render(<StorePage {...props} />);
+
+    expect(screen.getAllByRole('button', { name: /add/i }).length).toBeGreaterThan(0);
+  });
+
+  it('shows item name in cart after clicking Add', async () => {
+    const user = userEvent.setup();
+
+    // Only one fetch happens: the cart update from clicking Add.
+    // The product list is a static array, not fetched.
+    mockFetchOnce({ data: { items: [buildCartItem()] } });
+
+    render(<StorePage {...props} />);
+
+    await user.click(screen.getByTestId('add-prod_1'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('cart-items')).toHaveTextContent('Workshop T-Shirt')
+    );
+  });
+});
+```
+
+:::tip[🔍 RTL review checklist:]
+
+Are queries using `getByRole` or `getByTestId` rather than CSS classes?
+- Is `userEvent.setup()` called instead of the deprecated direct `userEvent.click()`?
+- Are `waitFor` assertions used to handle async fetch responses?
+- Is `global.fetch` mocked in `beforeEach` and reset in `afterEach`?
+- Is the fetch mock order correct? (product list first, then cart update)
+
+:::
+
+## Run the Tests
+
+```bash
+npx jest tests/components/StorePage.test.tsx --verbose
+```
+
+<VerifyBlock>
+
+```text
+PASS tests/components/StorePage.test.tsx
+  StorePage
+    ✓ renders products with Add buttons (38 ms)
+    ✓ shows item name in cart after clicking Add (54 ms)
+
+Tests: 2 passed, 2 total
+```
+
+</VerifyBlock>
+
+:::tip[🎬 Playwright live demo]
+
+The presenter will now run a live Playwright E2E test against the checkout flow. This shows the same user journey as the RTL tests, but through a real browser navigating from StorePage → cart → checkout confirmation.
+
+:::
+
+<div id="component-exercise">
+
+<TimedExercise minutes={8} title="Hands-on Challenge">
+
+A teammate wrote this StorePage test. Use Copilot to identify the problems and generate an improved version:
+
+```typescript
+it('adds item to cart', async () => {
+  const { container } = render(
+    <StorePage userId="u1" userEmail="a@b.com" token="tok" onLogout={() => {}} />
+  );
+
+  fireEvent.click(container.querySelector('.add-button'));
+
+  expect(container.querySelector('.cart-items')).toBeTruthy();
+});
+```
+
+<Collapsible title="Hint: What are the three problems?" variant="hint">
+
+- CSS class selector (`.add-button`) — fragile, breaks on rename; use `getByTestId('add-prod_1')`
+- `fireEvent` instead of `userEvent` — doesn't simulate real browser pointer events
+- `toBeTruthy()` on the element — passes even if cart shows nothing; assert the item _name_ is visible
+
+</Collapsible>
+
+<Collapsible title="Fixed Version" variant="solution">
+
+```typescript
+it('shows item name in cart after clicking Add', async () => {
+  const user = userEvent.setup();
+
+  mockFetchOnce({ data: { products: [{ id: 'prod_1', name: 'Workshop T-Shirt', price: 25 }] } });
+  mockFetchOnce({ data: { items: [buildCartItem()] } });
+
+  render(
+    <StorePage
+      userId="user-test-01"
+      userEmail="alice@example.com"
+      token="test-token"
+      onLogout={jest.fn()}
+    />
+  );
+
+  await waitFor(() => screen.getByTestId('add-prod_1'));
+  await user.click(screen.getByTestId('add-prod_1'));
+
+  await waitFor(() =>
+    expect(screen.getByTestId('cart-items')).toHaveTextContent('Workshop T-Shirt')
+  );
+});
+```
+
+</Collapsible>
+
+<Collapsible title="Bonus: Test empty cart state" variant="bonus">
+
+Add a test that verifies the cart section shows a "Your cart is empty" message on initial render before any items are added. Ask Copilot to generate it, then check whether it mocks the initial fetch correctly.
+
+</Collapsible>
+
+</TimedExercise>
+
+</div>
+
+## Key Takeaways {#component-debrief}
+
+<div className="summary-card">
+
+- Use `getByRole` and `getByTestId` — avoid CSS class selectors
+- Always use `userEvent.setup()` — it simulates real pointer and keyboard events
+- Mock `global.fetch` in `beforeEach`; load responses in order using `mockResolvedValueOnce`
+- Assert visible content (item names, text) not just element existence
+- Use `waitFor` for any assertion that depends on async fetch or state update
+
+</div>

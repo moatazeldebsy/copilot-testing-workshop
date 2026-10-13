@@ -1,0 +1,399 @@
+---
+title: "Reviewing AI Tests &amp; Guardrails"
+sidebar_label: "Reviewing AI Tests & Guardrails"
+slug: /workshop/reviewing-tests
+description: "Accepting AI-generated tests without a systematic review process is where quality debt accumulates. This step gives you a concrete review checklist, prompt templates for…"
+---
+
+# Reviewing AI Tests &amp; Guardrails
+
+<div className="page-header-meta">
+  <span className="step-badge">Exercise B</span>
+  <PageMeta duration="20 min" difficulty="intermediate" />
+</div>
+
+<div className="page-lead">
+
+Accepting AI-generated tests without a systematic review process is where quality debt accumulates. This step gives you a concrete review checklist, prompt templates for self-correcting Copilot output, and patterns for enforcing guardrails at the team level.
+
+</div>
+
+<ExerciseRepoCallout path="/workshop/reviewing-tests" />
+
+<PollBlock
+  mode="quiz"
+  quizId="reviewing-tests-assertion-priority"
+  question="Quick check: which generated assertion should you refactor first in a review pass?"
+  options={[
+    {
+      emoji: '⚠️',
+      label: "expect(result).toBeDefined()",
+      rationale: 'This can pass even when behavior is wrong. Replace with behavior-specific assertions plus dependency call checks.',
+      isCorrect: true,
+    },
+    {
+      emoji: '✅',
+      label: "expect(res.status).toBe(201)",
+      rationale: 'Status-code checks are useful, but they are not the weakest link. You usually tighten body-shape and behavior assertions next.',
+    },
+    {
+      emoji: '🧪',
+      label: "expect(mockRepo.save).toHaveBeenCalledTimes(1)",
+      rationale: 'Call-count checks are helpful, but they are stronger than toBeDefined-style assertions because they verify interaction intent.',
+    },
+    {
+      emoji: '🔍',
+      label: "expect(error.message).toMatch(/invalid/)",
+      rationale: 'Pattern-based error checks are often acceptable and resilient. They are usually not the first assertion to refactor.',
+    },
+  ]}
+  note="Select an answer, reveal rationale, then compare with your team review checklist."
+/>
+
+<ArchDiagram
+  title="AI Test Review Pipeline"
+  nodes={[
+    { label: 'Generated Test', icon: '🤖' },
+    { label: 'Review Checklist', icon: '✅' },
+    { label: 'Security Scan', icon: '🔒' },
+    { label: 'PR Review', icon: '👀' },
+    { label: 'Merged to Main', icon: '🚀' },
+  ]}
+  connections={[
+    { from: 0, to: 1, label: 'goes through' },
+    { from: 1, to: 2, label: 'then' },
+    { from: 2, to: 3, label: 'then' },
+    { from: 3, to: 4, label: 'approved' },
+  ]}
+/>
+
+## The AI-Generated Test Review Checklist {#review-generate}
+
+Apply this checklist to every PR that contains AI-generated test code. Print it, pin it to your team channel, or add it as a PR template.
+
+| # | Check | Why It Matters |
+| --- | --- | --- |
+| 1 | Does the test name describe expected behaviour, not implementation? | Tests named after methods break on rename; behaviour names survive refactors |
+| 2 | Is the assertion specific enough to catch a real regression? | `toBeTruthy()` passes on `'false'`; use `toBe(true)` |
+| 3 | Could this test pass without the code it is testing? | Tests that only assert what mocks return have zero value |
+| 4 | Are there hardcoded credentials, tokens, or PII in the test data? | AI sometimes generates real-looking secrets as examples |
+| 5 | Does the test depend on time, random values, or execution order? | These create flaky tests that erode CI trust |
+| 6 | Are error scenarios tested, not just happy paths? | Copilot defaults to success cases unless explicitly asked otherwise |
+| 7 | Is the mock reset between tests (`afterEach`)? | Stale mock state causes false passes in subsequent tests |
+| 8 | Do integration tests use isolated data (unique IDs, transactions)? | Shared data between tests causes non-deterministic failures |
+
+## Prompt Templates for Self-Correction
+
+When Copilot's output fails your checklist, use these follow-up prompts in Copilot Chat to correct specific problems:
+
+```bash
+# Problem: vague assertions
+"Review this test. Replace any toBeTruthy/toBeFalsy assertions with specific matchers."
+
+# Problem: missing error cases
+"This test suite only covers success paths. Add tests for all error conditions."
+
+# Problem: tautological tests (testing mocks)
+"Does this test actually verify the service behaviour, or does it only verify
+ what the mock returns? If the latter, rewrite it to test a real behaviour."
+
+# Problem: flaky time dependency
+"This test uses new Date() or Date.now() in an assertion. Rewrite it to be
+ time-independent using jest.useFakeTimers() or by comparing relative values."
+
+# Problem: missing call-argument assertions
+"Add assertions to verify that all mocked dependencies were called with the
+ correct arguments, not just that they were called."
+
+# General quality review
+"Review this test file for: vague assertions, missing error scenarios,
+ hardcoded secrets, flaky patterns, and missing mock resets. List issues found."
+```
+
+:::tip[💡 Copilot can review its own output]
+
+Select the generated test, open Chat, and ask _"What is wrong with this test?"_ Copilot will often identify issues it introduced. It is not infallible, but it is a fast first filter.
+
+:::
+
+## Spotting False Confidence
+
+False confidence is when coverage metrics look good but the tests would not catch a real bug. These patterns are common in AI-generated output:
+
+```typescript
+// ❌ Tautological test — only verifies what the mock returns
+it('should return a user', async () => {
+  mockRepo.findById.mockResolvedValue({ id: '1', name: 'Alice' });
+  const result = await userService.getUser('1');
+  expect(result).toBeDefined();  // passes even if service does nothing
+});
+
+// ✅ Behaviour test — verifies the service transforms/validates the data
+it('should return a user with formatted name', async () => {
+  mockRepo.findById.mockResolvedValue({ id: '1', name: '  alice  ' });
+  const result = await userService.getUser('1');
+  expect(result.name).toBe('Alice');           // verifies trimming + capitalisation
+  expect(mockRepo.findById).toHaveBeenCalledWith('1');  // verifies correct lookup
+});
+```
+
+## Team-Level Guardrails
+
+| Guardrail | Implementation | Enforced By |
+| --- | --- | --- |
+| No `toBeTruthy/toBeFalsy` in tests | ESLint rule: `jest/no-truthy-falsy` | Pre-commit / CI lint |
+| Minimum coverage threshold | Jest `coverageThreshold` in config | CI quality gate |
+| No secrets in test files | gitleaks / truffleHog scan | CI pre-merge |
+| PR description must note AI-generated tests | PR template checkbox | PR review process |
+| All tests pass before merge | GitHub branch protection + required status checks | GitHub repository settings |
+
+## ESLint Config for Test Quality
+
+```json
+// .eslintrc.json — add these rules for AI-assisted test quality
+{
+  "plugins": ["jest"],
+  "rules": {
+    "jest/no-truthy-falsy": "error",
+    "jest/prefer-expect-assertions": "warn",
+    "jest/no-identical-title": "error",
+    "jest/valid-expect": "error",
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error"
+  }
+}
+```
+
+## PR Metadata and Auto-Labeling
+
+Do not rely on memory for AI disclosure. Add a machine-readable signal in every AI-assisted test PR and auto-apply a label reviewers can filter.
+
+```yaml
+# .github/workflows/label-ai-pr.yml
+name: Label AI-assisted PRs
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Add label when PR template indicates AI-generated tests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const marker = '- [x] This PR contains AI-generated tests';
+            if (body.includes(marker)) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: ['ai-generated-tests']
+              });
+            }
+```
+
+## Exercise B — Part 2: The Flaky-Test Moment
+
+Flaky tests are not bugs in your code — they are bugs in your_assumptions_. Non-determinism makes a test pass sometimes and fail others, eroding trust in the whole suite.
+
+```typescript
+// ❌ Flaky — depends on wall-clock timing
+it('sentAt is within 50ms of the call', () => {
+  const before = Date.now();
+  const log = notificationService.send(payload);
+  const after = Date.now();
+
+  // Fails on a loaded CI runner where the function takes > 50ms
+  expect(log.sentAt.getTime()).toBeLessThanOrEqual(after + 50);
+});
+
+// ✅ Deterministic — mock the clock
+it('sentAt is the mocked time', () => {
+  jest.useFakeTimers().setSystemTime(new Date('2026-07-10T12:00:00Z'));
+
+  const log = notificationService.send(payload);
+
+  expect(log.sentAt).toEqual(new Date('2026-07-10T12:00:00Z'));
+
+  jest.useRealTimers();
+});
+```
+
+:::tip[Copilot prompt to fix a flaky test]
+
+```bash
+"Make this test deterministic. The sentAt field depends on Date.now() —
+replace the timing assertion with jest.useFakeTimers() and a fixed timestamp."
+```
+
+Alternatively, if you only need to verify _structure_ rather than exact value: assert that `sentAt` is an instance of `Date`, not a specific timestamp.
+
+:::
+
+| Non-determinism source | Fix |
+| --- | --- |
+| `Date.now()` / `new Date()` | `jest.useFakeTimers().setSystemTime(new Date(...))` |
+| `Math.random()` | Mock with `jest.spyOn(Math, 'random').mockReturnValue(0.5)` |
+| `sleep()` / fixed delays | Use `waitFor()` — polls until ready or times out cleanly |
+| Shared module-level state | Reset in `beforeEach`; generate unique IDs per test |
+
+<div id="review-exercise">
+
+<TimedExercise minutes={10} title="Hands-on Challenge">
+
+Open `tests/unit/calculateDiscount.weak.test.ts` — five pre-seeded, AI-generated tests that all pass today. Apply the review checklist above to each one, identify what real bug could slip through it, and use a Copilot Chat follow-up prompt to rewrite it with a specific-value assertion. Then add the missing tests called out in the file's own comments and verify your rewrites still pass — but now for the right reason.
+
+### The Prompt
+
+Select both files in Copilot Chat and use this prompt:
+
+```bash
+You are reviewing a Jest test file for a TypeScript Node.js project.
+
+Context files:
+- #file:tests/unit/calculateDiscount.weak.test.ts
+- #file:src/services/calculateDiscount.ts
+
+For each test in calculateDiscount.weak.test.ts:
+1. State whether the assertion checks a specific value or just existence/truthiness/no-throw.
+2. Explain what bug could exist in the implementation and still make this test pass.
+3. Rewrite the assertion to assert the exact expected value using .toBe()/.toEqual().
+
+Then write the 4 missing test cases listed in the comment at the bottom of the file:
+1. Exact discountAmount for SAVE10 on $100 (should be $10, not $100)
+2. FLAT5 below the $20 minimum (should not apply)
+3. finalTotal should never go negative
+4. Edge cases: $0 subtotal, very large amounts
+
+Do NOT modify src/services/calculateDiscount.ts — only the test file.
+```
+
+### Run It First — Confirm the False Confidence
+
+```bash
+npm test -- tests/unit/calculateDiscount.weak.test.ts
+```
+
+<VerifyBlock>
+
+```text
+PASS  tests/unit/calculateDiscount.weak.test.ts
+  calculateDiscount (weak AI-generated tests)
+    ✓ returns a result object (1 ms)
+    ✓ SAVE10 produces a discount
+    ✓ FLAT5 reduces the total (1 ms)
+    ✓ unknown code does not throw
+    ✓ code is case-insensitive (1 ms)
+
+Tests:       5 passed, 5 total
+```
+
+</VerifyBlock>
+
+:::::tip[💡 This all-green result is correct — and the problem]
+
+`toBeDefined()` / `toBeTruthy()` pass on any non-empty, non-zero result — so BUG 1 (SAVE10 giving 100% off instead of 10%) still passes, since `discountAmount` is truthy either way
+- `not.toThrow()` only checks that nothing threw, not what was returned
+- `finalTotal &lt; discountAmount + finalTotal` is tautological — true by arithmetic for any positive discount, so it proves nothing about the actual values
+- The case-insensitivity test compares `SAVE10` vs `save10` results to _each other_, never to a correct expected value — so even though both incorrectly return $100, they match and the test passes
+
+:::::
+
+<Collapsible title="Hint: Where to look first" variant="hint">
+
+- Every assertion in the file uses `toBeDefined()`, `toBeTruthy()`, `not.toThrow()`, or compares two calls to each other — none assert a specific expected value
+- The case-insensitivity test only checks that `SAVE10` and `save10` return the _same_ amount, never that the amount is correct ($10, not $100)
+- The bottom of the file lists 4 missing cases: exact SAVE10 amount, FLAT5 below the $20 minimum, the negative-`finalTotal` clamp, and edge amounts ($0, very large)
+
+</Collapsible>
+
+<Collapsible title="Bonus: Write a PR template" variant="bonus">
+
+Create a `.github/pull_request_template.md` that includes an "AI-Generated Code" section with the 8-point checklist above as checkboxes. Ask Copilot to generate the markdown for you.
+
+</Collapsible>
+
+</TimedExercise>
+
+<TimedExercise minutes={10} title="Spot the Bad Tests">
+
+Each snippet below was generated by Copilot. Identify the problem in each, explain why it's dangerous, and use Copilot to fix it.
+
+### Pattern 1 — The Flaky Wait
+
+```typescript
+it('saves user to the database', async () => {
+  await saveUser(user);
+  await sleep(2000); // ← what's wrong here?
+  expect(db.find(user.id)).toBeDefined();
+});
+```
+
+<Collapsible title="What's wrong?" variant="hint">
+
+- `sleep(2000)` is a fixed 2-second wait — slow on fast machines, flaky on slow ones
+- Use `waitFor(() =&gt; expect(db.find(user.id)).toBeDefined())` — polls until ready or times out cleanly
+- Copilot fix prompt: _"Replace the sleep() with a proper waitFor() assertion"_
+
+</Collapsible>
+
+### Pattern 2 — Shared State
+
+```typescript
+const testOrderId = '550e8400-e29b-41d4-a716-446655440000'; // module-level
+
+it('processes order', () => {
+  const result = processOrder({ id: testOrderId }); // ← shared state?
+  expect(result.status).toBe('complete');
+});
+```
+
+<Collapsible title="What's wrong?" variant="hint">
+
+- Module-level `testOrderId` is shared across all tests in the file
+- If another test mutates the order with that ID, this test becomes order-dependent and flaky
+- Fix: generate a fresh ID in each test with `crypto.randomUUID()` or use a factory
+
+</Collapsible>
+
+### Pattern 3 — Hardcoded Credential
+
+```typescript
+const token = 'ghp_abc123realtoken456'; // ← never do this
+
+it('calls API with auth header', async () => {
+  const res = await apiClient.get('/users', { headers: { Authorization: `Bearer ${token}` } });
+  expect(res.status).toBe(200);
+});
+```
+
+<Collapsible title="What's wrong?" variant="hint">
+
+- A hardcoded token committed to source control is a critical secret leak (OWASP A07)
+- Even fake-looking tokens will trigger **gitleaks** and secret scanners
+- Fix: use `process.env.TEST_API_TOKEN`; store real values in `.env.test` (gitignored)
+- Copilot fix prompt: _"Replace the hardcoded token with process.env.TEST_API_TOKEN"_
+
+</Collapsible>
+
+</TimedExercise>
+
+</div>
+
+## Key Takeaways {#review-debrief}
+
+<div className="summary-card">
+
+- A systematic review checklist turns ad-hoc review into a repeatable process
+- Copilot can review its own output — use Chat follow-up prompts to self-correct
+- False confidence is more dangerous than no tests — detect it with behaviour-focused assertions
+- Enforce guardrails with ESLint rules, gitleaks, and branch protection — not just reviews
+- Label AI-generated test PRs explicitly so reviewers know to apply the checklist
+
+</div>
