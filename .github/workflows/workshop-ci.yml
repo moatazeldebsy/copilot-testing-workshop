@@ -61,8 +61,10 @@ jobs:
       - name: Build store UI
         run: npm run build
 
+      # jest.config.ts carries the 80% threshold participants work towards in
+      # Exercise E; override it here so coverage is reported, not enforced.
       - name: Unit, API and component tests
-        run: npm test -- --coverage --coverageReporters=json-summary --coverageReporters=text-summary
+        run: npm test -- --coverage --coverageReporters=json-summary --coverageReporters=text-summary --coverageThreshold='{}'
 
       - name: Report coverage (not gated on the starter)
         run: |
@@ -118,7 +120,7 @@ jobs:
       - name: Solved suite passes against the fixed implementation
         run: |
           cp src/services/calculateDiscount.fixed.ts src/services/calculateDiscount.ts
-          npm test -- --coverage --coverageReporters=json-summary --coverageReporters=text-summary
+          npm test -- --coverage --coverageReporters=json-summary --coverageReporters=text-summary --coverageThreshold='{}'
 
       - name: Report coverage
         run: |
