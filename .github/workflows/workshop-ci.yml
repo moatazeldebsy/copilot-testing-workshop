@@ -1,0 +1,137 @@
+# CI for the hands-on app in workshop-exercises/.
+#
+# master is the participants' starting point: tests are deliberately incomplete
+# (it.todo stubs, test.fixme E2E) and calculateDiscount.ts has three planted
+# bugs, so coverage is reported but not gated here. The 80% gate participants
+# build in Exercise E lives in workshop-exercises/.github/workflows/test.yml.
+#
+# The solutions branch proves the exercises work: its strong unit tests must
+# fail against the buggy calculateDiscount.ts (they catch the bugs) and the
+# whole solved suite must pass once calculateDiscount.fixed.ts is swapped in.
+name: Workshop CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'workshop-exercises/**'
+      - '.github/workflows/workshop-ci.yml'
+      - '.github/scripts/run-e2e.sh'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'workshop-exercises/**'
+      - '.github/workflows/workshop-ci.yml'
+      - '.github/scripts/run-e2e.sh'
+  # The solutions job checks out another branch, so re-verify it weekly too.
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workshop-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: workshop-exercises
+
+jobs:
+  starter:
+    name: Starter (master) is healthy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: workshop-exercises/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit -p .
+
+      - name: Build store UI
+        run: npm run build
+
+      # jest.config.ts carries the 80% threshold participants work towards in
+      # Exercise E; override it here so coverage is reported, not enforced.
+      - name: Unit, API and component tests
+        run: npm test -- --coverage --coverageReporters=json-summary --coverageReporters=text-summary --coverageThreshold='{}'
+
+      - name: Report coverage (not gated on the starter)
+        run: |
+          node -e "
+            const t = require('./coverage/coverage-summary.json').total;
+            const row = (k) => '| ' + k + ' | ' + t[k].pct + '% |';
+            console.log(['### Starter coverage', '', 'Reported only: participants raise it in Exercise E.', '', '| Metric | Covered |', '| --- | --- |', ...['lines', 'statements', 'functions', 'branches'].map(row)].join('\n'));
+          " >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (placeholders are test.fixme on master)
+        run: bash ../.github/scripts/run-e2e.sh
+
+  solutions:
+    name: Solutions prove the exercises
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: solutions
+
+      # The E2E helper lives on master; solutions doesn't carry it.
+      - uses: actions/checkout@v4
+        with:
+          path: ci-tools
+          sparse-checkout: .github/scripts
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: workshop-exercises/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit -p .
+
+      - name: Build store UI
+        run: npm run build
+
+      - name: Strong tests catch the planted bugs
+        run: |
+          if npx jest --runInBand tests/unit/calculateDiscount.test.ts; then
+            echo "::error::The solved calculateDiscount tests passed against the buggy implementation, so they no longer catch the planted bugs."
+            exit 1
+          fi
+          echo "As expected: the solved tests fail against the buggy calculateDiscount.ts."
+
+      - name: Solved suite passes against the fixed implementation
+        run: |
+          cp src/services/calculateDiscount.fixed.ts src/services/calculateDiscount.ts
+          npm test -- --coverage --coverageReporters=json-summary --coverageReporters=text-summary --coverageThreshold='{}'
+
+      - name: Report coverage
+        run: |
+          node -e "
+            const t = require('./coverage/coverage-summary.json').total;
+            const row = (k) => '| ' + k + ' | ' + t[k].pct + '% |';
+            console.log(['### Solutions coverage (fixed implementation)', '', '| Metric | Covered |', '| --- | --- |', ...['lines', 'statements', 'functions', 'branches'].map(row)].join('\n'));
+          " >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Solved E2E checkout flow
+        run: bash ../ci-tools/.github/scripts/run-e2e.sh

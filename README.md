@@ -1,5 +1,7 @@
 # GenAI in Testing: Using GitHub Copilot to Accelerate Quality Without Losing Trust
 
+[![Workshop CI](https://github.com/moatazeldebsy/copilot-testing-workshop/actions/workflows/workshop-ci.yml/badge.svg)](https://github.com/moatazeldebsy/copilot-testing-workshop/actions/workflows/workshop-ci.yml) [![Deploy docs site](https://github.com/moatazeldebsy/copilot-testing-workshop/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/moatazeldebsy/copilot-testing-workshop/actions/workflows/deploy-docs.yml)
+
 Workshop materials for **WeAreDevelopers Berlin 2026**.
 
 **Session:** [GenAI in Testing — WeAreDevelopers World Congress](https://www.wearedevelopers.com/world-congress/agenda/workshops/genai-in-testing-using-github-copilot-to-accelerate-quality-without-losing-trust-1107886)
@@ -136,6 +138,15 @@ All narrative/reference documentation for the workshop lives inside `workshop-ex
 the root Docusaurus site reads `workshop-exercises/docs/tutorials/*.md` directly (a second docs
 plugin instance) and renders it as the site's `/tutorials` pages, so there's a single source of
 truth instead of a copy on each side.
+
+## Continuous Integration
+
+[`.github/workflows/workshop-ci.yml`](.github/workflows/workshop-ci.yml) checks the hands-on app on every change:
+
+- **Starter (`master`) is healthy:** typecheck, build, unit/API/component tests and the Playwright suite. Coverage is reported in the run summary but not gated, because `master` is deliberately incomplete.
+- **Solutions prove the exercises:** on the `solutions` branch, the strong `calculateDiscount` tests must *fail* against the buggy implementation (they catch the three planted bugs), and the whole solved suite plus the E2E checkout flow must pass once `calculateDiscount.fixed.ts` is swapped in.
+
+The 80% coverage gate you build in Exercise E is `workshop-exercises/.github/workflows/test.yml`. It's part of the exercise, so it lives inside `workshop-exercises/` and doesn't run in this repository (GitHub only runs workflows from the root `.github/workflows/`). Copy it to your own project's root `.github/workflows/` to use it.
 
 ## Recovery: the `solutions` Branch
 
