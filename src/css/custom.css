@@ -1,0 +1,492 @@
+/*
+ * GitHub Primer + Copilot theme for Docusaurus (Infima).
+ * Dark is the default color mode; light mirrors github.com light.
+ */
+
+:root {
+  /* Primer light */
+  --gh-canvas: #ffffff;
+  --gh-canvas-subtle: #f6f8fa;
+  --gh-canvas-inset: #eff2f5;
+  --gh-border: #d0d7de;
+  --gh-border-muted: #d8dee4;
+  --gh-fg: #1f2328;
+  --gh-fg-muted: #59636e;
+  --gh-link: #0969da;
+  --gh-violet: #8250df;
+  --gh-violet-soft: rgba(130, 80, 223, 0.1);
+  --gh-pink: #bf3989;
+  --gh-ghost: #8c959f;
+  --gh-success: #1a7f37;
+  --gh-attention: #9a6700;
+  --gh-danger: #d1242f;
+  --copilot-gradient: linear-gradient(90deg, #8250df 0%, #bf3989 100%);
+
+  --ifm-color-primary: #8250df;
+  --ifm-color-primary-dark: #7340d6;
+  --ifm-color-primary-darker: #6d3bcd;
+  --ifm-color-primary-darkest: #5a31a9;
+  --ifm-color-primary-light: #9165e3;
+  --ifm-color-primary-lighter: #996fe5;
+  --ifm-color-primary-lightest: #b08fea;
+
+  --ifm-background-color: var(--gh-canvas);
+  --ifm-background-surface-color: var(--gh-canvas);
+  --ifm-font-color-base: var(--gh-fg);
+  --ifm-color-emphasis-300: var(--gh-border);
+  --ifm-toc-border-color: var(--gh-border-muted);
+  --ifm-hr-border-color: var(--gh-border-muted);
+  --ifm-link-color: var(--gh-link);
+  --ifm-link-hover-color: var(--gh-link);
+  --ifm-menu-color: var(--gh-fg-muted);
+  --ifm-menu-color-active: var(--gh-fg);
+  --ifm-menu-color-background-active: var(--gh-violet-soft);
+  --ifm-menu-color-background-hover: rgba(208, 215, 222, 0.32);
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.82);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 4rem;
+  --ifm-footer-background-color: var(--gh-canvas-subtle);
+
+  --ifm-font-family-base: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  --ifm-heading-font-family: 'Hubot Sans', 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ifm-font-family-monospace: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.65;
+  --ifm-heading-font-weight: 700;
+  --ifm-code-font-size: 88%;
+  --ifm-code-border-radius: 6px;
+  --ifm-global-radius: 6px;
+  --ifm-pre-background: var(--gh-canvas-subtle);
+  --ifm-code-background: rgba(175, 184, 193, 0.2);
+  --ifm-table-stripe-background: transparent;
+  --ifm-table-border-color: var(--gh-border);
+  --ifm-table-head-background: var(--gh-canvas-subtle);
+  --docusaurus-highlighted-code-line-bg: rgba(130, 80, 223, 0.12);
+  --docusaurus-announcement-bar-height: auto;
+
+  /* Legacy tokens used by the carried-over workshop components */
+  --bg-primary: var(--gh-canvas);
+  --bg-surface: var(--gh-canvas-subtle);
+  --bg-deep: var(--gh-canvas-inset);
+  --border-color: var(--gh-border);
+  --text-primary: var(--gh-fg);
+  --text-body: var(--gh-fg);
+  --text-muted: var(--gh-fg-muted);
+  --text-dim: var(--gh-ghost);
+  --accent-primary: var(--gh-violet);
+  --accent-light: var(--gh-violet);
+  --accent-hover: #6639ba;
+  --accent-cta: var(--gh-pink);
+  --success: var(--gh-success);
+  --warning: var(--gh-attention);
+  --error: var(--gh-danger);
+}
+
+[data-theme='dark'] {
+  /* Primer dark */
+  --gh-canvas: #0d1117;
+  --gh-canvas-subtle: #151b23;
+  --gh-canvas-inset: #010409;
+  --gh-border: #3d444d;
+  --gh-border-muted: #2a313c;
+  --gh-fg: #f0f6fc;
+  --gh-fg-muted: #9198a1;
+  --gh-link: #4493f8;
+  --gh-violet: #ab7df8;
+  --gh-violet-soft: rgba(171, 125, 248, 0.14);
+  --gh-pink: #f778ba;
+  --gh-ghost: #656c76;
+  --gh-success: #3fb950;
+  --gh-attention: #d29922;
+  --gh-danger: #f85149;
+  --copilot-gradient: linear-gradient(90deg, #ab7df8 0%, #f778ba 100%);
+
+  --ifm-color-primary: #ab7df8;
+  --ifm-color-primary-dark: #9a64f6;
+  --ifm-color-primary-darker: #9157f6;
+  --ifm-color-primary-darkest: #7530f3;
+  --ifm-color-primary-light: #bc96fa;
+  --ifm-color-primary-lighter: #c5a3fa;
+  --ifm-color-primary-lightest: #ddc9fc;
+
+  --ifm-background-color: var(--gh-canvas);
+  --ifm-background-surface-color: var(--gh-canvas);
+  --ifm-navbar-background-color: rgba(13, 17, 23, 0.8);
+  --ifm-footer-background-color: var(--gh-canvas-inset);
+  --ifm-menu-color-background-hover: rgba(101, 108, 118, 0.2);
+  --ifm-code-background: rgba(101, 108, 118, 0.25);
+  --ifm-pre-background: #151b23;
+  --docusaurus-highlighted-code-line-bg: rgba(171, 125, 248, 0.16);
+  --accent-hover: #c8a6fb;
+}
+
+html {
+  background-color: var(--gh-canvas);
+}
+
+body {
+  font-feature-settings: 'ss01', 'ss02';
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-stretch: 105%;
+  letter-spacing: -0.012em;
+}
+
+.markdown h1:first-child {
+  --ifm-h1-font-size: clamp(2rem, 1.6rem + 1.6vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.markdown h2 {
+  --ifm-h2-font-size: 1.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--gh-border-muted);
+  margin-top: 2.75rem;
+}
+
+.markdown h3 {
+  --ifm-h3-font-size: 1.2rem;
+  margin-top: 2rem;
+}
+
+.markdown a:not(.card):not(.button) {
+  text-underline-offset: 0.2em;
+}
+
+/* ─── Navbar: translucent like github.com ─── */
+.navbar {
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--gh-border-muted);
+}
+
+.navbar__title {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 700;
+  font-stretch: 110%;
+}
+
+.navbar__logo {
+  height: 1.75rem;
+}
+
+.navbar__link {
+  font-weight: 500;
+  font-size: 0.925rem;
+}
+
+.navbar__link--active {
+  color: var(--gh-fg);
+  box-shadow: inset 0 -2px 0 var(--ifm-color-primary);
+}
+
+.header-github-link::before {
+  content: '';
+  display: flex;
+  width: 22px;
+  height: 22px;
+  background-color: var(--gh-fg);
+  mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+.header-github-link:hover {
+  opacity: 0.7;
+}
+
+/* ─── Announcement bar ─── */
+.theme-announcement-bar {
+  background: var(--gh-canvas-subtle) !important;
+  color: var(--gh-fg-muted) !important;
+  border-bottom: 1px solid var(--gh-border-muted) !important;
+  font-size: 0.875rem;
+}
+
+.theme-announcement-bar a {
+  color: var(--gh-link);
+  font-weight: 600;
+}
+
+/* ─── Buttons: Primer ─── */
+.button {
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+html .button.button--primary {
+  --ifm-button-color: #fff;
+  color: #fff;
+  --ifm-button-background-color: #8957e5;
+  --ifm-button-border-color: rgba(240, 246, 252, 0.1);
+}
+
+html .button.button--primary:hover {
+  --ifm-button-background-color: #7c4ddb;
+  --ifm-button-border-color: rgba(240, 246, 252, 0.1);
+  color: #fff;
+}
+
+html .button.button--secondary {
+  --ifm-button-color: var(--gh-fg);
+  --ifm-button-background-color: var(--gh-canvas-subtle);
+  --ifm-button-border-color: var(--gh-border);
+  color: var(--gh-fg);
+}
+
+html .button.button--secondary:hover {
+  --ifm-button-background-color: var(--gh-border-muted);
+  --ifm-button-border-color: var(--gh-border);
+  color: var(--gh-fg);
+}
+
+/* ─── Sidebar: docs.github.com style ─── */
+.theme-doc-sidebar-container {
+  border-right-color: var(--gh-border-muted) !important;
+}
+
+.menu {
+  font-size: 0.9rem;
+  padding: 1rem 0.75rem !important;
+}
+
+.menu__list-item-collapsible > .menu__link--sublist,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--gh-fg);
+}
+
+.theme-doc-sidebar-item-category-level-1 {
+  margin-top: 0.5rem;
+}
+
+.menu__link {
+  border-radius: 6px;
+  position: relative;
+  line-height: 1.35;
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  font-weight: 600;
+}
+
+.menu__link--active:not(.menu__link--sublist)::before {
+  content: '';
+  position: absolute;
+  left: -0.5rem;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  width: 4px;
+  border-radius: 6px;
+  background: var(--copilot-gradient);
+}
+
+/* ─── TOC ─── */
+.table-of-contents {
+  font-size: 0.8125rem;
+}
+
+.table-of-contents__link--active {
+  color: var(--gh-fg);
+  font-weight: 600;
+}
+
+.theme-doc-toc-desktop {
+  border-left: 1px solid var(--gh-border-muted);
+  padding-left: 0.25rem;
+}
+
+/* ─── Code ─── */
+.theme-code-block {
+  border: 1px solid var(--gh-border-muted);
+  box-shadow: none !important;
+}
+
+[data-theme='dark'] .theme-code-block pre,
+[data-theme='dark'] .prism-code {
+  background-color: #151b23 !important;
+}
+
+code {
+  border: none;
+  padding: 0.15em 0.4em;
+}
+
+kbd {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8em;
+  padding: 0.15em 0.45em;
+  border: 1px solid var(--gh-border);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--gh-canvas-subtle);
+  box-shadow: none;
+  color: var(--gh-fg);
+}
+
+/* ─── Tables ─── */
+.markdown table {
+  display: table;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.markdown table th {
+  text-align: left;
+  font-weight: 600;
+}
+
+/* ─── Admonitions: GitHub markdown alerts ─── */
+.theme-admonition {
+  --ifm-alert-background-color: transparent;
+  --ifm-alert-background-color-highlight: transparent;
+  --ifm-alert-foreground-color: var(--gh-fg);
+  --ifm-alert-border-width: 0;
+  --ifm-alert-border-left-width: 0.25rem;
+  --ifm-alert-padding-vertical: 0.75rem;
+  --ifm-alert-padding-horizontal: 1rem;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.theme-admonition [class^='admonitionHeading'] {
+  text-transform: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.alert--secondary,
+.theme-admonition-note {
+  --ifm-alert-border-color: #4493f8;
+}
+.theme-admonition-note [class^='admonitionHeading'] {
+  color: var(--gh-link);
+}
+.alert--success,
+.theme-admonition-tip {
+  --ifm-alert-border-color: var(--gh-success);
+}
+.theme-admonition-tip [class^='admonitionHeading'] {
+  color: var(--gh-success);
+}
+.alert--info,
+.theme-admonition-info {
+  --ifm-alert-border-color: var(--gh-violet);
+}
+.theme-admonition-info [class^='admonitionHeading'] {
+  color: var(--gh-violet);
+}
+.alert--warning,
+.theme-admonition-warning {
+  --ifm-alert-border-color: var(--gh-attention);
+}
+.theme-admonition-warning [class^='admonitionHeading'] {
+  color: var(--gh-attention);
+}
+.alert--danger,
+.theme-admonition-danger {
+  --ifm-alert-border-color: var(--gh-danger);
+}
+.theme-admonition-danger [class^='admonitionHeading'] {
+  color: var(--gh-danger);
+}
+.theme-admonition [class^='admonitionIcon'] svg {
+  fill: currentColor;
+}
+
+/* ─── Pagination & cards ─── */
+.pagination-nav__link {
+  border-color: var(--gh-border-muted);
+  border-radius: 6px;
+  transition: border-color 120ms ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.pagination-nav__sublabel {
+  color: var(--gh-fg-muted);
+  font-size: 0.75rem;
+}
+
+.card {
+  border: 1px solid var(--gh-border-muted);
+  box-shadow: none !important;
+  background: var(--gh-canvas);
+}
+
+.card:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+/* ─── Footer ─── */
+.footer--dark {
+  --ifm-footer-background-color: var(--gh-canvas-inset);
+  --ifm-footer-link-color: var(--gh-fg-muted);
+  --ifm-footer-title-color: var(--gh-fg);
+  border-top: 1px solid var(--gh-border-muted);
+}
+
+[data-theme='light'] .footer--dark {
+  --ifm-footer-background-color: var(--gh-canvas-subtle);
+  --ifm-footer-link-color: var(--gh-fg-muted);
+  --ifm-footer-title-color: var(--gh-fg);
+  --ifm-footer-color: var(--gh-fg-muted);
+}
+
+/* ─── Workshop page chrome ─── */
+.page-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.page-header-meta .page-meta {
+  margin: 0;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 1.6rem;
+  padding: 0 0.65rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--copilot-gradient);
+}
+
+.page-lead {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--gh-fg-muted);
+  margin-bottom: 1.5rem;
+}
+
+.page-lead p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Focus & motion ─── */
+:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

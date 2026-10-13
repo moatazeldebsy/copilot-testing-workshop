@@ -1,0 +1,260 @@
+---
+title: "Introduction to GitHub Copilot"
+sidebar_label: "Introduction to GitHub Copilot"
+slug: /workshop/copilot-intro
+description: "GitHub Copilot is an AI-powered coding assistant built on large language models. Before using it for test generation, you need to understand what it is, how it reasons about…"
+---
+
+# Introduction to GitHub Copilot
+
+<div className="page-header-meta">
+  <span className="step-badge">Step 2</span>
+  <PageMeta duration="15 min" difficulty="beginner" />
+</div>
+
+<div className="page-lead">
+
+GitHub Copilot is an AI-powered coding assistant built on large language models. Before using it for test generation, you need to understand what it is, how it reasons about your code, which interaction modes exist, and the full command vocabulary available to you in VS Code.
+
+</div>
+
+<ArchDiagram
+  title="How GitHub Copilot Works"
+  nodes={[
+    { label: 'Your Code + Context', icon: '📝' },
+    { label: 'Copilot Extension', icon: '🔌' },
+    { label: 'LLM (GPT-4o / Claude / Gemini)', icon: '🧠' },
+    { label: 'Suggestion / Response', icon: '✨' },
+    { label: 'Your Editor', icon: '💻' },
+  ]}
+  connections={[
+    { from: 0, to: 1, label: 'sent as prompt' },
+    { from: 1, to: 2, label: 'forwarded to' },
+    { from: 2, to: 3, label: 'generates' },
+    { from: 3, to: 4, label: 'rendered in' },
+  ]}
+/>
+
+## What GitHub Copilot Is {#intro-foundations}
+
+GitHub Copilot is an AI pair programmer embedded in your editor. It reads the code you have open — the current file, related files, comments, and your cursor position — and predicts what you likely want to write or asks you clarifying questions. It does **not** execute your code autonomously unless you use Agent mode; otherwise it reasons purely from the context window it receives.
+
+| Property | Detail |
+| --- | --- |
+| Available models | GPT-4o, Claude Sonnet, Gemini, o3-mini, and more — switchable per session |
+| Context window | Up to ~64 k tokens of surrounding code, comments, and open files |
+| Supported IDEs | VS Code, JetBrains, Visual Studio, Neovim, Xcode, Eclipse, and more |
+| Supported languages | All major languages; strongest for JavaScript/TypeScript, Python, Go, Java, C# |
+| Data privacy | Prompts and suggestions are not retained for model training on Business/Enterprise plans |
+
+## Interaction Surfaces
+
+Copilot surfaces in VS Code in several ways. Each targets a different workflow:
+
+| Surface | Shortcut | Best for |
+| --- | --- | --- |
+| **Inline completions** | Just start typing — ghost text appears automatically | Boilerplate, function bodies, one-liners; accept with <kbd>Tab</kbd> |
+| **Next Edit Suggestions (NES)** | <kbd>Tab</kbd> to navigate &amp; accept gutter arrow suggestions | Copilot proactively predicts the next edit location across files |
+| **Inline Chat** | <kbd>⌘I</kbd> / <kbd>Ctrl+I</kbd> | Targeted edits — refactor, add tests, or fix a specific code region |
+| **Chat sidebar** | <kbd>⌃⌘I</kbd> / <kbd>Ctrl+Alt+I</kbd> | Conversations, code generation, explanations, multi-file tasks |
+| **Quick Chat** | <kbd>⇧⌥⌘L</kbd> / <kbd>Ctrl+Shift+Alt+L</kbd> | Fast one-off questions without leaving your current context |
+
+## Chat Modes
+
+The Chat sidebar has three modes, selectable from the dropdown at the bottom of the chat view:
+
+| Mode | What it does | When to use |
+| --- | --- | --- |
+| **Ask** | Answers coding questions and provides code suggestions | Understanding code, exploring ideas, getting help with syntax |
+| **Agent** | Autonomously edits files, runs terminal commands, iterates until task is complete | Complex multi-step tasks — generate tests, refactor, fix bugs end-to-end |
+| **Plan** | Creates a detailed implementation plan _before_ touching any code | Large features where you want to review the approach before Copilot acts |
+
+### What Changed in Modern Copilot
+
+If your mental model is from older Copilot releases, these are the highest-impact shifts to adopt before using Copilot for production test workflows.
+
+| Then | Now |
+| --- | --- |
+| Mostly inline autocomplete | Ask, Plan, and Agent modes support multi-step test generation and refactoring workflows |
+| Manual model picking for most tasks | Auto model selection is usually the best default for quality, reliability, and cost balance |
+| One-off prompts with limited operational controls | Agent sessions are manageable artifacts: monitor logs, steer mid-run, and continue in VS Code or CLI |
+| Tooling mostly local to editor context | MCP and cloud-agent integrations can bring GitHub, browser, and platform context directly into workflows |
+| Few safety boundaries around agentic execution | Sandboxing, least-privilege tools, and automation policies are core governance controls |
+
+### Agent Management in Practice
+
+Modern Copilot workflows are not just about starting an agent task. GitHub now emphasizes managing agent sessions as ongoing work: start tasks, inspect logs, steer mid-run, and resume the work in your local tools when needed.
+
+| Capability | Why it matters |
+| --- | --- |
+| Run multiple sessions | Useful when one agent investigates a flaky test while another drafts a fix or refactor |
+| Steer mid-session | Lets you narrow scope, request a safer tool choice, or force the agent to inspect a specific failure signal |
+| Review logs and outputs | Important for trust: you should see what the agent tried before you accept any code or PR changes |
+| Open in VS Code or Copilot CLI | Helpful when cloud-agent work needs local follow-up, faster iteration, or deeper debugging against your environment |
+
+:::tip[Workshop rule]
+
+Use **Plan** first for risky or broad work, then **Agent**for execution, and always review session logs or diffs before treating the result as trustworthy.
+
+:::
+
+## Model Selection for Testing Tasks
+
+Model availability changes by plan and rollout, so optimize for task fit instead of memorizing one "best" model. Pick the smallest scope and cheapest prompt that still produces reliable output, then escalate only when complexity increases.
+
+| Task profile | Recommended approach | Escalate when |
+| --- | --- | --- |
+| Fast test draft | Use a lightweight model path with narrow `#file` context | Generated assertions are vague or miss negative paths |
+| Bug triage and flaky failures | Use a stronger reasoning model with explicit failure output | Root cause still unclear after one focused iteration |
+| Multi-file refactor + tests | Run **Plan** mode first, then **Agent** mode for implementation | Task touches contracts, auth, or shared utilities |
+
+### When to Use Auto Model Selection
+
+Current GitHub guidance is to prefer **Auto** when you do not have a strong reason to pin a specific model. Auto routes work based on task complexity, current model availability, and policy restrictions, which usually improves reliability and reduces unnecessary cost.
+
+| Choice | Use it when | Watch out for |
+| --- | --- | --- |
+| **Auto** | Daily chat, CLI, and agent work where you want the best default balance of speed, quality, and availability | Admins may restrict which models Auto can choose; evaluation models may also be excluded by policy |
+| Pin a specific model | You are reproducing an issue, comparing outputs, or intentionally using a stronger reasoning path | Pinned models can cost more and may hit rate limits sooner than Auto |
+
+:::tip[Practical default]
+
+Start with Auto for test generation and review loops. Switch to a pinned stronger model only when the task is clearly stuck, ambiguous, or spans multiple files and contracts.
+
+:::
+
+## Slash Commands (VS Code)
+
+Type `/` in the Chat prompt box to see all available commands. The most useful ones for everyday and testing workflows:
+
+| Command | What it does |
+| --- | --- |
+| `/tests` | Generate unit tests for the selected code |
+| `/explain` | Explain how the code in the active editor works |
+| `/fix` | Propose a fix for problems in the selected code |
+| `/fixTestFailure` | Find and fix a failing test automatically |
+| `/new` | Scaffold a new project from a natural-language description |
+| `/clear` | Start a fresh chat session |
+| `/help` | Quick reference and basics of using Copilot Chat |
+
+## Chat Participants (`@`)
+
+Prepend `@` to route your question to a domain expert. Copilot can also infer the right participant automatically.
+
+| Participant | Speciality |
+| --- | --- |
+| `@workspace` | Understands your entire project structure, patterns, and cross-file relationships |
+| `@github` | GitHub-specific skills: search issues, PRs, commits, web search |
+| `@vscode` | VS Code commands, settings, and extension APIs |
+| `@terminal` | Shell commands and integrated terminal context |
+| `@azure` | Azure services — deploy, configure, and manage cloud resources (preview) |
+
+## Context Variables (`#`)
+
+Type `#` in the prompt box to attach specific context to your question. Copilot uses only what you include:
+
+| Variable | What it attaches |
+| --- | --- |
+| `#file` | The full content of the current file |
+| `#selection` | The currently highlighted text |
+| `#function` | The function or method containing the cursor |
+| `#class` | The class containing the cursor |
+| `#project` | High-level project context (structure, dependencies) |
+| `#sym` | The symbol (type, function, variable) at the cursor |
+| `#path` | The file path of the active editor |
+| `#line` | The current line of code |
+
+## Keyboard Shortcuts Cheat Sheet
+
+| Action | macOS | Windows / Linux |
+| --- | --- | --- |
+| Accept inline suggestion | <kbd>Tab</kbd> | <kbd>Tab</kbd> |
+| Dismiss suggestion | <kbd>Esc</kbd> | <kbd>Esc</kbd> |
+| Accept next word | <kbd>⌘→</kbd> | <kbd>Ctrl+→</kbd> |
+| Next suggestion | <kbd>⌥]</kbd> | <kbd>Alt+]</kbd> |
+| Previous suggestion | <kbd>⌥[</kbd> | <kbd>Alt+[</kbd> |
+| Open suggestions panel | <kbd>Ctrl+Enter</kbd> | <kbd>Ctrl+Enter</kbd> |
+| Open Inline Chat | <kbd>⌘I</kbd> | <kbd>Ctrl+I</kbd> |
+| Open Chat sidebar | <kbd>⌃⌘I</kbd> | <kbd>Ctrl+Alt+I</kbd> |
+| Open Quick Chat | <kbd>⇧⌥⌘L</kbd> | <kbd>Ctrl+Shift+Alt+L</kbd> |
+
+## Tokens and the Context Window
+
+Every piece of text sent to the LLM — your code, comments, chat history, and Copilot's own instructions — is converted into **tokens**. A token is roughly 3–4 characters of English text or a short code symbol. The context window is the total number of tokens the model can consider at once (~64 k for most Copilot models).
+
+| Concept | What it means for you |
+| --- | --- |
+| Token budget | Large files, long chat histories, and many open tabs all consume tokens — leaving less room for Copilot to reason |
+| Context quality beats quantity | One focused `#file` reference beats five loosely-related open tabs |
+| Token cost in Agent mode | Each Agent-mode prompt consumes GitHub AI Credits; keep tasks focused to avoid burning budget on irrelevant context |
+| MCP toolsets consume tokens too | Enabling only the MCP toolsets you need improves accuracy and frees context for actual coding |
+
+```text
+Rough token estimates:
+  1 line of TypeScript ≈ 10–20 tokens
+  1 typical test file  ≈ 300–600 tokens
+  64 k context window  ≈ ~200–300 lines of dense code
+
+Rule of thumb: the more precise your #selection, the better the suggestion.
+```
+
+## How to Write Better Prompts
+
+- **Write a comment first.** A line like `// test that getUser returns 404 when user is not found` gives Copilot a clear target before it tries to complete code.
+- **Use `#file` or `#selection`.** Explicit context variables beat relying on Copilot to infer what you mean.
+- **Mention the framework.** Saying "using Jest with TypeScript" avoids mismatched syntax or wrong assertion libraries.
+- **Use Agent mode for end-to-end tasks.** Ask it to "generate tests for all exported functions in `#file` and run them" — it will edit, run, and fix failures on its own.
+
+## A Minimal Example
+
+Comment-driven inline completion — type the comment, press <kbd>Tab</kbd> to accept:
+
+```typescript
+// function that adds two numbers
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// test that add returns the correct sum
+it('returns the correct sum', () => {
+  expect(add(2, 3)).toBe(5);
+});
+```
+
+Or use the Chat sidebar with a context variable:
+
+```text
+/tests #file write Jest unit tests covering happy path and edge cases
+```
+
+<Collapsible title="Hands-on Challenge — Trigger Your First Suggestion" variant="hint">
+
+Open any TypeScript or JavaScript file in your editor. Type the following comment and wait a moment:
+
+```typescript
+// function that checks if a string is a palindrome
+```
+
+Copilot should suggest a function body. Press <kbd>Tab</kbd> to accept it, then open Inline Chat (<kbd>⌘I</kbd> / <kbd>Ctrl+I</kbd>) and type:
+
+```text
+/tests write Jest tests for isPalindrome including edge cases
+```
+
+Accept the generated tests and run them with `npm test`. You've completed your first Copilot-assisted test generation!
+
+</Collapsible>
+
+## Key Takeaways {#intro-debrief}
+
+<div className="summary-card">
+
+- Copilot supports multiple LLMs (GPT-4o, Claude, Gemini) — switchable per session.
+- Five surfaces: inline completions, NES, Inline Chat, Chat sidebar, Quick Chat.
+- Three chat modes: **Ask** (Q&amp;A), **Agent** (autonomous), **Plan** (design-first).
+- Every input consumes **tokens** — precise context (`#selection`, `#file`) beats broad context.
+- Use `/tests`, `/fix`, and `/fixTestFailure` slash commands for testing workflows.
+- Always review suggestions — Copilot can confidently produce incorrect or insecure code.
+- Later in this workshop, "Configuring Copilot for Your Team" covers MCP servers, GitHub skills, and customization files (`copilot-instructions.md`, `AGENTS.md`, prompt files, chat modes) that bake team conventions into every response.
+
+</div>

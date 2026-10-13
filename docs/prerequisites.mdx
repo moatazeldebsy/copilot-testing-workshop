@@ -1,0 +1,164 @@
+---
+title: "Prerequisites"
+sidebar_label: "Prerequisites"
+slug: /prerequisites
+description: "Before the workshop, make sure you have the tools below installed and a GitHub account with Copilot access enabled. The hands-on exercises assume you can run VS Code with…"
+---
+
+# Prerequisites
+
+<div className="page-header-meta">
+  <PageMeta duration="10 min" difficulty="beginner" />
+</div>
+
+<div className="page-lead">
+
+Before the workshop, make sure you have the tools below installed and a GitHub account with Copilot access enabled. The hands-on exercises assume you can run VS Code with GitHub Copilot active.
+
+</div>
+
+<ArchDiagram
+  title="What You Need"
+  nodes={[
+    { label: 'GitHub Account', icon: '🐙' },
+    { label: 'Copilot Access', icon: '🤖' },
+    { label: 'VS Code', icon: '💻' },
+    { label: 'Copilot Extension', icon: '⚡' },
+    { label: 'Git', icon: '📦' },
+    { label: 'Node.js 22+', icon: '🟩' },
+  ]}
+  connections={[
+    { from: 0, to: 1, label: 'activates' },
+    { from: 1, to: 3, label: 'powers' },
+    { from: 2, to: 3, label: 'hosts' },
+    { from: 3, to: 4 },
+    { from: 4, to: 5 },
+  ]}
+/>
+
+## Required Tools &amp; Accounts
+
+| Tool / Account | Purpose | Link |
+| --- | --- | --- |
+| **GitHub Account** | Required to sign in to GitHub Copilot in VS Code | [Sign up](https://github.com/signup) |
+| **GitHub Copilot Access** | Copilot Free or a paid Copilot plan for full usage in the workshop | [Activate Copilot](https://github.com/features/copilot) |
+| **Visual Studio Code (latest)** | Primary IDE for all hands-on exercises | [Download VS Code](https://code.visualstudio.com/) |
+| **GitHub Copilot Extension** | Primary VS Code integration for Copilot; Chat is available automatically in current VS Code setup | [Install Extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot) |
+| **Git** | Clone the starter repository and manage branches | [Install Git](https://git-scm.com/downloads) |
+| **Node.js 22+** | Runtime for the sample application and test tools (Jest, Supertest) | [Install Node.js](https://nodejs.org/) |
+
+## Verify Your Setup
+
+Run these commands to confirm everything is ready before the workshop:
+
+```bash
+# Git
+git --version
+
+# Node.js
+node --version   # must be 22+
+npm --version
+
+# VS Code — open from terminal
+code --version
+```
+
+<VerifyBlock>
+
+```text
+git version 2.x.x
+v22.x.x (or higher)
+10.x.x
+1.9x.x (or higher)
+```
+
+</VerifyBlock>
+
+## Verify GitHub Copilot is Active
+
+Open VS Code and check the status bar at the bottom. You should see the Copilot icon (a robot/star shape). If it shows a warning, sign in to GitHub via **Accounts** in the Activity Bar.
+
+```bash
+# Check Copilot is installed in VS Code
+code --list-extensions | grep copilot
+```
+
+<VerifyBlock>
+
+```text
+GitHub.copilot
+      # Some installs also show GitHub.copilot-chat.
+      # In current VS Code setup, Copilot Chat access is provided automatically.
+```
+
+</VerifyBlock>
+
+:::tip[💡 Copilot Chat]
+
+Current GitHub guidance no longer requires a separate manual Copilot Chat install for VS Code setup. Sign in to GitHub Copilot in VS Code, then verify that chat is available from the Copilot UI before the workshop starts.
+
+:::
+
+## Get Your Own Copy of the Starter Repository
+
+The starter repository is a **GitHub template**, so you get your own writable copy instead of a fork — needed if an exercise has you push a branch or open a PR. Open [github.com/moatazeldebsy/copilot-testing-workshop](https://github.com/moatazeldebsy/copilot-testing-workshop), click **Use this template → Create a new repository**, then clone your new copy:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/copilot-testing-workshop.git
+cd copilot-testing-workshop/workshop-exercises
+npm install
+```
+
+<VerifyBlock>
+
+```text
+added 412 packages in 8s
+```
+
+</VerifyBlock>
+
+:::tip[📌 Note]
+
+The exercises live in the `workshop-exercises/`folder of the repo above. It contains a small TypeScript REST API with intentionally incomplete test coverage for the hands-on exercises. If you only plan to read along without pushing anything, a plain `git clone` of the original repo works too.
+
+:::
+
+## No Local Setup? Use GitHub Codespaces
+
+If Node.js, npm, or VS Code aren't cooperating on your machine, skip local setup entirely. On your own copy of the repo, click **Code → Codespaces → Create codespace on master**. The container builds in about 1–2 minutes, installs dependencies and the Playwright browser automatically, and opens VS Code in the browser with `workshop-exercises/` as the working folder and GitHub Copilot pre-installed.
+
+```bash
+npm run dev:api   # backend on port 4000
+npm run dev       # frontend on port 3006
+```
+
+:::tip[📌 Note]
+
+Codespaces forwards ports 3006 and 4000 automatically; a notification will offer to open them in your browser.
+
+:::
+
+## Knowledge Prerequisites
+
+| Area | Expected Familiarity |
+| --- | --- |
+| Unit, API &amp; integration testing | Basic understanding of what each test type does |
+| TypeScript / JavaScript | Comfortable reading and writing basic code |
+| Git | Clone, branch, commit |
+| CI/CD basics | Awareness of pipelines and automated checks |
+| GitHub Copilot | No prior experience required — we start from scratch |
+
+## 🏋️ Pre-Workshop Check
+
+Open the starter repo in VS Code and create a new TypeScript file. Start typing a function — does Copilot suggest a completion? If yes, you are all set!
+
+<Collapsible title="Hint: Copilot not suggesting anything?" variant="hint">
+
+Try these steps:
+
+1. Click the Copilot icon in the status bar and check it says **Ready**
+2. Sign out and sign back in via **Accounts** → GitHub
+3. Open the Command Palette (`Cmd+Shift+P`) and run **GitHub Copilot: Enable**
+4. Restart VS Code
+
+</Collapsible>

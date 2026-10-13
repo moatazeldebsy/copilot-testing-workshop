@@ -1,0 +1,157 @@
+---
+title: "Environment Setup"
+sidebar_label: "Intro, Setup & Tour"
+slug: /workshop/setup
+description: "In this step you will confirm that GitHub Copilot is active in VS Code, clone the starter repository, open the workspace, and trigger your first Copilot inline suggestion — all…"
+---
+
+# Environment Setup
+
+<div className="page-header-meta">
+  <span className="step-badge">Step 1</span>
+  <PageMeta duration="15 min" difficulty="beginner" />
+</div>
+
+<div className="page-lead">
+
+In this step you will confirm that GitHub Copilot is active in VS Code, clone the starter repository, open the workspace, and trigger your first Copilot inline suggestion — all before writing a single test.
+
+</div>
+
+<ExerciseRepoCallout path="/workshop/setup" title="Workshop exercise repository" />
+
+<ArchDiagram
+  title="Your Setup"
+  nodes={[
+    { label: 'VS Code', icon: '💻' },
+    { label: 'Copilot Extension', icon: '🤖' },
+    { label: 'Starter Repo', icon: '📦' },
+    { label: 'Sample API', icon: '🔌' },
+    { label: 'Test Scaffold', icon: '🧪' },
+  ]}
+  connections={[
+    { from: 0, to: 1, label: 'runs' },
+    { from: 0, to: 2, label: 'opens' },
+    { from: 2, to: 3 },
+    { from: 2, to: 4 },
+  ]}
+/>
+
+## Step 1 — Clone the Starter Repository {#setup-generate}
+
+```bash
+git clone https://github.com/moatazeldebsy/copilot-testing-workshop.git
+    cd copilot-testing-workshop
+npm install
+```
+
+<VerifyBlock>
+
+```text
+added 412 packages in 8s
+```
+
+</VerifyBlock>
+
+## Step 2 — Open in VS Code
+
+```bash
+code .
+```
+
+VS Code opens the workspace. You should see a `src/` folder containing a small Express REST API, a minimal UI flow for the later Playwright and RTL exercises, and a `tests/` folder with workshop scaffolding.
+
+## Step 3 — Verify Copilot Is Active
+
+Look at the VS Code status bar (bottom). The Copilot icon should appear with no warning. If it shows a warning, click it and sign in to GitHub.
+
+```bash
+# Confirm Copilot is available in VS Code
+code --list-extensions | grep copilot
+```
+
+<VerifyBlock>
+
+```text
+GitHub.copilot
+# GitHub.copilot-chat may also appear on some installs.
+# Chat is available automatically in current VS Code Copilot setup.
+```
+
+</VerifyBlock>
+
+:::tip[💡 Current setup note]
+
+GitHub's current VS Code setup flow installs the required Copilot pieces automatically. Do not treat the old separate `GitHub.copilot-chat` install as a workshop prerequisite.
+
+:::
+
+## Step 1 — Your First Copilot Suggestion
+
+Create a new file `tests/smoke.test.ts` and start typing. Copilot will suggest a completion — press <kbd>Tab</kbd> to accept it.
+
+```typescript
+// tests/smoke.test.ts
+// Type the line below slowly and watch Copilot suggest the rest:
+describe('smoke', () => {
+  it('should pass', () => {
+    // Copilot will suggest: expect(true).toBe(true);
+  });
+});
+```
+
+:::tip[💡 Keyboard shortcuts]
+
+| Action | macOS | Windows / Linux |
+| --- | --- | --- |
+| Accept suggestion | <kbd>Tab</kbd> | <kbd>Tab</kbd> |
+| Dismiss suggestion | <kbd>Esc</kbd> | <kbd>Esc</kbd> |
+| Next suggestion | <kbd>Option+]</kbd> | <kbd>Alt+]</kbd> |
+| Open Copilot Chat | <kbd>Cmd+I</kbd> | <kbd>Ctrl+I</kbd> |
+
+:::
+
+## Step 2 — Run the Existing Tests
+
+```bash
+npm test
+```
+
+<VerifyBlock>
+
+```text
+Test Suites: 0 passed, 0 total
+Tests:       0 passed, 0 total
+
+    # This is expected — main starts with incomplete or empty tests.
+    # We will build the suites incrementally during the workshop.
+```
+
+</VerifyBlock>
+
+## 🏋️ Hands-on Challenge {#setup-exercise}
+
+Explore the starter repo structure. Find the main service file in `src/`. Open Copilot Chat (<kbd>Cmd+I</kbd>) and ask: _"What test cases should I write for this file?"_
+
+<Collapsible title="Hint: What to look for" variant="hint">
+
+Look for a file like `src/services/userService.ts` or `src/controllers/productController.ts`. Select the entire file content, open Copilot Chat, and type your question. Copilot will suggest relevant test cases based on the code.
+
+</Collapsible>
+
+<Collapsible title="Bonus: Generate a Jest config" variant="bonus">
+
+Open a new file `jest.config.ts` and ask Copilot to generate a Jest configuration for a TypeScript project. Compare the suggestion to the existing config in the starter repo.
+
+</Collapsible>
+
+## Key Takeaways {#setup-debrief}
+
+<div className="summary-card">
+
+- Copilot works inline — start typing and it suggests; press Tab to accept
+- Copilot Chat lets you ask questions about code in natural language
+- The starter repo has intentionally incomplete tests — we generate them together
+- Always verify Copilot is signed in before the session starts
+
+</div>

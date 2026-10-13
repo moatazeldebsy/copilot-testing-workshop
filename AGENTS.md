@@ -6,7 +6,7 @@ This workspace contains **two independent npm projects**. Always confirm which p
 
 | Project | Root | Purpose | Dev Port |
 |---------|------|---------|----------|
-| Workshop tutorial site | `/` (this folder) | React + Vite agenda/slide deck for the workshop | 3005 |
+| Workshop tutorial site | `/` (this folder) | Docusaurus docs site (MDX pages in `docs/`) for the workshop | 3005 |
 | System under test | `workshop-exercises/` | Express API + React store; participants write tests here | API: 4000, UI: 3006 |
 
 See [CLAUDE.md](CLAUDE.md) for full context on both projects.
@@ -16,7 +16,8 @@ See [CLAUDE.md](CLAUDE.md) for full context on both projects.
 ```bash
 npm install
 npm run dev      # http://localhost:3005
-npm run build
+npm run build    # static site in build/ (also builds the search index)
+npm run serve    # serve the production build on :3005
 ```
 
 ## Commands — System Under Test (workshop-exercises/)

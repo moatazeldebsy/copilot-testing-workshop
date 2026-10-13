@@ -1,0 +1,85 @@
+---
+title: "Key Takeaways"
+sidebar_label: "Key Takeaways"
+slug: /workshop/takeaways
+description: "You have reached the end of the workshop. Here is a summary of the five most important things to take back to your team today."
+---
+
+# Key Takeaways
+
+<div className="page-header-meta">
+  <PageMeta duration="10 min" difficulty="beginner" />
+</div>
+
+<div className="page-lead">
+
+You have reached the end of the workshop. Here is a summary of the five most important things to take back to your team today.
+
+</div>
+
+## The 5 Things That Matter Most {#takeaways-summary}
+
+<div className="summary-card">
+
+1. **Copilot accelerates testing — it does not replace judgement.** Use it for boilerplate, mocks, fixtures, and edge-case discovery. Write security, compliance, and domain-critical tests yourself.
+2. **Always follow the Generate → Review → Fix loop.** Never commit AI-generated test code that has not passed your review checklist. High coverage from low-value tests creates false confidence.
+3. **Specific prompts produce better tests.** Include the method name, expected scenarios (success + errors), and which dependencies to mock. Vague prompts produce vague tests.
+4. **Guardrails must be automated, not manual.** ESLint test rules, gitleaks, coverage thresholds, and branch protection are what make AI-assisted testing safe at team scale.
+5. **Measure quality, not just quantity.** Track flaky test rate and mean time to detect bugs — not just coverage %. These tell you whether Copilot is actually helping.
+
+</div>
+
+## What You Practised Today
+
+| Step | Skill | Take-Away |
+| --- | --- | --- |
+| [1. Setup](/workshop/setup) | Copilot activation &amp; first suggestion | Keyboard shortcuts, how to trigger suggestions |
+| [2. Big Picture](/workshop/copilot-overview) | Trust model &amp; risk areas | Generate → Review → Fix loop, trust tiers |
+| [3. Unit Tests](/workshop/unit-testing) | Prompt patterns for unit tests | Specific prompts, call-argument assertions, flaky risks |
+| [4. API &amp; Integration](/workshop/api-integration) | REST &amp; integration test scaffolding | Supertest pattern, reviewing body assertions, in-memory DB |
+| [5. Test Data &amp; Mocks](/workshop/test-data-mocks) | Factory functions &amp; mock stubs | Partial overrides, PII guardrail, faker usage |
+| [6. Review &amp; Guardrails](/workshop/reviewing-tests) | Review checklist &amp; self-correction prompts | False confidence detection, ESLint rules |
+| [7. CI/CD &amp; Adoption](/workshop/cicd-adoption) | Pipeline quality gates | gitleaks, coverage thresholds, CODEOWNERS, phased rollout |
+
+## Resources to Continue Learning {#takeaways-resources}
+
+| Resource | What It Covers |
+| --- | --- |
+| [GitHub Copilot Docs](https://docs.github.com/en/copilot) | Official documentation, keyboard shortcuts, configuration |
+| [gitleaks](https://github.com/gitleaks/gitleaks) | Secret scanning for AI-generated test data |
+| [Jest Coverage Thresholds](https://jestjs.io/docs/configuration#coveragethreshold-object) | Enforcing minimum coverage as a CI quality gate |
+| [@faker-js/faker](https://fakerjs.dev/) | Generating realistic but fake test data safely |
+| [eslint-plugin-jest](https://github.com/jest-community/eslint-plugin-jest) | ESLint rules for test quality (no truthy/falsy, etc.) |
+| `workshop-exercises/docs/tutorials/` | Advanced scenarios and MCP/skills practice reference guides |
+
+## What Next? {#takeaways-next}
+
+<div className="audience-icon">🚀</div>
+
+### Apply It This Week
+
+Pick one existing test file in your codebase. Use Copilot to add missing edge cases. Apply the review checklist. Commit the result.
+
+<div className="audience-icon">🤝</div>
+
+### Share With Your Team
+
+Share the prompt templates and review checklist from this workshop. Start a discussion about where AI-assisted testing fits in your current workflow.
+
+<div className="audience-icon">🔒</div>
+
+### Add the Guardrails
+
+Add gitleaks and the jest/no-truthy-falsy ESLint rule to your CI pipeline. These are the two highest-impact guardrails to add first.
+
+:::tip[Optional take-home reading:]
+
+We did not cover this live, but it is worth a look on your own time: [Testing AI-Powered Features](/workshop/ai-testing-patterns).
+
+:::
+
+:::tip[Thank you for attending!]
+
+<br />WeAreDevelopers World Congress · Berlin 2026<br />_GenAI in Testing: Using GitHub Copilot to Accelerate Quality Without Losing Trust_
+
+:::

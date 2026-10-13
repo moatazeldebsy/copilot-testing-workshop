@@ -21,7 +21,9 @@ function loadProgress(): Set<string> {
 }
 
 function saveProgress(completed: Set<string>) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
+  } catch { /* ignore */ }
 }
 
 function loadQuizProgress(): Set<string> {
@@ -33,20 +35,31 @@ function loadQuizProgress(): Set<string> {
 }
 
 function saveQuizProgress(completed: Set<string>) {
-  localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify([...completed]));
+  try {
+    localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify([...completed]));
+  } catch { /* ignore */ }
 }
 
 export function useProgress() {
-  const [completed, setCompleted] = useState<Set<string>>(loadProgress);
-  const [quizCompleted, setQuizCompleted] = useState<Set<string>>(loadQuizProgress);
+  // Pages are pre-rendered at build time, so storage is read after mount rather than
+  // during the first render; saving waits until that load has happened.
+  const [completed, setCompleted] = useState<Set<string>>(() => new Set());
+  const [quizCompleted, setQuizCompleted] = useState<Set<string>>(() => new Set());
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    saveProgress(completed);
-  }, [completed]);
+    setCompleted(loadProgress());
+    setQuizCompleted(loadQuizProgress());
+    setLoaded(true);
+  }, []);
 
   useEffect(() => {
-    saveQuizProgress(quizCompleted);
-  }, [quizCompleted]);
+    if (loaded) saveProgress(completed);
+  }, [completed, loaded]);
+
+  useEffect(() => {
+    if (loaded) saveQuizProgress(quizCompleted);
+  }, [quizCompleted, loaded]);
 
   const markComplete = useCallback((path: string) => {
     if (!isCompletablePath(path)) {

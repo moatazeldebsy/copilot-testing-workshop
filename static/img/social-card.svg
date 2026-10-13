@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="r" cx="85%" cy="0%" r="70%"><stop stop-color="#8957e5" stop-opacity=".45"/><stop offset="1" stop-color="#0d1117" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0d1117"/>
+  <rect width="1200" height="630" fill="url(#r)"/>
+  <text x="80" y="300" fill="#f0f6fc" font-family="Hubot Sans, Mona Sans, Helvetica, Arial, sans-serif" font-size="96" font-weight="800">GenAI in Testing</text>
+  <text x="80" y="380" fill="#9198a1" font-family="Mona Sans, Helvetica, Arial, sans-serif" font-size="36">Using GitHub Copilot to accelerate quality without losing trust</text>
+  <text x="80" y="540" fill="#ab7df8" font-family="Mona Sans, Helvetica, Arial, sans-serif" font-size="28">WeAreDevelopers Berlin 2026</text>
+</svg>

@@ -61,10 +61,8 @@ echo "==> Starting API (port 4000)"
 setsid nohup npm run dev:api </dev/null >/tmp/workshop-logs/api.log 2>&1 &
 disown
 
-# Both the Store UI and the root docs site (below) run the same plain `vite`
-# binary, so their process command lines both just end in ".../vite" — a
-# bare "vite$" pattern matches either one, meaning restarting one would kill
-# the other. Match each one's own node_modules path to keep them distinct.
+# Match the Store UI's own node_modules path so this only ever targets its
+# vite process, never some other vite running on the machine.
 kill_previous "workshop-exercises/node_modules/.bin/vite"
 echo "==> Starting Store UI (port 3006)"
 setsid nohup npm run dev:web </dev/null >/tmp/workshop-logs/web.log 2>&1 &
@@ -74,7 +72,7 @@ disown
 # from workshop-exercises — see repo CLAUDE.md) also needs a running dev
 # server. It's easy to miss because forwardPorts/postStart historically only
 # covered workshop-exercises' own two ports.
-kill_previous "$REPO_ROOT/node_modules/.bin/vite"
+kill_previous "$REPO_ROOT/node_modules/.bin/docusaurus"
 echo "==> Starting Workshop docs/agenda site (port 3005)"
 (cd "$REPO_ROOT" && setsid nohup npm run dev </dev/null >/tmp/workshop-logs/docs.log 2>&1 &)
 

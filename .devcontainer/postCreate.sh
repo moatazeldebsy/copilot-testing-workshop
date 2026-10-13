@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # Runs once when the Codespace/devcontainer is created.
 #
-# The root docs-site project uses vite@8, which ships its rolldown bundler as
-# per-platform native bindings under optionalDependencies. A known npm bug
+# Both projects pull in bundlers with per-platform native bindings under
+# optionalDependencies (workshop-exercises' vite/rolldown; the root Docusaurus
+# site's swc/lightningcss). A known npm bug
 # (https://github.com/npm/cli/issues/4828) sometimes installs the wrong/missing
 # native binding for the container's platform — and critically, `npm install`
-# still exits 0 when this happens. The failure only shows up later, when `vite`
-# actually runs and tries to load the binding. So instead of trusting npm's exit
-# code, we explicitly try `vite --version` after install and force a clean
-# reinstall if that fails.
+# still exits 0 when this happens. The failure only shows up later, when the
+# tool actually runs and tries to load the binding. So instead of trusting npm's
+# exit code, we explicitly run each tool's `--version` after install and force a
+# clean reinstall if that fails.
 set -euo pipefail
 
 # workspaceFolder is set to workshop-exercises/, not the repo root, so the
@@ -38,12 +39,12 @@ check_bin() {
   (cd "$dir" && "./node_modules/.bin/$bin" --version) >"$log" 2>&1
 }
 
-# Docs/marketing site at the repo root.
+# Docusaurus docs site at the repo root.
 install_dir .
-if ! check_bin . vite /tmp/vite-root-check.log; then
-  echo "==> vite failed to load after install in . — see /tmp/vite-root-check.log"
+if ! check_bin . docusaurus /tmp/docusaurus-root-check.log; then
+  echo "==> docusaurus failed to load after install in . — see /tmp/docusaurus-root-check.log"
   clean_reinstall .
-  check_bin . vite /tmp/vite-root-check.log
+  check_bin . docusaurus /tmp/docusaurus-root-check.log
 fi
 
 # The actual hands-on workshop app. Also verified post-install: it ships its

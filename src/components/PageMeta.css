@@ -1,8 +1,7 @@
 .page-meta {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 1.25rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -10,35 +9,28 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 20px;
+  height: 1.6rem;
+  padding: 0 0.65rem;
+  border-radius: 2rem;
+  border: 1px solid var(--gh-border);
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  border: 1px solid var(--border-color);
-  background: var(--bg-surface);
-  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  color: var(--gh-fg-muted);
 }
 
 .page-meta-icon {
-  font-size: 0.8rem;
-}
-
-.page-meta-time {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.7rem;
 }
 
 .page-meta-difficulty--beginner {
-  border-color: rgba(52, 211, 153, 0.3);
-  color: var(--success);
+  color: var(--gh-success);
 }
 
 .page-meta-difficulty--intermediate {
-  border-color: rgba(251, 191, 36, 0.3);
-  color: var(--warning);
+  color: var(--gh-attention);
 }
 
 .page-meta-difficulty--advanced {
-  border-color: rgba(249, 117, 131, 0.3);
-  color: var(--error);
+  color: var(--gh-danger);
 }

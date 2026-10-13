@@ -1,0 +1,360 @@
+---
+title: "CI/CD &amp; Team Adoption"
+sidebar_label: "CI/CD & Team Adoption"
+slug: /workshop/cicd-adoption
+description: "AI-assisted testing only improves quality at scale when it is governed by CI/CD pipelines and clear team norms. This step shows how to add quality gates, security scanning for…"
+---
+
+# CI/CD &amp; Team Adoption
+
+<div className="page-header-meta">
+  <span className="step-badge">Exercise E</span>
+  <PageMeta duration="10 min" difficulty="intermediate" />
+</div>
+
+<div className="page-lead">
+
+AI-assisted testing only improves quality at scale when it is governed by CI/CD pipelines and clear team norms. This step shows how to add quality gates, security scanning for AI-generated code, and onboard a team without creating inconsistency or risk.
+
+</div>
+
+<ExerciseRepoCallout path="/workshop/cicd-adoption" />
+
+<ArchDiagram
+  title="CI Pipeline with AI Test Guardrails"
+  nodes={[
+    { label: 'PR Opened', icon: '📬' },
+    { label: 'Lint & Secret Scan', icon: '🔍' },
+    { label: 'Test Suite', icon: '🧪' },
+    { label: 'Coverage Gate', icon: '📊' },
+    { label: 'Security Scan', icon: '🔒' },
+    { label: 'Merge Allowed', icon: '✅' },
+  ]}
+  connections={[
+    { from: 0, to: 1 },
+    { from: 1, to: 2 },
+    { from: 2, to: 3 },
+    { from: 3, to: 4 },
+    { from: 4, to: 5 },
+  ]}
+/>
+
+## GitHub Actions Pipeline with Quality Gates {#cicd-generate}
+
+Ask Copilot to generate a GitHub Actions workflow with the stages below. Review the output against your project's actual paths and thresholds.
+
+:::warning[Non-negotiable policy]
+
+AI-generated code must pass the exact same standards as human-written code. No bypass path.
+
+:::
+
+## Static and Security Analysis Matrix
+
+| Gate Type | Recommended Tools | What It Catches |
+| --- | --- | --- |
+| Lint and style | ESLint, Checkstyle | Invalid patterns, weak test assertions, consistency drift |
+| Static analysis | CodeQL, SonarQube | Logic flaws, taint paths, maintainability hotspots |
+| Dependency and SAST scan | Snyk, Dependabot, Trivy | Known CVEs, vulnerable transitive packages, insecure defaults |
+| Secret and token scan | gitleaks, truffleHog | Leaked credentials and API tokens in test fixtures or mocks |
+
+## CI Decision Outcomes
+
+For team clarity, define CI outcomes with explicit next actions:
+
+| Outcome | Meaning | Action |
+| --- | --- | --- |
+| `exit 0` | All gates passed | Continue to merge checks |
+| `exit 1` | Definitive failure | Block merge and fix before retry |
+| `exit 2` | Unclear or ambiguous result | Require human triage and explicit reviewer sign-off |
+
+```yaml
+# .github/workflows/test.yml  (Copilot-generated — review paths and thresholds)
+name: Test & Quality Gates
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Guardrail 1: Lint + test naming rules
+      - name: Lint
+        run: npm run lint
+
+      # Guardrail 2: Secret scanning (catches AI-generated fake credentials)
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Guardrail 3: Run tests with coverage
+      - name: Run tests
+        run: npm test -- --coverage --coverageReporters=json-summary
+
+      # Guardrail 4: Coverage threshold enforcement
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(node -e "
+            const s = require('./coverage/coverage-summary.json');
+            console.log(s.total.lines.pct);
+          ")
+          echo "Line coverage: $COVERAGE%"
+          node -e "if ($COVERAGE < 80) { console.error('Coverage below 80%'); process.exit(1); }"
+```
+
+## Jest Coverage Threshold (in jest.config.ts)
+
+```typescript
+// jest.config.ts
+import type { Config } from 'jest';
+
+const config: Config = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  coverageThreshold: {
+    global: {
+      lines: 80,
+      functions: 80,
+      branches: 70,
+      statements: 80,
+    },
+  },
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/index.ts',  // entry points excluded
+  ],
+};
+
+export default config;
+```
+
+<VerifyBlock>
+
+```text
+----------|---------|----------|---------|---------|
+File      | % Stmts | % Branch | % Funcs | % Lines |
+----------|---------|----------|---------|---------|
+All files |   84.2  |   73.1   |   88.9  |   84.2  |
+----------|---------|----------|---------|---------|
+✓ Coverage thresholds met
+```
+
+</VerifyBlock>
+
+## CODEOWNERS for AI-Generated Tests
+
+Add a CODEOWNERS rule so AI-generated test PRs always get a designated reviewer with the right context:
+
+```bash
+# .github/CODEOWNERS
+# All test files require review from a QA lead or senior dev
+tests/                    @your-org/qa-leads
+src/**/*.test.ts          @your-org/qa-leads
+src/**/*.spec.ts          @your-org/qa-leads
+```
+
+## PR Template for AI-Assisted Code
+
+This is the actual `.github/pull_request_template.md` from the exercises repository — not just an illustration:
+
+```markdown
+<!--
+Reviewing AI-generated tests checklist (see the workshop site's Advanced Scenarios
+tutorial — Trust Framework and Anti-Patterns sections — at /tutorials/advanced-scenarios).
+Treat every generated test like a pull request from a junior teammate.
+-->
+
+## What changed
+
+<!-- One or two sentences: what behavior does this PR add or change? -->
+
+## Test review checklist
+
+- [ ] Does each new test assert the actual behavior, not an implementation detail?
+- [ ] Would it fail if the code were broken on purpose? (fail-first check)
+- [ ] Are inputs realistic and are edge cases covered?
+- [ ] Is the test isolated, deterministic, and free of hidden state or timing dependence?
+- [ ] Is the test name a clear statement of the behavior under test?
+- [ ] Does it avoid leaking secrets, tokens, or real user data?
+
+## Quality gates (enforced in CI)
+
+- [ ] All tests green
+- [ ] Coverage threshold met (80% lines/functions/statements, 70% branches)
+- [ ] No flaky reruns needed to pass
+- [ ] Security scan clean (`npm audit --omit=dev --audit-level=high`)
+
+A human reviewer owns this checklist — AI-assisted generation speeds up
+authoring, but does not replace review.
+```
+
+## Team Adoption Strategy
+
+| Phase | Action | Goal |
+| --- | --- | --- |
+| Week 1–2 | Pilot with 1–2 volunteers; document what works and what does not | Build evidence and internal best practices |
+| Week 3–4 | Share prompt templates and review checklist with the team | Create shared standards before broad adoption |
+| Month 2 | Add ESLint rules and secret scanning to CI | Automate the guardrails |
+| Month 3+ | Retrospective: measure flaky test rate, coverage quality, PR review time | Validate that AI-assisted testing actually improves quality |
+
+## Copilot Cloud Agent Automations
+
+Current GitHub Copilot guidance also supports **automations**: scheduled or event-driven cloud-agent runs that can label issues, inspect pull requests, or attempt recurring maintenance work such as fixing failing tests overnight.
+
+| What to remember | Why it matters for testing |
+| --- | --- |
+| Use least-privilege tools only | Limit an automation to the smallest action set needed for labeling, PR creation, or test-fix attempts |
+| Expect human review | Automations can draft work, but reviewers still own merge decisions and ambiguous failures |
+| Do not trust unvetted external input | Prompt-injection risk is lower when automations ignore untrusted events by default and you keep triggers narrow |
+
+:::tip[Good testing use case]
+
+Run a nightly automation in a private repository that checks the main branch for failing tests, attempts a minimal fix, and opens a draft pull request for review the next morning.
+
+:::
+
+## Where Teams Can Trigger Copilot From
+
+GitHub Copilot cloud agent is no longer limited to GitHub-only entry points. Teams can also trigger agent work from collaboration and planning tools such as Slack, Teams, Jira, Linear, and Azure Boards.
+
+:::tip[Adoption implication]
+
+These integrations are useful for triage and workflow convenience, but they also expand the amount of contextual data Copilot can ingest. Apply the same least-privilege, review, and prompt-safety rules you use inside GitHub itself.
+
+:::
+
+:::tip[📏 Metrics that matter]
+
+Track _flaky test rate_, _mean time to detect_ (how quickly tests catch bugs), and _PR review time_ before and after Copilot adoption. Coverage % alone is not a quality metric.
+
+:::
+
+<div id="cicd-exercise">
+
+<TimedExercise minutes={15} title="Hands-on Challenge — Fill In and De-Flake NotificationService Tests">
+
+Open `tests/unit/notificationService.test.ts`. It ships with four `it.todo(...)` stubs and one deliberately flaky test. Fill in the stubs, then fix the flaky test so it's safe to run in CI.
+
+### The Stubs (what's there today)
+
+```typescript
+// notificationService.test.ts — todos not yet implemented
+
+it.todo('logs a receipt notification and returns a NotificationLog');
+it.todo('stores notifications so they can be retrieved by userId');
+it.todo('supports multiple notification types (receipt, order_confirmation, refund)');
+it.todo('reset() clears all stored notifications');
+
+// 🚨 FLAKY: asserts sentAt is within 50ms of the call — fails under CI load
+it('🚨 FLAKY: sentAt timestamp is within 50 ms of the call (demo — see comment)', () => {
+  const before = Date.now();
+  const log = service.send(basePayload);
+  const after = Date.now();
+  expect(log.sentAt.getTime()).toBeGreaterThanOrEqual(before);
+  expect(log.sentAt.getTime()).toBeLessThanOrEqual(after + 50);
+});
+```
+
+<Collapsible title="Hint: Prompt template" variant="hint">
+
+```bash
+Write Jest tests for NotificationService, filling in the it.todo stubs.
+#file:src/services/notificationService.ts
+#file:tests/unit/notificationService.test.ts
+
+Cover:
+- send() logs a receipt notification and returns a NotificationLog
+- sent notifications are retrievable by userId via getLogsForUser()
+- all three notification types (receipt, order_confirmation, refund) are supported
+- reset() clears all stored notifications
+
+Assert exact returned values — no toBeDefined()/toBeTruthy().
+```
+
+</Collapsible>
+
+<Collapsible title="Solution: Filled-in tests" variant="solution">
+
+```typescript
+it('logs a receipt notification and returns a NotificationLog', () => {
+  const log = service.send(basePayload);
+
+  expect(log.id).toBeDefined();
+  expect(log.userId).toBe('user-1');
+  expect(log.type).toBe('receipt');
+  expect(log.email).toBe('alice@example.com');
+  expect(log.sentAt).toBeInstanceOf(Date);
+});
+
+it('stores notifications so they can be retrieved by userId', () => {
+  service.send(basePayload);
+  service.send({ ...basePayload, userId: 'user-2' });
+
+  const logs = service.getLogsForUser('user-1');
+  expect(logs).toHaveLength(1);
+  expect(logs[0].userId).toBe('user-1');
+});
+
+it('supports multiple notification types (receipt, order_confirmation, refund)', () => {
+  service.send({ ...basePayload, type: 'order_confirmation' });
+  service.send({ ...basePayload, type: 'refund' });
+
+  const logs = service.getLogsForUser('user-1');
+  expect(logs.map((l) => l.type)).toEqual(['order_confirmation', 'refund']);
+});
+
+it('reset() clears all stored notifications', () => {
+  service.send(basePayload);
+  service.reset();
+
+  expect(service.getLogsForUser('user-1')).toEqual([]);
+});
+```
+
+</Collapsible>
+
+<Collapsible title="Bonus: Fix the flaky test" variant="bonus">
+
+Ask Copilot: _"Why is this test flaky in CI, and how should I fix it?"_ — it should point out that `Date.now()` comparisons are timing-dependent and fail when the runner is slow. Replace the 50 ms window assertion with a type check:
+
+```typescript
+it('sentAt is a Date instance', () => {
+  const log = service.send(basePayload);
+  expect(log.sentAt).toBeInstanceOf(Date);
+});
+```
+
+</Collapsible>
+
+</TimedExercise>
+
+</div>
+
+## Key Takeaways {#cicd-debrief}
+
+<div className="summary-card">
+
+- CI pipelines are where guardrails become enforceable — not optional
+- Always include a secret scan (gitleaks/truffleHog) in pipelines that accept AI-generated code
+- Coverage thresholds in Jest config enforce a minimum quality floor automatically
+- CODEOWNERS ensures AI-generated test PRs get the right reviewer
+- Phase adoption gradually — validate with metrics before rolling out team-wide
+
+</div>

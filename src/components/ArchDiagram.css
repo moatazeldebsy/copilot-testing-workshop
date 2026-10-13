@@ -10,11 +10,10 @@
 .arch-diagram-title {
   font-size: 0.7rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  
   color: var(--text-muted);
   margin-bottom: 1rem;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--ifm-font-family-monospace);
 }
 
 .arch-diagram-flow {
@@ -33,7 +32,7 @@
   padding: 0.6rem 0.75rem;
   border: 1.5px solid var(--accent-primary);
   border-radius: 8px;
-  background: rgba(124, 58, 237, 0.06);
+  background: var(--gh-violet-soft);
   text-align: center;
   min-width: 0;
   flex: 1 1 0;
@@ -103,8 +102,7 @@
   font-size: 0.5rem;
   color: var(--text-muted);
   white-space: nowrap;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  text-transform: uppercase;
+  font-family: var(--ifm-font-family-monospace);
   letter-spacing: 0.03em;
   pointer-events: none;
 }
