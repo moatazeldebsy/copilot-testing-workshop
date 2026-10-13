@@ -175,6 +175,10 @@ export default function Home(): ReactNode {
                 </li>
               ))}
             </ol>
+            <p className={styles.timelineNote}>
+              Copilot has changed since the session. <Link to="/whats-new">See what's new from July to October 2026</Link>{' '}
+              and how it affects each exercise.
+            </p>
           </div>
         </section>
 

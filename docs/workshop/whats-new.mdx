@@ -1,0 +1,113 @@
+---
+title: "What's changed since the workshop"
+sidebar_label: "What's new (Jul → Oct 2026)"
+slug: /whats-new
+description: "GitHub Copilot changes from July to October 2026 that affect AI-assisted testing: models, Copilot code review with skills and MCP, the Agents window, sandboxing and governance."
+---
+
+# What's changed since the workshop
+
+<div className="page-header-meta">
+  <span className="step-badge">Update</span>
+  <span className="page-meta-badge">Last reviewed 13 Oct 2026</span>
+</div>
+
+<div className="page-lead">
+
+We ran this workshop at WeAreDevelopers Berlin on 10 July 2026. Copilot has moved quickly since then. This page collects the changes from July to October 2026 that matter for **testing with Copilot**, each with a link to its GitHub Changelog entry and a note on how it changes what you practiced in the exercises.
+
+</div>
+
+The exercises themselves still work unchanged. Everything below is additive: new places to apply the same habits of specific prompts, exact assertions and enforceable guardrails.
+
+## At a glance
+
+| Area | What changed | Exercises it touches |
+| --- | --- | --- |
+| [Models](#models) | Several models retired; Claude Sonnet 5.5, GPT-6.1 Sol, Claude Haiku 5.5 and Gemini 4 Argon now available | A, B |
+| [Copilot code review](#code-review) | Uses your agent skills and MCP servers; reviews bot and very large PRs; can be triggered from the API | B, E |
+| [Agents window in VS Code](#agents-window) | Worktree sessions, scheduled Automations, agent merge, Dev Container sessions | C, D, E |
+| [Customization](#customization) | Prompt files convert to skills; Agent Plugins 1.0 | Configuring Copilot |
+| [Copilot CLI and app](#cli-and-app) | Local sandboxing GA; dynamic workflows in preview | E |
+| [Governance](#governance) | Org-wide model policies and managed settings | E |
+
+## Models {#models}
+
+The model lineup changed more than anything else. If a slide or prompt from the session names a specific model, check it against the current list.
+
+- **Retired on 1 September:** Gemini 3.1 Pro, Claude Opus 4.5 and 4.6, Claude Sonnet 4.5 and 4.6, and Raptor Mini ([changelog](https://github.blog/changelog/2026-08-31-selected-github-copilot-models-deprecated)). Gemini 2.5 Pro and Gemini 3 Flash went on 31 July ([changelog](https://github.blog/changelog/2026-07-31-gemini-2-5-pro-and-gemini-3-flash-deprecated)), and Gemini 3.5 Flash, Gemini 3.6 Flash, Kimi K2.7 Code and Claude Opus 4.7 on 2 October ([changelog](https://github.blog/changelog/2026-10-02-selected-models-in-github-copilot-deprecated)).
+- **Newly available:** Kimi K3 and MAI-Code-1.1-Flash ([10 Aug](https://github.blog/changelog/2026-08-13-github-copilot-weekly-releases-august-10/)), Claude Sonnet 5.5 ([28 Sep](https://github.blog/changelog/2026-09-28-claude-sonnet-5-5-in-github-copilot)), GPT-6.1 Sol ([29 Sep](https://github.blog/changelog/2026-09-29-gpt-6-1-sol-in-github-copilot)), Claude Haiku 5.5 ([7 Oct](https://github.blog/changelog/2026-10-07-claude-haiku-5-5-in-github-copilot)) and Gemini 4 Argon ([13 Oct](https://github.blog/changelog/2026-10-13-gemini-4-argon-in-github-copilot)).
+- **HydraFusion** is a research preview that picks models and workflows for a coding task automatically. It now appears in the model picker in VS Code and the Copilot app ([changelog](https://github.blog/changelog/2026-09-30-hydrafusion-in-vs-code-and-the-github-copilot-app)).
+
+:::tip[Why it matters for testing]
+
+Model churn is the strongest argument for what Exercise A taught. The strong prompt spells out every rule (SAVE10 is 10%, FLAT5 needs a $20 minimum, totals never go negative), so it catches the three bugs whichever model answers. Re-run the weak and strong prompts from [Unit Test Generation](/workshop/unit-testing) on a new model: the weak prompt's results will vary, the strong prompt's should not.
+
+:::
+
+## Copilot code review {#code-review}
+
+Copilot code review is now the place where the guardrails from Exercise E apply to every pull request, not only in your editor.
+
+- **Agent skills and MCP are generally available** for Pro, Pro+, Business and Enterprise ([29 Jul](https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available)). Code review reads skills from `.github/skills/<name>/SKILL.md`, MCP tool calls are read-only, and the GitHub and Playwright MCP servers are on by default. Review comments say when a skill or MCP context was used.
+- **Repository MCP configuration is shared** between Copilot cloud agent and code review. You set it in the repository's **Settings → Copilot → MCP servers** on GitHub.com ([docs](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/extend-cloud-agent-with-mcp)).
+- **More pull requests get reviewed** ([27 Aug](https://github.blog/changelog/2026-08-27-copilot-code-review-resolution-reasons-and-expanded-capabilities)): automatic reviews now cover bot-authored PRs, cloud agent PRs get a full agentic review, and the old 300-file / 20,000-line limit is gone. When you resolve a Copilot comment you can say why: Addressed, Won't fix or Incorrect.
+- **API and effort levels** ([2 Oct](https://github.blog/changelog/2026-10-02-copilot-code-review-api-support-and-new-default-effort-level)): you can request a review through the REST and GraphQL APIs with an effort level, and "Default" now means **Balanced** rather than Lite.
+
+:::tip[Why it matters for testing]
+
+The exercises repo already ships three skills in `workshop-exercises/.github/skills/`: `test-generation`, `flaky-test-hunt` and `pact-contracts`. Code review reads skills from the `.github/skills/` folder at the **repository root**, so in your own project put them there (in this repo they sit inside `workshop-exercises/`, which GitHub doesn't scan). Then whenever Copilot reviews a PR, the weak-assertion checks from [Exercise B](/workshop/reviewing-tests) happen on review instead of relying on someone remembering the checklist. Pair this with the coverage gate from [Exercise E](/workshop/cicd-adoption): the gate catches missing tests, review catches tests that exist but prove nothing.
+
+:::
+
+## Agents window in VS Code {#agents-window}
+
+VS Code now has a dedicated Agents window for running and reviewing agent sessions side by side.
+
+- **July** ([changelog](https://github.blog/changelog/2026-07-30-github-copilot-in-visual-studio-code-july-2026-releases)): the redesigned Agents window entered public preview. Copilot, Claude and Codex sessions can each run in their own Git worktree, running subagents show their model, elapsed time and current tool call, and a banner above the chat lets you act on failed CI checks and new review comments.
+- **September** ([changelog](https://github.blog/changelog/2026-10-01-github-copilot-in-vs-code-september-2026-releases/)):
+  - **Automations** (preview) run agent tasks hourly, daily, weekly or on demand.
+  - **Agent merge** (preview) lets the agent work through review feedback, failed checks, merge conflicts and workflow reruns to get a PR ready.
+  - **Dev Container sessions** run an agent session inside the project's dev container, including on SSH, Tunnel and WSL hosts.
+  - You can **create a pull request directly from an agent session**.
+
+:::tip[Why it matters for testing]
+
+- **Flaky tests:** schedule a daily Automation that runs the `flaky-test-hunt` skill against the suite and reports tests that fail intermittently, instead of waiting for someone to notice a red build.
+- **Same environment:** the repo's `.devcontainer/` is what Codespaces uses for the workshop. A Dev Container session gives the agent exactly the same Node, Jest and Playwright setup, so "it passed for the agent" means it passes for you.
+- **Worktrees:** try [Exercise C](/workshop/api-integration) twice in parallel worktree sessions with two different prompts and compare which suite catches more error codes.
+
+:::
+
+## Customization {#customization}
+
+- **Prompt files can be converted to skills** from the AI Customizations overview in VS Code ([July](https://github.blog/changelog/2026-07-30-github-copilot-in-visual-studio-code-july-2026-releases)). The workshop's `workshop-exercises/.github/prompts/generate-tests.prompt.md` is a good candidate: as a skill, Copilot can pick it up automatically and code review can use it too.
+- **Agent Plugins 1.0** is generally available in VS Code, Copilot CLI, the Copilot SDK and the Copilot app, so one plugin works across all of them ([10 Aug](https://github.blog/changelog/2026-08-13-github-copilot-weekly-releases-august-10/)).
+- **Team sessions:** Copilot now works with a shared agent session in [Slack](https://github.blog/changelog/2026-08-21-the-new-github-copilot-experience-in-slack) and [Microsoft Teams](https://github.blog/changelog/2026-08-21-shared-agentic-work-with-github-copilot-in-microsoft-teams), and Visual Studio can share specialized agents across a team ([28 Aug](https://github.blog/changelog/2026-08-28-github-copilot-in-visual-studio-august-update-2)).
+
+See [Configuring Copilot for Your Team](/workshop/copilot-configuration) for where these files live and how they fit together.
+
+## Copilot CLI and app {#cli-and-app}
+
+- **Local sandboxing is generally available** in Copilot CLI, the Copilot app and VS Code sessions that use Agent Host ([7 Oct](https://github.blog/changelog/2026-10-07-local-sandboxing-for-github-copilot-now-generally-available)). It limits which files agent-run commands can touch, network access, Git and GitHub CLI credentials, and local MCP and language servers. Organizations can require it and stop developers from weakening the policy.
+- **Dynamic workflows** (public preview) let you define a multi-step process in code, with agents doing the judgment calls and your code controlling the order, in sequence or in parallel ([1 Oct](https://github.blog/changelog/2026-10-01-dynamic-workflows-in-copilot-cli-and-the-copilot-app/)).
+
+:::tip[Why it matters for testing]
+
+Sandboxing is what makes it reasonable to let an agent run the test suite unattended: it can execute `npm test` and Playwright without reaching your credentials or the network. The [Advanced Scenarios tutorial](/tutorials/advanced-scenarios) covers setting it up. A dynamic workflow is a natural fit for the pipeline from Exercises A to E: generate tests, run them, review assertions, then gate on coverage, with the order fixed in code.
+
+:::
+
+## Governance {#governance}
+
+For teams rolling this out, as discussed in the wrap-up:
+
+- **Model policies:** the global default model policy is generally available for Business and Enterprise ([26 Aug](https://github.blog/changelog/2026-08-26-global-model-policy-generally-available)), and admins can target model access to specific enterprise teams ([31 Jul, preview](https://github.blog/changelog/2026-07-31-enterprise-teams-model-policy-targeting-in-public-preview)).
+- **Managed settings:** a validator catches malformed or unsupported settings ([25 Sep](https://github.blog/changelog/2026-09-25-enterprise-managed-settings-in-product-validator)), and admins can require clients to fetch current settings at startup and set minimum client versions ([13 Oct](https://github.blog/changelog/2026-10-13-enterprise-managed-settings-enforcement-updates)).
+- **Telemetry:** activity can be attributed to users without collecting prompts, responses or tool content ([12 Oct](https://github.blog/changelog/2026-10-12-client-telemetry-user-attribution-and-configurable-capture)).
+
+## Coming up
+
+GitHub Universe takes place on 28–29 October 2026 in San Francisco ([schedule](https://github.blog/news-insights/company-news/your-guide-to-github-universe-2026-is-here-the-schedule-just-launched/)). This page will be reviewed again after the event.
+
+For anything newer than the date at the top, the [GitHub Changelog for Copilot](https://github.blog/changelog/label/copilot/) is the source of truth.

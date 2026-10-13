@@ -3,13 +3,18 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import { exerciseRepository } from './src/data/workshopSteps';
 
+// GitHub Pages serves the site from /<repo>/; local, Docker and Codespaces runs use /.
+const siteUrl = process.env.DOCS_URL ?? 'https://moatazeldebsy.github.io';
+const baseUrl = process.env.DOCS_BASE_URL ?? '/';
+const slidesHref = `pathname://${baseUrl}GenAI-in-testing.pdf`;
+
 const config: Config = {
   title: 'GenAI in Testing',
   tagline: 'Using GitHub Copilot to Accelerate Quality Without Losing Trust',
   favicon: 'img/favicon.svg',
 
-  url: 'https://moatazeldebsy.github.io',
-  baseUrl: '/',
+  url: siteUrl,
+  baseUrl,
   organizationName: 'moatazeldebsy',
   projectName: exerciseRepository.name,
 
@@ -87,9 +92,8 @@ const config: Config = {
       respectPrefersColorScheme: false,
     },
     announcementBar: {
-      id: 'wad-2026',
-      content:
-        '<b>WeAreDevelopers Berlin 2026</b> hands-on workshop. New here? <a href="/prerequisites">Check the prerequisites</a> before you start.',
+      id: 'whats-new-2026-10',
+      content: `<b>Updated October 2026:</b> <a href="${baseUrl}whats-new">see what's changed in GitHub Copilot since the workshop</a>.`,
       isCloseable: true,
     },
     docs: {
@@ -105,7 +109,8 @@ const config: Config = {
         { to: '/workshop/unit-testing', label: 'Exercises', position: 'left' },
         { to: '/workshop/copilot-configuration', label: 'Configure Copilot', position: 'left' },
         { type: 'docSidebar', sidebarId: 'tutorials', docsPluginId: 'tutorials', position: 'left', label: 'Tutorials' },
-        { href: 'pathname:///GenAI-in-testing.pdf', label: 'Slides', position: 'right' },
+        { to: '/whats-new', label: "What's new", position: 'left' },
+        { href: slidesHref, label: 'Slides', position: 'right' },
         { type: 'search', position: 'right' },
         {
           href: exerciseRepository.url,
@@ -141,7 +146,7 @@ const config: Config = {
               label: 'WeAreDevelopers World Congress',
               href: 'https://www.wearedevelopers.com/world-congress/agenda/workshops/genai-in-testing-using-github-copilot-to-accelerate-quality-without-losing-trust-1107886',
             },
-            { label: 'Slides (PDF)', href: 'pathname:///GenAI-in-testing.pdf' },
+            { label: 'Slides (PDF)', href: slidesHref },
           ],
         },
       ],

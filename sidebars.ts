@@ -8,6 +8,13 @@ const docIdFromPath = (path: string) => path.replace(/^\//, '');
 const sidebars: SidebarsConfig = {
   workshop: [
     { type: 'link', label: 'Overview', href: '/' },
+    // Not a workshop step, so it stays out of workshopSections and progress tracking.
+    {
+      type: 'category',
+      label: 'Since the workshop',
+      collapsible: false,
+      items: [{ type: 'doc', id: 'workshop/whats-new' }],
+    },
     ...workshopSections.map((section) => ({
       type: 'category' as const,
       label: section.title,

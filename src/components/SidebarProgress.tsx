@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from '@docusaurus/router';
+import { useBaseUrlUtils } from '@docusaurus/useBaseUrl';
 import { useProgressContext } from '../context/ProgressContext';
 import { useFacilitatorMode } from '../hooks/useFacilitator';
 import { useCurrentStep } from '../hooks/useCurrentStep';
@@ -21,6 +22,7 @@ const SidebarProgress: React.FC = () => {
   const { enabled: isFacilitatorMode } = useFacilitatorMode();
   const { current, next } = useCurrentStep();
   const history = useHistory();
+  const { withBaseUrl } = useBaseUrlUtils();
 
   const pacingHint = unifiedPct < 35
     ? 'Kick off with a short demo, then move quickly into guided hands-on.'
@@ -81,7 +83,7 @@ const SidebarProgress: React.FC = () => {
               type="button"
               className="button button--sm button--primary"
               disabled={!next}
-              onClick={() => next && history.push(next.path)}>
+              onClick={() => next && history.push(withBaseUrl(next.path))}>
               Jump to next step
             </button>
           </div>

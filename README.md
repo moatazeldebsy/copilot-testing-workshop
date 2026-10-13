@@ -7,6 +7,8 @@ Workshop materials for **WeAreDevelopers Berlin 2026**.
 
 **Slides:** [GenAI-in-testing.pdf](docs/slides/GenAI-in-testing.pdf)
 
+**Live site:** [moatazeldebsy.github.io/copilot-testing-workshop](https://moatazeldebsy.github.io/copilot-testing-workshop/) · **Updated Oct 2026:** [what's changed in Copilot since the workshop](https://moatazeldebsy.github.io/copilot-testing-workshop/whats-new)
+
 ## Overview
 
 A hands-on workshop exploring how to use GitHub Copilot to speed up testing workflows — unit tests, API integration tests, component tests, E2E with Playwright — without sacrificing trust or quality.

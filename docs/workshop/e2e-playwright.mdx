@@ -187,7 +187,7 @@ When selector details are unclear, the **Playwright MCP Server**gives Copilot li
 
 This repo already ships `.vscode/mcp.json`, pointing at `npx @playwright/mcp@latest` — `npx` downloads it on first run, so no separate `npm install` is needed. You do need to turn it on in your editor:
 
-1. Open Copilot Chat and switch to **Agent mode** (MCP tools are only available there, not in Ask/Edit mode)
+1. Open Copilot Chat and switch to **Agent mode** (MCP tools are only available in Agent mode)
 2. VS Code should detect `.vscode/mcp.json` and prompt to start the `playwright` server — click **Start** (or run _MCP: List Servers_ from the Command Palette and start it manually)
 3. Confirm it's live: the Chat tool picker (🔧 icon) should now list Playwright tools (`browser_navigate`, `browser_click`, `browser_snapshot`, etc.)
 4. Make sure the app is actually running (`npm run dev`) — the MCP server drives a real browser against `http://127.0.0.1:3006`, it doesn't read your source code
